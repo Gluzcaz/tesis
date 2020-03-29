@@ -1,0 +1,18 @@
+"Test content for git tutorial"~
+
+git config --global user.name "Luz Castillo"
+git config --global user.email luz.celezte@gmail.com
+git config --list
+git help config
+
+C:\Users\LUZ\Envs\my_django_environment
+
+-- crear un repositorio nuevo, entonces no tendrás ningún repositorio remoto al que enviar cambios.
+git init
+
+--Añadir CommitTest.txt al entorno de ensayo de repositorio
+git add CommitTest.txt
+--Crea una nueva confirmación con un mensaje
+git commit -m "added CommitTest.txt to the repo"
+
+
