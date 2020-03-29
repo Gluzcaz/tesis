@@ -1,9 +1,8 @@
 "Test content for git tutorial"~
+https://github.com/Gluzcaz/tesis
 
-git config --global user.name "Luz Castillo"
+git config --global user.name "luz"
 git config --global user.email luz.celezte@gmail.com
-git config --list
-git help config
 
 C:\Users\LUZ\Envs\my_django_environment
 
@@ -12,7 +11,39 @@ git init
 
 --Añadir CommitTest.txt al entorno de ensayo de repositorio
 git add CommitTest.txt
+
 --Crea una nueva confirmación con un mensaje
 git commit -m "added CommitTest.txt to the repo"
 
+----Una vez configurado el repositorio remoto, deberás añadir una URL de repositorio remoto a tu comando git config local y
+---- configurar una rama de nivel superior para tus ramas locales.
+git remote add luz https://github.com/Gluzcaz/tesis.git
 
+----Crea una nueva rama llamada "feature_x" y cámbiate a ella usando
+git checkout -b feauture_Models_luz
+git push luz feauture_Models_luz
+
+***********************EXTRA COMMANDS:
+git config --list
+git help config
+
+--actualizar tu repositorio local al commit más nuevo, ejecuta
+git pull
+
+--Antes de fusionar los cambios, puedes revisarlos usando
+git diff <source_branch> <target_branch>
+
+--Fusionar esos conflictos manualmente al editar los archivos mostrados por git. Después de modificarlos, necesitas marcarlos como fusionados con
+git add <filename>
+
+--Para fusionar otra rama a tu rama activa (por ejemplo master), utiliza
+git merge <branch>
+
+--borra la rama local
+git branch -d feature_x
+
+--eliminar una rama del repositorio remoto
+git push luz :feature_Models_Luz
+
+--vuelve a la rama principal
+git checkout master
