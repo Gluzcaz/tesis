@@ -4,24 +4,27 @@ https://github.com/Gluzcaz/tesis
 git config --global user.name "luz"
 git config --global user.email luz.celezte@gmail.com
 
-C:\Users\LUZ\Envs\my_django_environment
+cd C:\Users\LUZ\Envs\my_django_environment
 
 -- crear un repositorio nuevo, entonces no tendrás ningún repositorio remoto al que enviar cambios.
 git init
-
---Añadir CommitTest.txt al entorno de ensayo de repositorio
-git add CommitTest.txt
-
---Crea una nueva confirmación con un mensaje
-git commit -m "added CommitTest.txt to the repo"
 
 ----Una vez configurado el repositorio remoto, deberás añadir una URL de repositorio remoto a tu comando git config local y
 ---- configurar una rama de nivel superior para tus ramas locales.
 git remote add luz https://github.com/Gluzcaz/tesis.git
 
+
+--Añadir CommitTest.txt al entorno de ensayo de repositorio
+git add CommitTest.txt
+
+--Crea una nueva confirmación con un mensaje
+git commit -m "Added Actividad y Ubicacion models."
+
 ----Crea una nueva rama llamada "feature_x" y cámbiate a ella usando
-git checkout -b feauture_Models_luz
-git push luz feauture_Models_luz
+Crear un branch: git checkout -b feature_Models_luz
+Mover a ese branch: git checkout feature_Models_luz
+
+git push luz feature_Models_luz
 
 ***********************EXTRA COMMANDS:
 git config --list
@@ -40,10 +43,13 @@ git add <filename>
 git merge <branch>
 
 --borra la rama local
-git branch -d feature_x
+git branch -d feauture_Models_luz
 
 --eliminar una rama del repositorio remoto
-git push luz :feature_Models_Luz
+git push luz :feauture_Models_luz
 
 --vuelve a la rama principal
 git checkout master
+
+--Quitar alguna carpeta o archivo del commit
+git restore --staged saaacd/submodels/__pycache__/*

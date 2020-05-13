@@ -1,0 +1,21 @@
+<h2>My Heroes</h2>
+
+<div>
+  <label>Activity name:
+    <input #activityName />
+  </label>
+  <!-- (click) passes input value to add() and then clears the input 
+  <button (click)="add(activityName.value); activityName.value=''">
+    add
+  </button>-->
+</div>
+
+<ul class="activities">
+  <li *ngFor="let activity of activities">
+    <a routerLink="/detail/{{activity.id}}">
+      <span class="badge">{{activity.id}}</span> {{activity.name}}
+    </a>
+    <!--<button class="delete" title="delete activity"
+      (click)="delete(activity)">x</button>-->
+  </li>
+</ul>
