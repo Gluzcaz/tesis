@@ -10,7 +10,7 @@ import { MessageService } from './Message.service';
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
 
-  private activitiesUrl = '/activities';  // URL to web api
+  private activitiesUrl = '/api/activities';  // URL to web api
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })

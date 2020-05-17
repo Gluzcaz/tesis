@@ -23,16 +23,15 @@ class Actividad(models.Model):
 	semestre = models.ForeignKey(Semestre, on_delete=models.CASCADE)
 	estado = models.CharField(max_length=20, choices=ESTADO)
 	prioridad = models.CharField(max_length=20, choices=PRIORIDAD)
-	nombre = models.CharField(max_length=150)
-	comentario = models.CharField(max_length=250)
-	fechaResolucion = models.DateField()
+	comentario = models.CharField(max_length=250, null=True)
+	fechaResolucion = models.DateField( null=True)
 	esSiniestro = models.BooleanField(default=False)
 	#Foreign Keys
-	usuario = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-	ubicacion=models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
+	usuario = models.ForeignKey('auth.User', on_delete=models.CASCADE, null=True)
+	ubicacion=models.ForeignKey(Ubicacion, on_delete=models.CASCADE, null=True)
 	categoria=models.ForeignKey(Categoria, on_delete=models.CASCADE)
-	dispositivo=models.ForeignKey(Dispositivo, on_delete=models.CASCADE)
-	actividadSuperior = models.ForeignKey('self', on_delete=models.CASCADE)
+	dispositivo=models.ForeignKey(Dispositivo, on_delete=models.CASCADE, null=True)
+	actividadSuperior = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
 	
 	
 	

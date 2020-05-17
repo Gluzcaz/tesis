@@ -13,7 +13,7 @@
 <ul class="activities">
   <li *ngFor="let activity of activities">
     <a routerLink="/detail/{{activity.id}}">
-      <span class="badge">{{activity.id}}</span> {{activity.name}}
+      <span class="badge">{{activity.id}}</span> {{activity.comentario}}
     </a>
     <!--<button class="delete" title="delete activity"
       (click)="delete(activity)">x</button>-->

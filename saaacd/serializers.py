@@ -4,4 +4,4 @@ from saaacd.models import Actividad
 class ActividadSerializador(serializers.ModelSerializer):
     class Meta:
         model = Actividad
-        fields = ('id', 'nombre')
+        fields = ('id', 'comentario')

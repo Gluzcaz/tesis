@@ -18,7 +18,7 @@ git remote add luz https://github.com/Gluzcaz/tesis.git
 git add CommitTest.txt
 
 --Crea una nueva confirmación con un mensaje
-git commit -m "Added Actividad y Ubicacion models."
+git commit -m "Added TipoDispositivo, Semestre, Marca. Angular Integration. Get all activities."
 
 ----Crea una nueva rama llamada "feature_x" y cámbiate a ella usando
 Crear un branch: git checkout -b feature_Models_luz

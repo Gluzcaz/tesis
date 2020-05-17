@@ -7,10 +7,10 @@ from saaacd.submodels.TipoDispositivo import TipoDispositivo
 class Dispositivo(Model):
 
 	inventarioUNAM = models.CharField(max_length=50)
-	fechaIngresoUbicacion = models.DateField()
-	fechaBaja = models.DateField()
-	fechaAlta = models.DateField()
-	motivoBaja = models.TextField(help_text='Redacta algún Comentario')
+	fechaIngresoUbicacion = models.DateField(null=True)
+	fechaBaja = models.DateField(null=True)
+	fechaAlta = models.DateField(null=True)
+	motivoBaja = models.TextField(help_text='Redacta algún Comentario', null=True)
 	cantidadIdealInventario = models.IntegerField(blank=False, null=True)
 			
 	#Foreign Keys
