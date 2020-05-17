@@ -1,0 +1,55 @@
+"Test content for git tutorial"~
+https://github.com/Gluzcaz/tesis
+
+git config --global user.name "luz"
+git config --global user.email luz.celezte@gmail.com
+
+cd C:\Users\LUZ\Envs\my_django_environment
+
+-- crear un repositorio nuevo, entonces no tendrás ningún repositorio remoto al que enviar cambios.
+git init
+
+----Una vez configurado el repositorio remoto, deberás añadir una URL de repositorio remoto a tu comando git config local y
+---- configurar una rama de nivel superior para tus ramas locales.
+git remote add luz https://github.com/Gluzcaz/tesis.git
+
+
+--Añadir CommitTest.txt al entorno de ensayo de repositorio
+git add CommitTest.txt
+
+--Crea una nueva confirmación con un mensaje
+git commit -m "Added TipoDispositivo, Semestre, Marca. Angular Integration. Get all activities."
+
+----Crea una nueva rama llamada "feature_x" y cámbiate a ella usando
+Crear un branch: git checkout -b feature_Models_luz
+Mover a ese branch: git checkout feature_Models_luz
+
+git push luz feature_Models_luz
+
+***********************EXTRA COMMANDS:
+git config --list
+git help config
+
+--actualizar tu repositorio local al commit más nuevo, ejecuta
+git pull
+
+--Antes de fusionar los cambios, puedes revisarlos usando
+git diff <source_branch> <target_branch>
+
+--Fusionar esos conflictos manualmente al editar los archivos mostrados por git. Después de modificarlos, necesitas marcarlos como fusionados con
+git add <filename>
+
+--Para fusionar otra rama a tu rama activa (por ejemplo master), utiliza
+git merge <branch>
+
+--borra la rama local
+git branch -d feauture_Models_luz
+
+--eliminar una rama del repositorio remoto
+git push luz :feauture_Models_luz
+
+--vuelve a la rama principal
+git checkout master
+
+--Quitar alguna carpeta o archivo del commit
+git restore --staged saaacd/submodels/__pycache__/*
