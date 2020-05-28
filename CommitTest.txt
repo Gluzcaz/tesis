@@ -18,11 +18,13 @@ git remote add luz https://github.com/Gluzcaz/tesis.git
 git add CommitTest.txt
 
 --Crea una nueva confirmación con un mensaje
-git commit -m "Added TipoDispositivo, Semestre, Marca. Angular Integration. Get all activities."
+git commit -m "Merge feauture_Models_luz to saaacd"
 
 ----Crea una nueva rama llamada "feature_x" y cámbiate a ella usando
-Crear un branch: git checkout -b feature_Models_luz
-Mover a ese branch: git checkout feature_Models_luz
+Crear un branch:
+ git checkout -b saaacd
+Mover a ese branch:
+ git checkout feature_Models_luz
 
 git push luz feature_Models_luz
 
@@ -40,16 +42,55 @@ git diff <source_branch> <target_branch>
 git add <filename>
 
 --Para fusionar otra rama a tu rama activa (por ejemplo master), utiliza
-git merge <branch>
+git merge feature_Models_luz
 
 --borra la rama local
 git branch -d feauture_Models_luz
 
 --eliminar una rama del repositorio remoto
-git push luz :feauture_Models_luz
+git push luz :newBranch
 
 --vuelve a la rama principal
 git checkout master
 
 --Quitar alguna carpeta o archivo del commit
 git restore --staged saaacd/submodels/__pycache__/*
+
+--Mostrar todas las ramas 
+git branch -a
+
+--Mostrar las ramas remotas
+git branch -r
+
+--there are three sets of branch names involved here:
+	*Your local branches;
+	*Your remote-tracking branches; and
+	*Their branches (in the remote Git).
+git remote show luz
+
+------------PROCESO CREAR RAMAS-------------
+--Crear la rama remota en la pagina web Git.
+	Nota: Cuando creas una nueva rama tomará de base en la que estas colocado actualmente.
+--Me traiga todas las ramas remotas(IMPORTANTE PARA PUSH Y MERGE)
+	git fetch luz 
+--En cmd crear la rama local con el mismo nombre de la remota:
+	git checkout main_saaacd
+	
+	Y debe aparecer un mensaje :
+		Branch 'main_saaacd' set up to track remote branch 'main_saaacd' from 'luz'
+--Comprobamos con :
+	git remote show luz
+
+	
+---Hacer merge de una rama feature_Models_luz
+git checkout main_saaacd
+git merge feature_Models_luz
+git push
+
+
+----ERRORS:
+--fatal: refusing to merge unrelated histories
+Solution:
+git pull luz main_saaacd --allow-unrelated-histories
+https://www.educative.io/edpresso/the-fatal-refusing-to-merge-unrelated-histories-git-error
+

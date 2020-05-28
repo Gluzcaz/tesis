@@ -8,14 +8,23 @@
   <button (click)="add(activityName.value); activityName.value=''">
     add
   </button>-->
+  <button mat-raised-button color="primary" (click)="confirmDialog()"  [disabled]="selectedActivity == undefined">Borrar</button>
+	<br>
 </div>
 
-<ul class="activities">
+<!-- <ul class="activities">
   <li *ngFor="let activity of activities">
     <a routerLink="/detail/{{activity.id}}">
       <span class="badge">{{activity.id}}</span> {{activity.comentario}}
     </a>
-    <!--<button class="delete" title="delete activity"
-      (click)="delete(activity)">x</button>-->
+    <button class="delete" title="delete activity"
+      (click)="delete(activity)">x</button>
   </li>
-</ul>
+</ul>-->
+
+<tbody>
+  <tr *ngFor="let a of activities; let i=index;" (click)="rowSelected(a);">
+	<td>{{a.id}}</td>
+	<td>{{a.comentario}}</td>
+  </tr> 
+</tbody>

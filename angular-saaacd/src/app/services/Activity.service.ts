@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders,  HttpParams } from '@angular/common/http';
 
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
@@ -7,18 +7,42 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { Activity } from '../models/Activity';
 import { MessageService } from './Message.service';
 
+import { ConfirmDialogModel, ConfirmDialogComponent } from '../views/confirmDialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
-
   private activitiesUrl = '/api/activities';  // URL to web api
-
+  private deleteActivityUrl = '/api/deleteActivity/';
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
 
   constructor(
     private http: HttpClient,
-    private messageService: MessageService) { }
+    private messageService: MessageService,
+	public dialog: MatDialog) { }
+  
+  /** DELETE: delete the Activity */
+  deleteActivity(activity: Activity | number): Observable<Activity> {
+    const id = typeof activity === 'number' ? activity : activity.id;
+	let httpParams = new HttpParams().set('id', id.toString());
+	httpParams.set('Content-Type', 'application/json');
+	let options = { params: httpParams };
+	return this.http.delete<Activity>(this.deleteActivityUrl, options).pipe(
+	tap(_ => this.log(`deleted activity id=${id}`)), catchError(this.handleError<Activity>('deleteActivity')));	
+  }
+ 
+  delete(id: number):  Observable<Activity>{
+	let httpParams = new HttpParams().set('pk', '4');
+	httpParams.set('Content-Type', 'application/json');
+	let options = { params: httpParams };
+    let url = '${this.activitiesUrl}/delete/';
+	let a = this.http.delete<Activity>(url);
+	console.log('url:' + url);
+    return a;
+  }
+  
 
   /** GET activities */
   getActivities(): Observable<Activity[]> {
@@ -53,17 +77,6 @@ export class ActivityService {
     );
   }
 
-  /** DELETE: delete the Activity */
-  deleteActivity(activity: Activity | number): Observable<Activity> {
-    const id = typeof activity === 'number' ? activity : activity.id;
-    const url = `${this.activitiesUrl}/${id}`;
-
-    return this.http.delete<Activity>(url, this.httpOptions).pipe(
-      tap(_ => this.log(`deleted activity id=${id}`)),
-      catchError(this.handleError<Activity>('deleteActivity'))
-    );
-  }
-
   /** PUT: update the activity on the server */
   updateActivity(activity: Activity): Observable<any> {
     return this.http.put(this.activitiesUrl, activity, this.httpOptions).pipe(
@@ -95,5 +108,34 @@ export class ActivityService {
   /** Log a ActivityService message with the MessageService */
   private log(message: string) {
     this.messageService.add(`ActivityService: ${message}`);
+  }
+  
+  /**
+   * Handle deletion confirmation.
+   */
+  openDialog(activity: Activity): void {
+    const message = `¿Realmente quieres eliminar la siguiente actividad?\n` +activity.comentario;
+	const title = `Confirmación de eliminación`;
+	
+    const dialogData = new ConfirmDialogModel(title , message);
+ 
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      maxWidth: "400px",
+      data: dialogData
+    });
+	
+	dialogRef.afterClosed().subscribe(
+	    dialogResult => {
+			if(dialogResult){
+				this.deleteActivity(activity.id).subscribe(
+				response => {
+				  console.log(response);
+				},
+				error => {
+				  console.log('error:'+error);
+				});
+			}
+		}
+    );
   }
 }
