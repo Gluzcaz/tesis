@@ -17,32 +17,24 @@ export class ActivityService {
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
-
+  
   constructor(
     private http: HttpClient,
     private messageService: MessageService,
 	public dialog: MatDialog) { }
   
   /** DELETE: delete the Activity */
-  deleteActivity(activity: Activity | number): Observable<Activity> {
+  deleteActivity(activity: Activity | number): Observable<any>{
     const id = typeof activity === 'number' ? activity : activity.id;
 	let httpParams = new HttpParams().set('id', id.toString());
 	httpParams.set('Content-Type', 'application/json');
 	let options = { params: httpParams };
-	return this.http.delete<Activity>(this.deleteActivityUrl, options).pipe(
-	tap(_ => this.log(`deleted activity id=${id}`)), catchError(this.handleError<Activity>('deleteActivity')));	
-  }
- 
-  delete(id: number):  Observable<Activity>{
-	let httpParams = new HttpParams().set('pk', '4');
-	httpParams.set('Content-Type', 'application/json');
-	let options = { params: httpParams };
-    let url = '${this.activitiesUrl}/delete/';
-	let a = this.http.delete<Activity>(url);
-	console.log('url:' + url);
-    return a;
-  }
-  
+	return this.http.delete<Activity>(this.deleteActivityUrl, options);
+	
+	/*.pipe(
+	tap(_ => {this.log(`deleted activity id=${id}`); this.deletionResult=true;}), tap(_=> {catchError(this.handleError<Activity>('deleteActivity')); this.deletionResult=false;}));	
+    */
+ }
 
   /** GET activities */
   getActivities(): Observable<Activity[]> {
@@ -91,7 +83,7 @@ export class ActivityService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation', result?: T) {
+  handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
@@ -113,7 +105,7 @@ export class ActivityService {
   /**
    * Handle deletion confirmation.
    */
-  openDialog(activity: Activity): void {
+  openDialog(activity: Activity): Observable<any> {
     const message = `¿Realmente quieres eliminar la siguiente actividad?\n` +activity.comentario;
 	const title = `Confirmación de eliminación`;
 	
@@ -124,18 +116,6 @@ export class ActivityService {
       data: dialogData
     });
 	
-	dialogRef.afterClosed().subscribe(
-	    dialogResult => {
-			if(dialogResult){
-				this.deleteActivity(activity.id).subscribe(
-				response => {
-				  console.log(response);
-				},
-				error => {
-				  console.log('error:'+error);
-				});
-			}
-		}
-    );
+	return dialogRef.afterClosed();
   }
 }

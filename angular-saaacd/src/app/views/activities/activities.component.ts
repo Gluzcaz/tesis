@@ -13,6 +13,8 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatFormFieldControl} from '@angular/material/form-field';
 
+import { catchError} from 'rxjs/operators';
+
 @Component({
   selector: 'app-activities',
   templateUrl: './activities.component.html',
@@ -44,11 +46,20 @@ export class ActivitiesComponent implements OnInit {
   }
   
   confirmDialog(): void {
-	this.activities = this.activities.filter(a => a !== this.selectedActivity); //PENDIENTE VALIDACIÓN: ELIMINAR DE LA LISTA SOLO CUANDO SE ELIMINO EN DB
-   	this.updateDataSource();
-	
-	this.activityService.openDialog(this.selectedActivity);
-	this.selectedActivity = undefined;
+	this.activityService.openDialog(this.selectedActivity).subscribe(confirmationResult => {
+      if(confirmationResult){
+	    this.activityService.deleteActivity(this.selectedActivity).subscribe(
+				response => {
+				  //console.log('response'+response);
+				  this.activities = this.activities.filter(a => a !== this.selectedActivity);
+   	              this.updateDataSource();
+				  this.selectedActivity = undefined;},
+				error => {
+				  //console.log('error:'+error);
+				  catchError(this.activityService.handleError<Activity>('deleteActivity'));}
+		);
+	  }
+    });
   }
   
   rowSelected(a:any){

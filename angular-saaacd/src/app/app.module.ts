@@ -13,6 +13,13 @@ import { MessagesComponent }    from './views/messages/messages.component';
 import { ConfirmDialogComponent } from './views/confirmDialog/confirm-dialog.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
+import {MatTableModule} from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import {MatSortModule} from '@angular/material/sort';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import { MatMenuModule} from '@angular/material/menu';
+
  
 @NgModule({
   declarations: [
@@ -29,6 +36,12 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 	MatButtonModule, 
 	MatDialogModule,
 	NoopAnimationsModule,
+	MatPaginatorModule,
+	MatSortModule,
+	MatTableModule,
+	MatFormFieldModule,
+	MatInputModule,
+	MatMenuModule,
   ],
   providers: [],
   entryComponents: [ConfirmDialogComponent],

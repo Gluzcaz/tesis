@@ -8,5 +8,28 @@
 		</mat-menu>
 	<button mat-button>Mapa</button>
 </nav>
+
+<!--<div>
+  <mat-menu overlapTrigger="true" #firstMenu="matMenu">
+    <div *ngFor="let first of data;let index = index">
+      <button *ngIf="first.child" mat-menu-item [matMenuTriggerFor]="secondMenu" (onMenuOpen)="firstOpen(index)">{{ first.label }}</button>
+      <button *ngIf="!first.child" mat-menu-item (click)="firstClose(index)">{{ first.label }}</button>
+
+      <mat-menu overlapTrigger="true" #secondMenu="matMenu">
+        <div *ngFor="let item of first.child;let secondIndex = index">
+          <button *ngIf="item.child" mat-menu-item [matMenuTriggerFor]="thirdMenu" (onMenuOpen)="secondOpen(secondIndex)">{{ item.label }}</button>
+          <button *ngIf="!item.child" mat-menu-item (click)="secondClose(secondIndex)">{{ item.label }}</button>
+
+          <mat-menu overlapTrigger="true" #thirdMenu="matMenu">
+            <div *ngFor="let thirdChild of item.child;let thirdIndex = index">
+              <button *ngIf="!thirdChild.child" mat-menu-item (click)="thirdClose(thirdIndex)">{{ thirdChild.label }}</button>
+            </div>
+          </mat-menu>
+        </div>
+      </mat-menu>
+    </div>
+  </mat-menu>
+</div>-->
+
 <router-outlet></router-outlet>
 <app-messages></app-messages>
