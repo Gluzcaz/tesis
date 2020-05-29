@@ -18,7 +18,7 @@ git remote add luz https://github.com/Gluzcaz/tesis.git
 git add CommitTest.txt
 
 --Crea una nueva confirmación con un mensaje
-git commit -m "Merge feauture_Models_luz to saaacd"
+git commit -m "Added Confirm Dialog and delete action."
 
 ----Crea una nueva rama llamada "feature_x" y cámbiate a ella usando
 Crear un branch:

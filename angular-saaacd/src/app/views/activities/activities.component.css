@@ -72,3 +72,45 @@ button.delete {
   color: white;
 }
 
+.table-container{
+	width: 80% !important;
+	margin-left: 10%;
+	margin-right: 10%;
+}
+
+td, th {
+  width: 100%;
+}
+
+.highlight{
+  background: #D0E0EC; /* blue */
+}
+
+/*
+.mat-header-row {
+    width: 20%;
+}
+
+.mat-row {
+    width: 20%;
+}
+
+
+.mat-table__wrapper .mat-table {
+    min-width: auto !important;
+    width: 80% !important;
+}
+
+table {
+  width: 80%;
+}
+
+.mat-form-field {
+  font-size: 14px;
+  width: 30%;
+}
+
+td, th {
+  width: 20%;
+}
+*/

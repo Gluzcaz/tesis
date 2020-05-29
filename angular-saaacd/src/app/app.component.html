@@ -1,6 +1,12 @@
 <h1>{{title}}</h1>
 <nav>
-  <a routerLink="/allActivities">Activities</a>
+	<button mat-button routerLink="/allActivities">Bitácora</button>
+	<button mat-button [matMenuTriggerFor]="belowMenu">Reportes</button>
+		<mat-menu #belowMenu="matMenu" yPosition="below">
+		  <button mat-menu-item>Estadístico</button>
+		  <button mat-menu-item>Monitoreo</button>
+		</mat-menu>
+	<button mat-button>Mapa</button>
 </nav>
 <router-outlet></router-outlet>
 <app-messages></app-messages>
