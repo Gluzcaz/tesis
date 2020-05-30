@@ -19,6 +19,8 @@ import {MatSortModule} from '@angular/material/sort';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import { MatMenuModule} from '@angular/material/menu';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 
  
 @NgModule({
@@ -42,6 +44,8 @@ import { MatMenuModule} from '@angular/material/menu';
 	MatFormFieldModule,
 	MatInputModule,
 	MatMenuModule,
+	BrowserAnimationsModule,
+	ToastrModule.forRoot()
   ],
   providers: [],
   entryComponents: [ConfirmDialogComponent],

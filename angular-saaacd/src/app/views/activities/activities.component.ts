@@ -14,6 +14,7 @@ import {MatSort} from '@angular/material/sort';
 import {MatFormFieldControl} from '@angular/material/form-field';
 
 import { catchError} from 'rxjs/operators';
+import { NotificationService } from '../../services/notification.service'
 
 @Component({
   selector: 'app-activities',
@@ -30,7 +31,12 @@ export class ActivitiesComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   
-  constructor(private activityService: ActivityService) {   
+  //Notification Elements
+  title = 'Notificación';
+  deletionSuccessMessage = 'La actividad se ha eliminado satisfactoriamente: ';
+  deletionErrorMessage = 'La actividad no se ha eliminado: ';
+  
+  constructor(private activityService: ActivityService, private notifyService : NotificationService) {   
   }
   
   ngOnInit() {
@@ -53,16 +59,20 @@ export class ActivitiesComponent implements OnInit {
 				  //console.log('response'+response);
 				  this.activities = this.activities.filter(a => a !== this.selectedActivity);
    	              this.updateDataSource();
-				  this.selectedActivity = undefined;},
+				  this.showToasterSuccessTimeout();
+				  this.selectedActivity = undefined;
+				  },
 				error => {
 				  //console.log('error:'+error);
-				  catchError(this.activityService.handleError<Activity>('deleteActivity'));}
+				  catchError(this.activityService.handleError<Activity>('deleteActivity'));
+				  this.showToasterError();
+				  }
 		);
 	  }
     });
   }
   
-  rowSelected(a:any){
+  rowSelected(a:Activity){
 	this.selectedActivity = a;
 	console.log("Table selection:", a.id);
   }
@@ -81,6 +91,14 @@ export class ActivitiesComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+  
+  showToasterSuccessTimeout(){
+      this.notifyService.showSuccessTimeout(this.deletionSuccessMessage + this.selectedActivity.id , this.title, 4000);
+  }
+  
+  showToasterError(){
+      this.notifyService.showErrorTimeout(this.deletionErrorMessage + this.selectedActivity.id, this.title, 4000);
   }
   
 }

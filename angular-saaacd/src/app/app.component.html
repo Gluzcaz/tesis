@@ -1,35 +1,24 @@
 <h1>{{title}}</h1>
 <nav>
 	<button mat-button routerLink="/allActivities">Bitácora</button>
-	<button mat-button [matMenuTriggerFor]="belowMenu">Reportes</button>
-		<mat-menu #belowMenu="matMenu" yPosition="below">
-		  <button mat-menu-item>Estadístico</button>
-		  <button mat-menu-item>Monitoreo</button>
+	<button mat-button [matMenuTriggerFor]="reports_menu">Reportes</button>
+	<mat-menu #reports_menu="matMenu">
+	  <ng-container>
+		<button mat-menu-item [matMenuTriggerFor]="estadistico_menu">Estadístico</button>
+		<mat-menu #estadistico_menu="matMenu">
+		   <button mat-menu-item>Actividades</button>
+		   <button mat-menu-item>Material</button>
 		</mat-menu>
+		<button mat-menu-item [matMenuTriggerFor]="monitoreo_menu">Monitoreo</button>
+		<mat-menu #monitoreo_menu="matMenu">
+		   <button mat-menu-item>Actividades</button>
+		   <button mat-menu-item>Material</button>
+		</mat-menu>
+	  </ng-container>
+	</mat-menu>
+
 	<button mat-button>Mapa</button>
 </nav>
-
-<!--<div>
-  <mat-menu overlapTrigger="true" #firstMenu="matMenu">
-    <div *ngFor="let first of data;let index = index">
-      <button *ngIf="first.child" mat-menu-item [matMenuTriggerFor]="secondMenu" (onMenuOpen)="firstOpen(index)">{{ first.label }}</button>
-      <button *ngIf="!first.child" mat-menu-item (click)="firstClose(index)">{{ first.label }}</button>
-
-      <mat-menu overlapTrigger="true" #secondMenu="matMenu">
-        <div *ngFor="let item of first.child;let secondIndex = index">
-          <button *ngIf="item.child" mat-menu-item [matMenuTriggerFor]="thirdMenu" (onMenuOpen)="secondOpen(secondIndex)">{{ item.label }}</button>
-          <button *ngIf="!item.child" mat-menu-item (click)="secondClose(secondIndex)">{{ item.label }}</button>
-
-          <mat-menu overlapTrigger="true" #thirdMenu="matMenu">
-            <div *ngFor="let thirdChild of item.child;let thirdIndex = index">
-              <button *ngIf="!thirdChild.child" mat-menu-item (click)="thirdClose(thirdIndex)">{{ thirdChild.label }}</button>
-            </div>
-          </mat-menu>
-        </div>
-      </mat-menu>
-    </div>
-  </mat-menu>
-</div>-->
 
 <router-outlet></router-outlet>
 <app-messages></app-messages>
