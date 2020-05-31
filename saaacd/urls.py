@@ -11,8 +11,10 @@ router = routers.DefaultRouter()
 urlpatterns = [
     url(r'^$', views.HomePageView.as_view()),
 	url(r'^allActivities/', views.HomePageView.as_view()),
-	url(r'^api/deleteActivity/',views.HomePageView.detailActivity),
+	url(r'^api/detailActivity/',views.HomePageView.detailActivity),
+	url(r'^api/createActivity/', views.HomePageView.createActivity),
 	url(r'^api/activities/', views.HomePageView.getActivities),
+
 	
    #url(r'^.*', TemplateView.as_view(template_name="home.html"), name="home")
    # url(r'^links/$', views.LinksPageView.as_view()), # simple view

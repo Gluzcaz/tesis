@@ -33,8 +33,8 @@ export class ActivitiesComponent implements OnInit {
   
   //Notification Elements
   title = 'Notificación';
-  deletionSuccessMessage = 'La actividad se ha eliminado satisfactoriamente: ';
-  deletionErrorMessage = 'La actividad no se ha eliminado: ';
+  deletionSuccessMessage = 'Se ha eliminado satisfactoriamente la actividad con ID: ';
+  deletionErrorMessage = 'No se ha podido eliminar la actividad con ID: ';
   
   constructor(private activityService: ActivityService, private notifyService : NotificationService) {   
   }
@@ -56,16 +56,14 @@ export class ActivitiesComponent implements OnInit {
       if(confirmationResult){
 	    this.activityService.deleteActivity(this.selectedActivity).subscribe(
 				response => {
-				  //console.log('response'+response);
 				  this.activities = this.activities.filter(a => a !== this.selectedActivity);
    	              this.updateDataSource();
-				  this.showToasterSuccessTimeout();
+    	          this.notifyService.showSuccessTimeout(this.deletionSuccessMessage + this.selectedActivity.id , this.title);
 				  this.selectedActivity = undefined;
 				  },
 				error => {
-				  //console.log('error:'+error);
 				  catchError(this.activityService.handleError<Activity>('deleteActivity'));
-				  this.showToasterError();
+				  this.notifyService.showErrorTimeout(this.deletionErrorMessage + this.selectedActivity.id, this.title);
 				  }
 		);
 	  }
@@ -93,12 +91,16 @@ export class ActivitiesComponent implements OnInit {
     }
   }
   
-  showToasterSuccessTimeout(){
-      this.notifyService.showSuccessTimeout(this.deletionSuccessMessage + this.selectedActivity.id , this.title, 4000);
+  isActivitySelected(){
+	return this.selectedActivity == undefined;
   }
   
-  showToasterError(){
-      this.notifyService.showErrorTimeout(this.deletionErrorMessage + this.selectedActivity.id, this.title, 4000);
+  getDetailActivityUrl(): string{
+	if( this.selectedActivity!= undefined){
+		var url='/detail/' + this.selectedActivity.id;
+		return url;
+	}
+	return '/detail/';
   }
   
 }

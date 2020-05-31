@@ -1,0 +1,14 @@
+<div *ngIf="activity">
+	<div *ngIf="isEdition">
+	  <h2>{{activity.comentario| uppercase}} Details</h2>
+	  <div><span>ID: </span>{{activity.id}}</div>
+	</div>
+	<div>
+		<label>Comentario:
+		  <input [(ngModel)]="activity.comentario"/>
+		</label>
+	</div>
+	<button (click)="goBack()">Cancelar</button>
+	<button (click)="save()">Guardar</button>
+</div>
+

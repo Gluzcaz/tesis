@@ -21,6 +21,7 @@ import {MatInputModule} from '@angular/material/input';
 import { MatMenuModule} from '@angular/material/menu';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
+import { ActivityDetailComponent }  from './views/activity-detail/activity-detail.component';
 
  
 @NgModule({
@@ -29,6 +30,7 @@ import { ToastrModule } from 'ngx-toastr';
 	ActivitiesComponent,
     MessagesComponent,
     ConfirmDialogComponent,
+	ActivityDetailComponent,
   ],
   imports: [
     BrowserModule,

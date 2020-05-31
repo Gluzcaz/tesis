@@ -13,7 +13,8 @@ import { MatDialog } from '@angular/material/dialog';
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
   private activitiesUrl = '/api/activities';  // URL to web api
-  private deleteActivityUrl = '/api/deleteActivity/';
+  private detailActivityUrl = '/api/detailActivity/';
+  private createActivityUrl = '/api/createActivity/';
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
@@ -21,21 +22,32 @@ export class ActivityService {
   constructor(
     private http: HttpClient,
     private messageService: MessageService,
-	public dialog: MatDialog) { }
+	public dialog: MatDialog) {}
+	
+  getHttpOptionsWithNumberParam(id: number): any{
+	let httpParams = new HttpParams().set('id', id.toString());
+	let httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json' })
+	let options = { params: httpParams,
+					headers: httpHeaders };
+    return options;
+  }
   
   /** DELETE: delete the Activity */
   deleteActivity(activity: Activity | number): Observable<any>{
     const id = typeof activity === 'number' ? activity : activity.id;
-	let httpParams = new HttpParams().set('id', id.toString());
-	httpParams.set('Content-Type', 'application/json');
-	let options = { params: httpParams };
-	return this.http.delete<Activity>(this.deleteActivityUrl, options);
-	
-	/*.pipe(
-	tap(_ => {this.log(`deleted activity id=${id}`); this.deletionResult=true;}), tap(_=> {catchError(this.handleError<Activity>('deleteActivity')); this.deletionResult=false;}));	
-    */
+	var options = this.getHttpOptionsWithNumberParam(id);
+	return this.http.delete<Activity>(this.detailActivityUrl, options);
  }
 
+  /** GET activity by id. Will 404 if id not found */
+  getActivity(id: number): Observable<any>{
+    let options = this.getHttpOptionsWithNumberParam(id);
+    return this.http.get<Activity>(this.detailActivityUrl, options).pipe(
+      tap(_ => this.log(`fetched hero id=${id}`)),
+      catchError(this.handleError<Activity>(`getActivity id=${id}`))
+    );
+  }
+  
   /** GET activities */
   getActivities(): Observable<Activity[]> {
     return this.http.get<Activity[]>(this.activitiesUrl)
@@ -45,44 +57,48 @@ export class ActivityService {
       );
   }
 
-   /* GET activities whose name contains search term */
-  searchActivities(term: string): Observable<Activity[]> {
-    if (!term.trim()) {
-      // if not search term, return empty activity array.
-      return of([]);
-    }
-    return this.http.get<Activity[]>(`${this.activitiesUrl}/?name=${term}`).pipe(
-      tap(x => x.length ?
-         this.log(`found activities matching "${term}"`) :
-         this.log(`no activities matching "${term}"`)),
-      catchError(this.handleError<Activity[]>('searchActivities', []))
-    );
-  }
-
   //////// Save methods //////////
 
   /** POST: add a new activity to the server */
-  addActivity(activity: Activity): Observable<Activity> {
-    return this.http.post<Activity>(this.activitiesUrl, activity, this.httpOptions).pipe(
+  createActivity(newActivity: Activity): Observable<Activity> {
+    return this.http.post<Activity>(this.createActivityUrl, newActivity, this.httpOptions).pipe(
       tap((newActivity: Activity) => this.log(`added activity w/ id=${newActivity.id}`)),
-      catchError(this.handleError<Activity>('addActivity'))
+      catchError(this.handleError<Activity>('createActivity'))
     );
   }
 
   /** PUT: update the activity on the server */
-  updateActivity(activity: Activity): Observable<any> {
-    return this.http.put(this.activitiesUrl, activity, this.httpOptions).pipe(
+  updateActivity(activity: Activity): Observable<Activity> {
+	let options = this.getHttpOptionsWithNumberParam(activity.id);
+    return this.http.put(this.detailActivityUrl, activity, this.httpOptions).pipe(
       tap(_ => this.log(`updated activity id=${activity.id}`)),
       catchError(this.handleError<any>('updateActivity'))
     );
   }
 
   /**
+   * Handle deletion confirmation.
+   */
+  openDialog(activity: Activity): Observable<any> {
+    const message = `¿Realmente quieres eliminar la siguiente actividad?\n` +activity.comentario;
+	const title = `Confirmación de eliminación`;
+	
+    const dialogData = new ConfirmDialogModel(title , message);
+ 
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      maxWidth: "400px",
+      data: dialogData
+    });
+	
+	return dialogRef.afterClosed();
+  }
+  
+  /**
    * Handle Http operation that failed.
    * Let the app continue.
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
-   */
+  */
   handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
 
@@ -100,22 +116,5 @@ export class ActivityService {
   /** Log a ActivityService message with the MessageService */
   private log(message: string) {
     this.messageService.add(`ActivityService: ${message}`);
-  }
-  
-  /**
-   * Handle deletion confirmation.
-   */
-  openDialog(activity: Activity): Observable<any> {
-    const message = `¿Realmente quieres eliminar la siguiente actividad?\n` +activity.comentario;
-	const title = `Confirmación de eliminación`;
-	
-    const dialogData = new ConfirmDialogModel(title , message);
- 
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      maxWidth: "400px",
-      data: dialogData
-    });
-	
-	return dialogRef.afterClosed();
   }
 }

@@ -18,7 +18,7 @@ git remote add luz https://github.com/Gluzcaz/tesis.git
 git add CommitTest.txt
 
 --Crea una nueva confirmación con un mensaje
-git commit -m "Added the following features on the Table: Search, Sort, Pagination, Selection."
+git commit -m "Added toasts for notifications of result actions on activities. Added two levels to the main menu."
 
 ----Crea una nueva rama llamada "feature_x" y cámbiate a ella usando
 Crear un branch:
@@ -84,13 +84,14 @@ git remote show luz
 	
 ---Hacer merge de una rama feature_Models_luz
 git checkout main_saaacd
-git merge feature_Models_luz
+git merge feature_Borrar_Actividad_luz
 git push
 
+git branch -d feature_Models_luz
+git branch -d feature_Borrar_Actividad_luz
 
 ----ERRORS:
 --fatal: refusing to merge unrelated histories
 Solution:
 git pull luz main_saaacd --allow-unrelated-histories
 https://www.educative.io/edpresso/the-fatal-refusing-to-merge-unrelated-histories-git-error
-

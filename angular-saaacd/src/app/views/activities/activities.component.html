@@ -13,16 +13,21 @@
 	  <button (click)="add(activityName.value); activityName.value=''">
 		add
 	  </button>-->
-	  
-
-	<mat-form-field>
-	  <mat-label>Buscar</mat-label>
-	  <input matInput (keyup)="applyFilter($event)" placeholder="">
-	</mat-form-field>
-    <button mat-raised-button color="primary" (click)="confirmDialog()"  [disabled]="selectedActivity == undefined">Borrar</button>
-	<br>
-
-
+	 
+    <div class="grid-container">
+	  <div class="actions">
+		<button mat-raised-button color="primary" routerLink="/create/">Crear</button>
+	    <button mat-raised-button color="primary" [routerLink]="getDetailActivityUrl()"  [disabled]="isActivitySelected()">Editar</button>
+		<button mat-raised-button color="primary" (click)="confirmDialog()"  [disabled]="isActivitySelected()">Borrar</button>
+	</div>
+	  <div class="search">
+		<mat-form-field>
+		  <mat-label>Buscar</mat-label>
+		  <input matInput (keyup)="applyFilter($event)" placeholder="">
+		</mat-form-field>
+	  </div>
+    </div>
+	 
 	<div class="mat-elevation-z8">
 
 	  <table mat-table [dataSource]="dataSource" matSort >
