@@ -83,12 +83,12 @@ button.delete {
 }*/
 
 .highlight{
-  background: #D0E0EC; /* blue */
+  background: #DCDEDF; /* #D0E0EC blue */
 }
 
 .grid-container {
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto auto auto auto;
 
 }
 
@@ -194,11 +194,35 @@ button.delete {
 	 height: 50%;
 }
 
+.attach-icon{
+	 width: 40%; 
+	 height: 40%;
+}
+
 mark {
 	background-color: #f8f32b;
 }
 
-b {
-	color: red;
+/*b {
+	color: black;
+}*/
+
+/**EXPANDED ROW**/
+.element-detail {
+  overflow: hidden;
+  display: flex;
+  background: #DCDEDF;
 }
 
+.element-description {
+  padding: 16px;
+  font-style: oblique;
+}
+
+.element-description-attribution {
+  opacity: 0.5;
+}
+
+tr.detail-row {
+  height: 0;
+}

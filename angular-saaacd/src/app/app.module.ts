@@ -15,9 +15,10 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import {MatTableModule} from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import {MatSortModule} from '@angular/material/sort';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
+import { MatSortModule} from '@angular/material/sort';
+import { MatFormFieldModule} from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule} from '@angular/material/input';
 import { MatMenuModule} from '@angular/material/menu';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
@@ -47,6 +48,7 @@ import { ActivityDetailComponent }  from './views/activity-detail/activity-detai
 	MatInputModule,
 	MatMenuModule,
 	BrowserAnimationsModule,
+	MatSelectModule,
 	ToastrModule.forRoot()
   ],
   providers: [],

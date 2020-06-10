@@ -20,14 +20,27 @@
 		<button mat-raised-button color="primary" routerLink="/create/">Crear</button>
 	    <button mat-raised-button color="primary" [routerLink]="getDetailActivityUrl()"  [disabled]="isActivitySelected()">Editar</button>
 		<button mat-raised-button color="primary" (click)="confirmDialog()"  [disabled]="isActivitySelected()">Borrar</button>
-	</div>
-	  <div class="search">
+	  </div>
+	  
+	  <div>
 		<mat-form-field>
-		  <mat-label>Buscar</mat-label>
-		  <input matInput (keyup)="applyFilter($event)" placeholder="">
+			<mat-label>Semestre:</mat-label>
+			<mat-select [(ngModel)]="selectedSemester" name="semester" (selectionChange)="filterActivitiesBySemester()">
+			  <mat-option *ngFor="let semester of semesters" [value]="semester.id">
+				{{semester.nombre}}
+			  </mat-option>
+			</mat-select>
 		</mat-form-field>
 	  </div>
+	
+		<div class="search">
+			<mat-form-field>
+			  <mat-label>Buscar</mat-label>
+			  <input matInput (keyup)="applyFilter($event)" placeholder="">
+			</mat-form-field>
+		</div>
     </div>
+	
 	<div id="postip">
 	  <h2>Nota:</h2>
 	  <p *ngIf="selectedActivity">{{selectedActivity.comentario}}</p>
@@ -35,7 +48,7 @@
 	 
 	<div id="notebook" class="mat-elevation-z15">
 
-	  <table mat-table [dataSource]="dataSource" matSort >
+	  <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort >
 	  	<!-- ID Column -->
 		<ng-container matColumnDef="id">
 		  <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
@@ -111,19 +124,43 @@
 			<ng-template #hideDispositivo>{{getDispositivoText(row)}} </ng-template>
 		  </td>
 		</ng-container>
-
 		
 		<!-- Estado Column -->
 		<ng-container matColumnDef="estado">
 		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
 		  <td mat-cell *matCellDef="let row" > 
-			<img class="status-icon" [src]="getStatusImageUrl(row.estado)" alt="Estado" /></td>
+			<img class="status-icon" [src]="getStatusImageUrl(row.estado)" alt="Estado" />
+		  </td>
+		</ng-container>
+		
+		<!-- Actividad Superior Column -->
+		<ng-container matColumnDef="actividadSuperior">
+		  <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+		  <td mat-cell *matCellDef="let row"> 
+			<img *ngIf="row.actividadSuperior" class="attach-icon" src="\.\./static/images/tachuelaMorada.jpg" alt="Attach" />
+		  </td>
         </ng-container>
+		
+		 <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+		  <ng-container matColumnDef="expandedDetail">
+			<td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
+			  <div class="element-detail" *ngIf="row.actividadSuperior"
+				   [@detailExpand]="row == expandedActivity && row.actividadSuperior != null ? 'expanded' : 'collapsed'">
+				<div class="element-description">
+				 <span class="description-attribution">Actividad Superior : </span>
+				  {{row.actividadSuperior.id + ".- " + row.actividadSuperior.usuario.first_name + " reporta " + row.actividadSuperior.categoria.nombre }}
+				</div>
+			  </div>
+			</td>
+			<ng-template #NoShow></ng-template>
+		  </ng-container>
 
 		<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
 		<tr mat-row *matRowDef="let row; columns: displayedColumns;"
 				[ngClass]="{'highlight': selectedActivity == row}" 
+				[class.expanded-row]="expandedActivity === row"
 				(click)="rowSelected(row);" ></tr>
+		<tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
 	  </table>
 
 	  <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>

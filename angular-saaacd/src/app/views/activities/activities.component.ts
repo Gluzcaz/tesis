@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { Actividad } from '../../models/Actividad';
 import { Ubicacion } from '../../models/Ubicacion';
+import { Semestre } from '../../models/Semestre';
 import { ActivityService } from '../../services/Activity.service';
 
 import { Observable, of } from 'rxjs';
@@ -17,17 +18,31 @@ import {MatFormFieldControl} from '@angular/material/form-field';
 import { catchError} from 'rxjs/operators';
 import { NotificationService } from '../../services/notification.service'
 
+import {animate, state, style, transition, trigger} from '@angular/animations';
+
 @Component({
   selector: 'app-activities',
   templateUrl: './activities.component.html',
-  styleUrls: ['./activities.component.css']
+  styleUrls: ['./activities.component.css'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
+
 export class ActivitiesComponent implements OnInit {
   activities: Actividad[];
+  allActivities: Actividad[];
   selectedActivity : Actividad;
+  expandedActivity: Actividad | null;
+  selectedSemester: number;
+  semesters: Semestre[];
   
   //Table Elements
-  displayedColumns: string[] = [ 'id', 'prioridad', 'semestre', 'fechaAlta', 'usuario', 'categoria', 'ubicacion', 'dispositivo', 'estado'];
+  displayedColumns: string[] = [ 'id', 'prioridad', 'semestre', 'fechaAlta', 'usuario', 'categoria', 'ubicacion', 'dispositivo', 'estado', 'actividadSuperior'];
   dataSource: MatTableDataSource<Actividad>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -41,14 +56,21 @@ export class ActivitiesComponent implements OnInit {
   }
   
   ngOnInit() {
+	this.semesters = [
+	{id: 0, nombre: 'Todos', esActivo: false},
+    {id: 2, nombre: '2020-1', esActivo: false},
+    {id: 3, nombre: '2020-2', esActivo: true},
+    {id: 1, nombre: '2019-2', esActivo: false}
+	];
+	this.assignDefaultSemester();
 	this.getActivities();
   }
   
   getActivities(): void {
     this.activityService.getActivities()
     .subscribe(activities =>{ 
-		this.activities = activities;
-		this.updateDataSource();
+		this.allActivities = activities;
+		this.filterActivitiesBySemester();
 	});
   }
   
@@ -73,7 +95,7 @@ export class ActivitiesComponent implements OnInit {
   
   rowSelected(a:Actividad){
 	this.selectedActivity = a;
-	console.log("Table selection:", a.id);
+	this.expandedActivity = this.expandedActivity === a ? null : a;
   }
   
   updateDataSource(){
@@ -201,6 +223,26 @@ export class ActivitiesComponent implements OnInit {
 		activityText = " -> " + activity.fechaResolucion;
 	return activityText;
   }
+  
+  assignDefaultSemester(){
+    for (var i=0; i<this.semesters.length; i++) {
+      if(this.semesters[i].esActivo){
+		this.selectedSemester=this.semesters[i].id;
+		break;
+	  }
+    }
+  }
+ 
+  filterActivitiesBySemester(){
+    if(this.selectedSemester == 0){
+		this.activities = this.allActivities;
+	} 
+	else {
+		this.activities = this.allActivities.filter((activity: Actividad) =>
+			activity.semestre.id == this.selectedSemester);
+	}
+	this.updateDataSource();
+  }
 
   /*********Filtering********/
   //also add this nestedFilterCheck class function
@@ -224,8 +266,7 @@ export class ActivitiesComponent implements OnInit {
       this.dataSource.paginator.firstPage();
     }
   }
-  
-  
+
   descapitalizeFirstLetter(s:string) {
        return s.charAt(0).toLowerCase() + s.slice(1);
   }
