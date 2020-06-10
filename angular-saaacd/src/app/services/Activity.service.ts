@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders,  HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
-import { Activity } from '../models/Activity';
+import { Actividad } from '../models/Actividad';
 import { MessageService } from './Message.service';
 
 import { ConfirmDialogModel, ConfirmDialogComponent } from '../views/confirmDialog/confirm-dialog.component';
@@ -32,43 +32,43 @@ export class ActivityService {
     return options;
   }
   
-  /** DELETE: delete the Activity */
-  deleteActivity(activity: Activity | number): Observable<any>{
+  /** DELETE: delete the Actividad */
+  deleteActivity(activity: Actividad | number): Observable<any>{
     const id = typeof activity === 'number' ? activity : activity.id;
 	var options = this.getHttpOptionsWithNumberParam(id);
-	return this.http.delete<Activity>(this.detailActivityUrl, options);
+	return this.http.delete<Actividad>(this.detailActivityUrl, options);
  }
 
   /** GET activity by id. Will 404 if id not found */
   getActivity(id: number): Observable<any>{
     let options = this.getHttpOptionsWithNumberParam(id);
-    return this.http.get<Activity>(this.detailActivityUrl, options).pipe(
-      tap(_ => this.log(`fetched hero id=${id}`)),
-      catchError(this.handleError<Activity>(`getActivity id=${id}`))
+    return this.http.get<Actividad>(this.detailActivityUrl, options).pipe(
+      tap(_ => this.log(`fetched activity id=${id}`)),
+      catchError(this.handleError<Actividad>(`getActivity id=${id}`))
     );
   }
   
   /** GET activities */
-  getActivities(): Observable<Activity[]> {
-    return this.http.get<Activity[]>(this.activitiesUrl)
+  getActivities(): Observable<Actividad[]> {
+    return this.http.get<Actividad[]>(this.activitiesUrl)
       .pipe(
         tap(_ => this.log('fetched activities')),
-        catchError(this.handleError<Activity[]>('getActivities', []))
+        catchError(this.handleError<Actividad[]>('getActivities', []))
       );
   }
 
   //////// Save methods //////////
 
   /** POST: add a new activity to the server */
-  createActivity(newActivity: Activity): Observable<Activity> {
-    return this.http.post<Activity>(this.createActivityUrl, newActivity, this.httpOptions).pipe(
-      tap((newActivity: Activity) => this.log(`added activity w/ id=${newActivity.id}`)),
-      catchError(this.handleError<Activity>('createActivity'))
+  createActivity(newActivity: Actividad): Observable<Actividad> {
+    return this.http.post<Actividad>(this.createActivityUrl, newActivity, this.httpOptions).pipe(
+      tap((newActivity: Actividad) => this.log(`added activity w/ id=${newActivity.id}`)),
+      catchError(this.handleError<Actividad>('createActivity'))
     );
   }
 
   /** PUT: update the activity on the server */
-  updateActivity(activity: Activity): Observable<Activity> {
+  updateActivity(activity: Actividad): Observable<Actividad> {
 	let options = this.getHttpOptionsWithNumberParam(activity.id);
     return this.http.put(this.detailActivityUrl, activity, this.httpOptions).pipe(
       tap(_ => this.log(`updated activity id=${activity.id}`)),
@@ -79,7 +79,7 @@ export class ActivityService {
   /**
    * Handle deletion confirmation.
    */
-  openDialog(activity: Activity): Observable<any> {
+  openDialog(activity: Actividad): Observable<any> {
     const message = `¿Realmente quieres eliminar la siguiente actividad?\n` +activity.comentario;
 	const title = `Confirmación de eliminación`;
 	

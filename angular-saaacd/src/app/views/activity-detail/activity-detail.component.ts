@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
-import { Activity } from '../../models/Activity';
+import { Actividad } from '../../models/Actividad';
 import { ActivityService } from '../../services/Activity.service';
 import { NotificationService } from '../../services/notification.service'
 
@@ -14,7 +14,7 @@ import { catchError} from 'rxjs/operators';
   styleUrls: [ './activity-detail.component.css' ]
 })
 export class ActivityDetailComponent implements OnInit {
-  @Input() activity: Activity;
+  @Input() activity: Actividad;
   isEdition : boolean;
   id : number;
   
@@ -40,7 +40,22 @@ export class ActivityDetailComponent implements OnInit {
 	if(this.isEdition)
 		this.getActivity();
 	else 
-		this.activity = {'id': null, 'comentario': ''};
+		this.activity = {
+		  'id': null,
+		  'estado': '',
+		  'prioridad': '',
+		  'comentario': '',
+		  'fechaResolucion': '',
+		  'fechaAlta': '',
+		  'fechaRequerido': '',
+		  'esSiniestro': false,
+		  'actividadSuperior': null,
+		  'categoria': null,
+		  'semestre': null,
+		  'ubicacion': null,
+		  'usuario': null,
+		  'dispositivo': null
+		};
   }
 
   getActivity(): void {
@@ -61,7 +76,7 @@ export class ActivityDetailComponent implements OnInit {
 					  this.goBack();
 					  },
 					error => {
-					  catchError(this.activityService.handleError<Activity>('deleteActivity'));
+					  catchError(this.activityService.handleError<Actividad>('deleteActivity'));
 					  this.notifyService.showErrorTimeout(this.updateErrorMessage + this.activity.id, this.title);
 					  this.goBack();
 					  });
@@ -73,7 +88,7 @@ export class ActivityDetailComponent implements OnInit {
 					  this.goBack();
 					  },
 					error => {
-					  catchError(this.activityService.handleError<Activity>('deleteActivity'));
+					  catchError(this.activityService.handleError<Actividad>('deleteActivity'));
 					  this.notifyService.showErrorTimeout(this.creationErrorMessage + this.activity.id, this.title);
 					  this.goBack();
 					  });

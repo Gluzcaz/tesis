@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from django.contrib.auth.decorators import login_required
 
+
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -17,6 +18,7 @@ from rest_framework import serializers
 from rest_framework import viewsets
 
 from rest_framework.parsers import JSONParser 
+
  
 #from data.models import Customer
   
@@ -27,7 +29,7 @@ class HomePageView(TemplateView):
     @csrf_exempt	
     def getActivities(request):
         if request.method == 'GET':
-            data = Actividad.objects.all()		
+            data = Actividad.objects.all()
             serializer =  ActividadSerializador(data, many=True)
             return JsonResponse(serializer.data, safe=False)
 		
@@ -36,7 +38,7 @@ class HomePageView(TemplateView):
         try:
             if(request.GET):
                 id=request.GET['id']
-                activity = Actividad.objects.get(id=id) 
+                activity = Actividad.objects.get(id=id);
         except Actividad.DoesNotExist: 
             return JsonResponse({'message': 'La actividad no existe.'}, status=status.HTTP_404_NOT_FOUND) 
         try:
@@ -53,8 +55,8 @@ class HomePageView(TemplateView):
             elif request.method == 'GET':
                 serializer =  ActividadSerializador(activity)
                 return JsonResponse(serializer.data, safe=False)
-        except Exception:
-            return JsonResponse({'error': 'Something went wrong'}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
+        except Exception as e:
+            return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
 	
     @api_view(['POST'])
     def createActivity(request):

@@ -7,13 +7,14 @@
       (click)="delete(activity)">x</button>
   </li>
 </ul>-->
+<link  href="http://fonts.googleapis.com/css?family=Reenie+Beanie:regular" rel="stylesheet" type="text/css"> 
 
 <div class="table-container">
 	  <!-- (click) passes input value to add() and then clears the input 
 	  <button (click)="add(activityName.value); activityName.value=''">
 		add
 	  </button>-->
-	 
+
     <div class="grid-container">
 	  <div class="actions">
 		<button mat-raised-button color="primary" routerLink="/create/">Crear</button>
@@ -27,21 +28,97 @@
 		</mat-form-field>
 	  </div>
     </div>
+	<div id="postip">
+	  <h2>Nota:</h2>
+	  <p *ngIf="selectedActivity">{{selectedActivity.comentario}}</p>
+	</div> 
 	 
-	<div class="mat-elevation-z8">
+	<div id="notebook" class="mat-elevation-z15">
 
 	  <table mat-table [dataSource]="dataSource" matSort >
-		<!-- ID Column -->
+	  	<!-- ID Column -->
 		<ng-container matColumnDef="id">
-		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Id</th>
-		  <td mat-cell *matCellDef="let row"> {{row.id}} </td>
+		  <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
+		  <td mat-cell *matCellDef="let row">
+		    <mark *ngIf="row.esSiniestro; else hideId">{{row.id}}</mark>
+			<ng-template #hideId>{{row.id}}</ng-template>
+			</td>
+		</ng-container>
+		
+	  	<!-- Prioridad Column -->
+		<ng-container matColumnDef="prioridad">
+		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Prioridad </th>
+		  <td mat-cell *matCellDef="let row" >
+			<img class="priority-icon" [src]="getPriorityImageUrl(row.prioridad)" alt="Prioridad" /></td>
+		</ng-container>
+		
+	    <!-- Semestre Column -->
+		<ng-container matColumnDef="semestre">
+		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Semestre </th>
+		  <td mat-cell *matCellDef="let row"> 
+			<mark *ngIf="row.esSiniestro; else hideSemestre">{{row.semestre.nombre}}</mark>
+			<ng-template #hideSemestre>{{row.semestre.nombre}}</ng-template>
+		  </td>
+		</ng-container>
+	
+		<!-- Periodo Column -->
+		<ng-container matColumnDef="fechaAlta">
+		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Periodo </th>
+		  <td mat-cell *matCellDef="let row" >
+			<mark  *ngIf="row.esSiniestro; else hidePeriodo">
+				{{ row.fechaAlta + getFechaPeriodoText(row) }}
+     			<b>{{ getFechaRequeridoText(row) }}</b>
+			</mark>
+			<ng-template #hidePeriodo>
+				{{ row.fechaAlta + getFechaPeriodoText(row) }}
+     			<b>{{ getFechaRequeridoText(row) }}</b>
+			</ng-template>
+    	  </td>
+		</ng-container>
+		
+		<!-- Usuario Column -->
+		<ng-container matColumnDef="usuario">
+		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Usuario </th>
+		  <td mat-cell *matCellDef="let row" > 
+			<mark *ngIf="row.esSiniestro; else hideUsuario">{{row.usuario.first_name}}</mark>
+			<ng-template #hideUsuario>{{row.usuario.first_name}}</ng-template>
+		  </td>
+		</ng-container>
+		
+		<!-- Categoria Column -->
+		<ng-container matColumnDef="categoria">
+		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Actividad </th>
+		  <td mat-cell *matCellDef="let row" >
+			<mark *ngIf="row.esSiniestro; else hideCategoria"> {{row.categoria.nombre}} </mark>
+			<ng-template #hideCategoria>{{row.categoria.nombre}}</ng-template>
+		  </td>
+		</ng-container>
+		
+		<!-- Ubicacion Column -->
+		<ng-container matColumnDef="ubicacion">
+		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Ubicación </th>
+		  <td mat-cell *matCellDef="let row" > 
+			<mark *ngIf="row.esSiniestro; else hideUbicacion">{{getUbicacionText(row)}}</mark>
+			<ng-template #hideUbicacion>{{getUbicacionText(row)}}</ng-template>
+		  </td>
+		</ng-container>
+		
+		<!-- Dispositivo Column -->
+		<ng-container matColumnDef="dispositivo">
+		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Dispositivo </th>
+		  <td mat-cell *matCellDef="let row" >
+			<mark *ngIf="row.esSiniestro; else hideDispositivo">{{getDispositivoText(row)}} </mark>
+			<ng-template #hideDispositivo>{{getDispositivoText(row)}} </ng-template>
+		  </td>
 		</ng-container>
 
-		<!-- Comentario Column -->
-		<ng-container matColumnDef="comentario">
-		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Comentario </th>
-		  <td mat-cell *matCellDef="let row" > {{row.comentario}} </td>
-		</ng-container>
+		
+		<!-- Estado Column -->
+		<ng-container matColumnDef="estado">
+		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+		  <td mat-cell *matCellDef="let row" > 
+			<img class="status-icon" [src]="getStatusImageUrl(row.estado)" alt="Estado" /></td>
+        </ng-container>
 
 		<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
 		<tr mat-row *matRowDef="let row; columns: displayedColumns;"
@@ -51,4 +128,5 @@
 
 	  <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
 	</div>
+
 </div>	
