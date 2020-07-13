@@ -1,8 +1,10 @@
-from rest_framework import serializers
 from saaacd.submodels.Categoria import Categoria
+from saaacd.subserializers.DynamicFieldsModelSerializer import DynamicFieldsModelSerializer
 
-class CategoriaSerializador(serializers.ModelSerializer):
+
+class CategoriaSerializador(DynamicFieldsModelSerializer):
 
     class Meta:
         model = Categoria
-        fields = 'id', 'nombre'
+        fields = 'id', 'nombre','categoriaSuperior'
+        depth = 2

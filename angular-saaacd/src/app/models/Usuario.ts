@@ -1,5 +1,5 @@
 
-export interface Usuario{
+export class Usuario{
   id: number;
   first_name: string;
 }

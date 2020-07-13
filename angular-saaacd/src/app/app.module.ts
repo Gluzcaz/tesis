@@ -4,6 +4,7 @@ import { FormsModule }    from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
  
 import { AppRoutingModule }     from './app-routing.module'; 
  
@@ -23,6 +24,10 @@ import { MatMenuModule} from '@angular/material/menu';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { ActivityDetailComponent }  from './views/activity-detail/activity-detail.component';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import {MAT_DATE_LOCALE} from '@angular/material/core';
+import { ReactiveFormsModule } from '@angular/forms';
 
  
 @NgModule({
@@ -49,9 +54,13 @@ import { ActivityDetailComponent }  from './views/activity-detail/activity-detai
 	MatMenuModule,
 	BrowserAnimationsModule,
 	MatSelectModule,
+	MatDatepickerModule,
+	MatNativeDateModule,
+	ReactiveFormsModule,
+	MatCheckboxModule,
 	ToastrModule.forRoot()
   ],
-  providers: [],
+  providers: [{provide: MAT_DATE_LOCALE, useValue: 'es-ES'}],
   entryComponents: [ConfirmDialogComponent],
   bootstrap: [AppComponent]
 })

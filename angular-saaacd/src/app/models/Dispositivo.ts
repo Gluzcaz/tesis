@@ -1,5 +1,5 @@
 import {TipoDispositivo} from './TipoDispositivo';
-export interface Dispositivo {
+export class Dispositivo {
   id: number;
   inventarioUNAM: string;
   tipoDispositivo: TipoDispositivo;

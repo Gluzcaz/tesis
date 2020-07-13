@@ -28,3 +28,11 @@ button:disabled {
   color: #ccc;
   cursor: auto;
 }
+
+.selectOption {
+  white-space: initial;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+

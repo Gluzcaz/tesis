@@ -147,8 +147,8 @@
 			  <div class="element-detail" *ngIf="row.actividadSuperior"
 				   [@detailExpand]="row == expandedActivity && row.actividadSuperior != null ? 'expanded' : 'collapsed'">
 				<div class="element-description">
-				 <span class="description-attribution">Actividad Superior : </span>
-				  {{row.actividadSuperior.id + ".- " + row.actividadSuperior.usuario.first_name + " reporta " + row.actividadSuperior.categoria.nombre }}
+				 <span class="description-attribution">Petición : </span>
+				  {{row.actividadSuperior.id + ".- " + row.actividadSuperior.usuario.first_name + " pide " + row.actividadSuperior.categoria.nombre }}
 				</div>
 			  </div>
 			</td>

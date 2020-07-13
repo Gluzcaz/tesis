@@ -6,9 +6,10 @@ from saaacd.subserializers.UsuarioSerializador import UsuarioSerializador
 from saaacd.subserializers.DispositivoSerializador import DispositivoSerializador
 from saaacd.subserializers.ActividadSuperiorSerializador import ActividadSuperiorSerializador
 from saaacd.models import Actividad
+from saaacd.subserializers.DynamicFieldsModelSerializer import DynamicFieldsModelSerializer
 
-class ActividadSerializador(serializers.ModelSerializer):
-    categoria = CategoriaSerializador(read_only=True) 
+class ActividadSerializador(DynamicFieldsModelSerializer):
+    categoria = CategoriaSerializador(read_only=True, fields=('id', 'nombre')) 
     semestre = SemestreSerializador(read_only=True) 
     ubicacion = UbicacionSerializador(read_only=True) 
     usuario = UsuarioSerializador(read_only=True) 

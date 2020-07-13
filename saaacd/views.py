@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 
 
 from rest_framework import status
-from rest_framework.decorators import api_view
+
 from rest_framework.response import Response
 from rest_framework.utils import json
 from rest_framework import serializers
@@ -30,9 +30,20 @@ class HomePageView(TemplateView):
     def getActivities(request):
         if request.method == 'GET':
             data = Actividad.objects.all()
-            serializer =  ActividadSerializador(data, many=True)
+            serializer =  ActividadSerializador(data, many=True, fields=('id', 'estado','prioridad', 'comentario', 'fechaResolucion', 'fechaAlta', 'fechaRequerido', 'esSiniestro', 'actividadSuperior', 'categoria', 'semestre', 'ubicacion', 'usuario', 'dispositivo'))
             return JsonResponse(serializer.data, safe=False)
-		
+	
+    @csrf_exempt	
+    @api_view(['GET'])
+    def getPetitionActivities(request):
+        try:
+            data = Actividad.objects.filter(esSiniestro=1).exclude(estado=Actividad.ESTADO.r)
+            serializer = ActividadSerializador(data, many=True, fields=('id','categoria','usuario'))
+            return JsonResponse(serializer.data, safe=False)
+        except Exception as e:
+            return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
+			
+    @csrf_exempt		
     @api_view(['DELETE', 'PUT', 'GET'])
     def detailActivity(request):
         try:
@@ -51,7 +62,7 @@ class HomePageView(TemplateView):
                   return JsonResponse(serializer.data, safe=False, status=status.HTTP_201_CREATED)
             elif request.method == 'DELETE':
                 activity.delete() 
-                return JsonResponse({'message': 'La actividad fue eliminada satisfactoriamente.'}, status=status.HTTP_204_NO_CONTENT)
+                return JsonResponse({'message': 'La actividad fue eliminada satisfactoriamente.'},safe=False, status=status.HTTP_204_NO_CONTENT)
             elif request.method == 'GET':
                 serializer =  ActividadSerializador(activity)
                 return JsonResponse(serializer.data, safe=False)
@@ -69,7 +80,8 @@ class HomePageView(TemplateView):
                   serializer.save() 
                   return JsonResponse(serializer.data, safe=False, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
+            return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+			
 	
 #class LinksPageView(TemplateView):
 #    def get(self, request, **kwargs):

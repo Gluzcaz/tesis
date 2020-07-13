@@ -7,6 +7,7 @@ import { Actividad } from '../../models/Actividad';
 import { Ubicacion } from '../../models/Ubicacion';
 import { Semestre } from '../../models/Semestre';
 import { ActivityService } from '../../services/Activity.service';
+import { SemesterService } from '../../services/semester.service';
 
 import { Observable, of } from 'rxjs';
 
@@ -51,27 +52,28 @@ export class ActivitiesComponent implements OnInit {
   title = 'Notificación';
   deletionSuccessMessage = 'Se ha eliminado satisfactoriamente la actividad con ID: ';
   deletionErrorMessage = 'No se ha podido eliminar la actividad con ID: ';
+  semesterErrorMessage = 'No se ha podido mostrar los semestres';
+  activityErrorMessage = 'No se ha podido mostrar las actividades';
   
-  constructor(private activityService: ActivityService, private notifyService : NotificationService) {   
+  constructor(private activityService: ActivityService, private semesterService: SemesterService, private notifyService : NotificationService) {   
   }
   
   ngOnInit() {
-	this.semesters = [
-	{id: 0, nombre: 'Todos', esActivo: false},
-    {id: 2, nombre: '2020-1', esActivo: false},
-    {id: 3, nombre: '2020-2', esActivo: true},
-    {id: 1, nombre: '2019-2', esActivo: false}
-	];
-	this.assignDefaultSemester();
+    this.getSemesters();
 	this.getActivities();
   }
   
   getActivities(): void {
     this.activityService.getActivities()
     .subscribe(activities =>{ 
-		this.allActivities = activities;
-		this.filterActivitiesBySemester();
-	});
+			this.allActivities = activities;
+			this.filterActivitiesBySemester();
+		},
+		error => {
+			catchError(this.notifyService.handleError<Actividad>('getActivities'));
+			this.notifyService.showErrorTimeout(this.activityErrorMessage, this.title);
+	    }
+	);
   }
   
   confirmDialog(): void {
@@ -79,13 +81,13 @@ export class ActivitiesComponent implements OnInit {
       if(confirmationResult){
 	    this.activityService.deleteActivity(this.selectedActivity).subscribe(
 				response => {
-				  this.activities = this.activities.filter(a => a !== this.selectedActivity);
+				  this.activities = this.activities.filter(a => a.id !== this.selectedActivity.id);
    	              this.updateDataSource();
     	          this.notifyService.showSuccessTimeout(this.deletionSuccessMessage + this.selectedActivity.id , this.title);
 				  this.selectedActivity = undefined;
 				  },
 				error => {
-				  catchError(this.activityService.handleError<Actividad>('deleteActivity'));
+				  catchError(this.notifyService.handleError<Actividad>('deleteActivity'));
 				  this.notifyService.showErrorTimeout(this.deletionErrorMessage + this.selectedActivity.id, this.title);
 				  }
 		);
@@ -232,18 +234,22 @@ export class ActivitiesComponent implements OnInit {
 	  }
     }
   }
+   
+  getSemesters(){
+    this.semesterService.getSemesters()
+    .subscribe(semesters =>{ 
+				this.semesters = semesters;
+				this.semesters.push({"id": 0, "nombre": "Todos", "esActivo": false});
+				this.assignDefaultSemester();
+	           },
+			   error => {
+				  catchError(this.notifyService.handleError<Semestre>('getSemester'));
+				  this.notifyService.showErrorTimeout(this.semesterErrorMessage, this.title);
+				  }
+			   );
+  }  
  
-  filterActivitiesBySemester(){
-    if(this.selectedSemester == 0){
-		this.activities = this.allActivities;
-	} 
-	else {
-		this.activities = this.allActivities.filter((activity: Actividad) =>
-			activity.semestre.id == this.selectedSemester);
-	}
-	this.updateDataSource();
-  }
-
+ 
   /*********Filtering********/
   //also add this nestedFilterCheck class function
 	nestedFilterCheck(search, data, key) {
@@ -266,6 +272,18 @@ export class ActivitiesComponent implements OnInit {
       this.dataSource.paginator.firstPage();
     }
   }
+  
+  filterActivitiesBySemester(){
+    if(this.selectedSemester == 0){
+		this.activities = this.allActivities;
+	} 
+	else {
+		this.activities = this.allActivities.filter((activity: Actividad) =>
+			activity.semestre.id == this.selectedSemester);
+	}
+	this.updateDataSource();
+  }
+
 
   descapitalizeFirstLetter(s:string) {
        return s.charAt(0).toLowerCase() + s.slice(1);

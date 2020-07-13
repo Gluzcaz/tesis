@@ -5,74 +5,66 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 import { Actividad } from '../models/Actividad';
-import { MessageService } from './Message.service';
+import { URLutility } from '../utilities/URLutility';
 
 import { ConfirmDialogModel, ConfirmDialogComponent } from '../views/confirmDialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
-  private activitiesUrl = '/api/activities';  // URL to web api
+  private activitiesUrl = '/api/activities'; 
+  private petitionActivitiesUrl = '/api/petitionActivities/'; 
   private detailActivityUrl = '/api/detailActivity/';
   private createActivityUrl = '/api/createActivity/';
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
+ 
   
   constructor(
     private http: HttpClient,
-    private messageService: MessageService,
 	public dialog: MatDialog) {}
-	
-  getHttpOptionsWithNumberParam(id: number): any{
-	let httpParams = new HttpParams().set('id', id.toString());
-	let httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json' })
-	let options = { params: httpParams,
-					headers: httpHeaders };
-    return options;
-  }
+
   
   /** DELETE: delete the Actividad */
   deleteActivity(activity: Actividad | number): Observable<any>{
     const id = typeof activity === 'number' ? activity : activity.id;
-	var options = this.getHttpOptionsWithNumberParam(id);
+	var options = URLutility.getHttpOptionsWithParam('id', id.toString());
 	return this.http.delete<Actividad>(this.detailActivityUrl, options);
  }
 
   /** GET activity by id. Will 404 if id not found */
   getActivity(id: number): Observable<any>{
-    let options = this.getHttpOptionsWithNumberParam(id);
+    let options = URLutility.getHttpOptionsWithParam('id', id.toString());
     return this.http.get<Actividad>(this.detailActivityUrl, options).pipe(
-      tap(_ => this.log(`fetched activity id=${id}`)),
-      catchError(this.handleError<Actividad>(`getActivity id=${id}`))
+      tap(_ => URLutility.log(`fetched activity id=${id}`)),
+      catchError(URLutility.handleError<Actividad>(`getActivity id=${id}`))
     );
   }
   
   /** GET activities */
   getActivities(): Observable<Actividad[]> {
-    return this.http.get<Actividad[]>(this.activitiesUrl)
-      .pipe(
-        tap(_ => this.log('fetched activities')),
-        catchError(this.handleError<Actividad[]>('getActivities', []))
-      );
+    return this.http.get<Actividad[]>(this.activitiesUrl);
+  }
+  
+  /** GET  petition activities */
+  getPetitionActivities(): Observable<Actividad[]> {
+    return this.http.get<Actividad[]>(this.petitionActivitiesUrl);
   }
 
   //////// Save methods //////////
 
   /** POST: add a new activity to the server */
   createActivity(newActivity: Actividad): Observable<Actividad> {
-    return this.http.post<Actividad>(this.createActivityUrl, newActivity, this.httpOptions).pipe(
-      tap((newActivity: Actividad) => this.log(`added activity w/ id=${newActivity.id}`)),
-      catchError(this.handleError<Actividad>('createActivity'))
+    return this.http.post<Actividad>(this.createActivityUrl, newActivity, URLutility.httpOptions).pipe(
+      tap((newActivity: Actividad) => URLutility.log(`added activity w/ id=${newActivity.id}`)),
+      catchError(URLutility.handleError<Actividad>('createActivity'))
     );
   }
 
   /** PUT: update the activity on the server */
   updateActivity(activity: Actividad): Observable<Actividad> {
-	let options = this.getHttpOptionsWithNumberParam(activity.id);
-    return this.http.put(this.detailActivityUrl, activity, this.httpOptions).pipe(
-      tap(_ => this.log(`updated activity id=${activity.id}`)),
-      catchError(this.handleError<any>('updateActivity'))
+	let options = URLutility.getHttpOptionsWithParam('id', activity.id.toString());
+    return this.http.put(this.detailActivityUrl, activity, URLutility.httpOptions).pipe(
+      tap(_ => URLutility.log(`updated activity id=${activity.id}`)),
+      catchError(URLutility.handleError<any>('updateActivity'))
     );
   }
 
@@ -80,7 +72,8 @@ export class ActivityService {
    * Handle deletion confirmation.
    */
   openDialog(activity: Actividad): Observable<any> {
-    const message = `¿Realmente quieres eliminar la siguiente actividad?\n` +activity.comentario;
+    const message = "¿Realmente quieres eliminar la siguiente actividad?\n"
+						+ activity.id + ".- " + activity.usuario.first_name + " reporta " + activity.categoria.nombre;
 	const title = `Confirmación de eliminación`;
 	
     const dialogData = new ConfirmDialogModel(title , message);
@@ -93,28 +86,4 @@ export class ActivityService {
 	return dialogRef.afterClosed();
   }
   
-  /**
-   * Handle Http operation that failed.
-   * Let the app continue.
-   * @param operation - name of the operation that failed
-   * @param result - optional value to return as the observable result
-  */
-  handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-
-      // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
-
-      // TODO: better job of transforming error for user consumption
-      this.log(`${operation} failed: ${error.message}`);
-
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
-  }
-
-  /** Log a ActivityService message with the MessageService */
-  private log(message: string) {
-    this.messageService.add(`ActivityService: ${message}`);
-  }
 }
