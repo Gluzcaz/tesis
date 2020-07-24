@@ -8,18 +8,20 @@ from saaacd.subviews.CategoryView import CategoryView
 from saaacd.subviews.LocationView import LocationView
 from saaacd.subviews.DeviceView import DeviceView
 from rest_framework import routers
+from django.urls import re_path
  
  
 router = routers.DefaultRouter()
 #router.register(r'customers', views.CustViewSet) 
  
 urlpatterns = [
-    url(r'^$', views.HomePageView.as_view()),
-	url(r'^allActivities/', views.HomePageView.as_view()),
-	url(r'^api/petitionActivities/', views.HomePageView.getPetitionActivities),
-	url(r'^api/detailActivity/',views.HomePageView.detailActivity),
-	url(r'^api/createActivity/', views.HomePageView.createActivity),
-	url(r'^api/activities/', views.HomePageView.getActivities),
+    url(r'^$', views.ActivityView.as_view()),
+	url(r'^allActivities/', views.ActivityView.as_view()),
+	re_path(r'^detail/(?P<id>[0-9]+)/$',views.ActivityView.getDetailUrl),
+	url(r'^api/petitionActivities/', views.ActivityView.getPetitionActivities),
+	url(r'^api/detailActivity/', views.ActivityView.detailActivity),
+	url(r'^api/saveActivity/', views.ActivityView.saveActivity),
+	url(r'^api/activities/', views.ActivityView.getActivities),
 	url(r'^api/semesters/', SemesterView.getSemesters),
 	url(r'^api/users/', UserView.getUsers),
 	url(r'^api/categories/', CategoryView.getCategories),

@@ -1,150 +1,176 @@
 <div *ngIf="activity">
 	<div *ngIf="isEdition">
-	  <h2>{{activity.comentario| uppercase}} Details</h2>
+	  <!--<h2>{{activity.comentario| uppercase}} Details</h2>-->
 	  <div><span>ID: </span>{{activity.id}}</div>
 	</div>
 	
+    <form [formGroup] = "validationGroup" (ngSubmit)="save()">
     <div>
 		<mat-form-field>
 			<mat-label>Semestre:</mat-label>
-			<mat-select [(ngModel)]="activity.semestre.id" name="semester">
+			<mat-select formControlName="semesterControl" required>
 			  <mat-option *ngFor="let semester of semesters" [value]="semester.id">
 				{{semester.nombre}}
 			  </mat-option>
 			</mat-select>
+			<mat-error *ngIf="hasRequiredError('semesterControl')">{{requiredSemesterField}}</mat-error>
 		</mat-form-field>
 
-		<mat-form-field appearance="fill" name="date">
+		<mat-form-field appearance="fill">
 		  <mat-label>Escoge la fecha de alta</mat-label>
-		  <input matInput [matDatepicker]="picker" [formControl]="currentDate">
+		  <input matInput [matDatepicker]="picker" formControlName="currentDateControl">
 		  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
 		  <mat-datepicker #picker></mat-datepicker>
+		  <mat-error *ngIf="hasRequiredError('currentDateControl')">{{requiredStartDateField}}</mat-error>
+		  <mat-error *ngIf="hasCurrentDateError()">{{getCurrentDateErrorMessage}}</mat-error>
 		</mat-form-field>
 		
 		<mat-form-field>
 				<mat-label>Prioridad:</mat-label>
-				<mat-select [(ngModel)]="activity.prioridad" name="priority">
+				<mat-select  formControlName="priorityControl" required>
 				  <mat-option *ngFor="let priority of priorities" [value]="priority.id">
 					{{priority.name}}
 				  </mat-option>
 				</mat-select>
+				<mat-error *ngIf="hasRequiredError('priorityControl')">{{requiredPriorityField}}</mat-error>
 		</mat-form-field>
 
 		<mat-form-field>
 				<mat-label>Estado:</mat-label>
-				<mat-select [(ngModel)]="activity.estado" name="estado">
+				<mat-select formControlName="statusControl" required>
 				  <mat-option *ngFor="let status of statuses" [value]="status.id">
 					{{status.name}}
 				  </mat-option>
 				</mat-select>
+				<mat-error *ngIf="hasRequiredError('statusControl')">{{requiredStatusField}}</mat-error>
+				<mat-error *ngIf="hasDateError('statusControl')">{{requireDoneStatusMessage}}</mat-error>
 		</mat-form-field>
 	</div>
-		
 				
 		
 	<div>
 		<mat-form-field>
 			<mat-label>Usuario:</mat-label>
-			<mat-select [(ngModel)]="activity.usuario.id" [formControl]="userControl" name="user" required>
+			<mat-select formControlName="userControl" required>
 			  <mat-option class="selectOption" *ngFor="let user of users" [value]="user.id">
 				{{user.first_name}}
 			  </mat-option>
 			</mat-select>
-			<mat-error *ngIf="userControl.hasError('required')">Por favor escoge un usuario</mat-error>
+			<mat-error *ngIf="hasRequiredError('userControl')">{{requiredUserField}}</mat-error>
 		</mat-form-field>
 
 		<mat-form-field>
 			<mat-label> Asume actividad de tipo: </mat-label>
-			<mat-select (selectionChange)="assignCategoryList($event.value)" name="superiorCategory">
+			<mat-select (selectionChange)="assignCategoryList($event.value)" formControlName="superiorCategoryControl" required>
 			  <mat-option class="selectOption" *ngFor="let superiorCategory of categoryTree" [value]="superiorCategory.element.id">
 				{{superiorCategory.element.nombre}}
 			  </mat-option>
 			</mat-select>
+			 <mat-error *ngIf="hasRequiredError('superiorCategoryControl')">{{requiredSuperiorCategoryField }}</mat-error>
 		</mat-form-field>
 		
 		<mat-form-field>
 		  <mat-label>cuya descripción es:</mat-label>
-		  <mat-select [(ngModel)]="selectedCategory" name="Category">
+		  <mat-select formControlName="categoryControl" required>
 			<div *ngFor="let group of categoryGroups">
 			  <mat-option *ngIf="(group.children.length === 0); else showGroup" [value]="group.element.id" class="selectOption">
 				{{group.element.nombre}}
 			  </mat-option>
 			  
 			 <ng-template #showGroup>
-				  <mat-optgroup *ngFor="let superiorCategory of categoryTree"[label]="group.element.nombre" class="selectOption" >
+				  <mat-optgroup [label]="group.element.nombre" class="selectOption" >
 					  <mat-option *ngFor="let category of group.children" [value]="category.id" class="selectOption">
 						{{category.nombre}}
 					  </mat-option>
 				 </mat-optgroup>
 			 </ng-template>
-			
    			</div>
 		  </mat-select>
+		  <mat-error *ngIf="hasRequiredError('categoryControl')">{{requiredCategoryField}}</mat-error>
 		</mat-form-field>
 	</div>
 	
 	<div>
 		<mat-form-field>
 			<mat-label> Ubicado en: </mat-label>
-			<mat-select (selectionChange)="assignDeviceList($event.value)" name="Location">
-				<mat-optgroup *ngFor="let superiorLocation of locationTree" [label]="superiorLocation.element.tipoUbicacion.nombre + ' ' + superiorLocation.element.nombre" class="selectOption" >
-					  <mat-option *ngFor="let location of superiorLocation.children" [value]="location.id" class="selectOption">
-						{{location.tipoUbicacion.nombre + ' ' +location.nombre}}
-					  </mat-option>
-				</mat-optgroup>
+			<mat-select (selectionChange)="assignDeviceList($event.value)" formControlName="locationControl">
+			  <div *ngFor="let superiorLocation of locationTree">
+				<mat-option *ngIf="(superiorLocation.children.length === 0); else showLocationGroup" [value]="superiorLocation.element.id" class="selectOption">
+				{{superiorLocation.element.tipoUbicacion.nombre + ' ' + superiorLocation.element.nombre}}
+			    </mat-option>
+				<ng-template #showLocationGroup>
+					<mat-optgroup [label]="superiorLocation.element.tipoUbicacion.nombre + ' ' + superiorLocation.element.nombre" class="selectOption" >
+						  <mat-option *ngFor="let location of superiorLocation.children" [value]="location.id" class="selectOption">
+							{{location.tipoUbicacion.nombre + ' ' +location.nombre}}
+						  </mat-option>
+					</mat-optgroup>
+				</ng-template>
+			  </div>
 			</mat-select>
 		</mat-form-field>
 		<mat-form-field>
 			<mat-label> Relacionado a dispositivo: </mat-label>
-			<mat-select [(ngModel)]="selectedDevice" name="Device">
+			<mat-select formControlName="deviceControl">
   			    <mat-option *ngFor="let device of devicesByLocation" [value]="device.id" class="selectOption">
 						{{device.tipoDispositivo.nombre + ' ' + device.inventarioUNAM}}
 				</mat-option>
 			</mat-select>
 		</mat-form-field>
+		<mat-form-field>
+			<mat-label>Tiempo de vida: </mat-label>
+			<input matInput placeholder="Ex. 105" formControlName="lifeTimeControl">
+            <mat-hint align="end">horas</mat-hint>
+        </mat-form-field>
 	</div>
 	
-	<div *ngIf="isEdition">
-		<mat-form-field appearance="fill" name="requiredDate">
-		  <mat-label>Escoge la fecha de requerimiento</mat-label>
-		  <input matInput [matDatepicker]="requiredPicker" [formControl]="requiredDate">
-		  <mat-datepicker-toggle matSuffix [for]="requiredPicker"></mat-datepicker-toggle>
-		  <mat-datepicker #requiredPicker></mat-datepicker>
+	<div>
+		<mat-form-field appearance="fill">
+		  <mat-label>Escoge la fecha de resolución</mat-label>
+		  <input matInput [matDatepicker]="resolutionPicker" formControlName="resolutionDateControl">
+		  <mat-datepicker-toggle matSuffix [for]="resolutionPicker"></mat-datepicker-toggle>
+		  <mat-datepicker #resolutionPicker></mat-datepicker>
+		  <mat-error *ngIf="hasDateError('resolutionDateControl')">{{dateLessValidationMessage}}</mat-error>
+		  <mat-error *ngIf="resolutionDateControl.hasError('requireResolutionDate')">{{requireResolutionDateMessage}}</mat-error>
 		</mat-form-field>
 	</div>
 
 	<div>
-		<mat-form-field appearance="fill" name="resolutionDate">
-		  <mat-label>Escoge la fecha de resolución</mat-label>
-		  <input matInput [matDatepicker]="resolutionPicker" [formControl]="resolutionDate">
-		  <mat-datepicker-toggle matSuffix [for]="resolutionPicker"></mat-datepicker-toggle>
-		  <mat-datepicker #resolutionPicker></mat-datepicker>
+		<mat-form-field appearance="fill" name="requiredDate">
+		  <mat-label>Escoge la fecha requerida para ser resuelto</mat-label>
+		  <input matInput [matDatepicker]="requiredPicker" formControlName="requiredDateControl">
+		  <mat-datepicker-toggle matSuffix [for]="requiredPicker"></mat-datepicker-toggle>
+		  <mat-datepicker #requiredPicker></mat-datepicker>
+		  <mat-error *ngIf="hasDateError('requiredDateControl')">{{dateLessValidationMessage}}</mat-error>
 		</mat-form-field>
-		
-		<mat-checkbox name="petition"
-						  [(ngModel)]="isPetition">
+		<mat-checkbox name="petition" formControlName="petitionControl">
 			Petición
 		</mat-checkbox>
 		
 		<mat-form-field>
 				<mat-label>Resuelve la siguiente petición:</mat-label>
-				<mat-select [(ngModel)]="activity.actividadSuperior.id" name="petition">
-				  <mat-option *ngFor="let petition of petitionActivities" [value]="petition.id" class="selectOption">
-					{{ petition.id + '.- ' + petition.usuario.first_name + ' pide ' + petition.categoria.nombre}}
-				  </mat-option>
+				<mat-select formControlName="superiorActivityControl">
+				  <div *ngFor="let petition of petitionActivities" >
+					  <mat-option *ngIf="petition.id==0; else showPetitionOptions" [value]="0">Ninguno</mat-option>
+					  <ng-template #showPetitionOptions>
+						  <mat-option [value]="petition.id" class="selectOption">
+							{{ petition.id + '.- ' + petition.usuario.first_name + ' pide ' + petition.categoria.nombre}}
+						  </mat-option>
+					  </ng-template>
+				  </div>
 				</mat-select>
 		</mat-form-field>
 
-		
-		<label>Comentario:</label>
-		<textarea [(ngModel)]="activity.comentario"></textarea>
+		<mat-form-field>
+			<label>Comentario:</label>
+			<textarea  matInput formControlName="commentControl"></textarea>
+			<mat-hint align="end">{{commentControl.value.length + "/" + MAX_LENGTH_COMMENT}}</mat-hint>
+			<mat-error *ngIf="validationGroup.get('commentControl').hasError('maxlength')">{{maxLenghtCommentField}}</mat-error>
+		</mat-form-field>
 	</div>
-	
-	
-
 	
 	<div>
-		<button (click)="goBack()">Cancelar</button>
-		<button (click)="save()">Guardar</button>
+		<button (click)="cancel($event)">Cancelar</button>
+		<button type="submit">Guardar</button>
 	</div>
+	</form>
 </div>

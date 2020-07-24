@@ -22,6 +22,7 @@
     "@angular/platform-browser-dynamic": "~9.1.1",
     "@angular/router": "~9.1.1",
     "angular-material": "^1.1.22",
+    "ng-date-value-accessor": "0.0.2",
     "ngx-toastr": "^12.1.0",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",

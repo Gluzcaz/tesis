@@ -1,5 +1,5 @@
 import { CategoriaSuperior} from './CategoriaSuperior';
-export interface Categoria {
+export class Categoria {
   id: number;
   nombre: string;
   categoriaSuperior: CategoriaSuperior;

@@ -21,4 +21,5 @@ export class Actividad {
   dispositivo: Dispositivo;
   public static PRIORITIES  = [ {id :'a', name:'Alta'}, {id:'m', name:'Media'}, {id:'b', name:'Baja'}];
   public static STATUSES = [ {id :'r', name:'Realizada'}, {id:'p', name:'Pendiente'}, {id:'e', name:'En Progreso'}];
+  public static MAX_LENGTH_COMMENT : number = 250;
 }

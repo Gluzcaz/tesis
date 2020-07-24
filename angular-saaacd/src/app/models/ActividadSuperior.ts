@@ -1,6 +1,6 @@
 import { Usuario} from './Usuario';
 import { Categoria} from './Categoria';
-export interface ActividadSuperior {
+export class ActividadSuperior {
   id: number;
   categoria: Categoria;
   usuario: Usuario;

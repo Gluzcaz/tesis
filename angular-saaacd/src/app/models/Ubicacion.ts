@@ -1,6 +1,6 @@
 import { TipoUbicacion} from './TipoUbicacion';
 import { UbicacionSuperior} from './UbicacionSuperior';
-export interface Ubicacion {
+export class Ubicacion {
   id: number;
   nombre: string;
   tipoUbicacion: TipoUbicacion; 

@@ -199,10 +199,13 @@ export class ActivitiesComponent implements OnInit {
   }
   
   getUbicacionText(activity:Actividad): string{
-	var activityText = activity.ubicacion.tipoUbicacion.nombre + " " + activity.ubicacion.nombre;
-	if(activity.ubicacion.ubicacionSuperior)
-		activityText = activityText + "\n" + activity.ubicacion.ubicacionSuperior.tipoUbicacion.nombre + " " + activity.ubicacion.ubicacionSuperior.nombre;
-    return activityText;
+	var activityText = "";
+	if(activity.ubicacion){
+		var activityText = activity.ubicacion.tipoUbicacion.nombre + " " + activity.ubicacion.nombre;
+		if(activity.ubicacion.ubicacionSuperior)
+			activityText = activityText + "\n" + activity.ubicacion.ubicacionSuperior.tipoUbicacion.nombre + " " + activity.ubicacion.ubicacionSuperior.nombre;
+    }
+	return activityText;
   }
   
   getDispositivoText(activity:Actividad): string{
@@ -239,8 +242,8 @@ export class ActivitiesComponent implements OnInit {
     this.semesterService.getSemesters()
     .subscribe(semesters =>{ 
 				this.semesters = semesters;
-				this.semesters.push({"id": 0, "nombre": "Todos", "esActivo": false});
 				this.assignDefaultSemester();
+				this.semesters.push({"id": 0, "nombre": "Todos", "esActivo": false});
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Semestre>('getSemester'));

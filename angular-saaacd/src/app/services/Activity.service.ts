@@ -16,6 +16,7 @@ export class ActivityService {
   private petitionActivitiesUrl = '/api/petitionActivities/'; 
   private detailActivityUrl = '/api/detailActivity/';
   private createActivityUrl = '/api/createActivity/';
+  private saveActivityUrl = '/api/saveActivity/'
  
   
   constructor(
@@ -33,10 +34,7 @@ export class ActivityService {
   /** GET activity by id. Will 404 if id not found */
   getActivity(id: number): Observable<any>{
     let options = URLutility.getHttpOptionsWithParam('id', id.toString());
-    return this.http.get<Actividad>(this.detailActivityUrl, options).pipe(
-      tap(_ => URLutility.log(`fetched activity id=${id}`)),
-      catchError(URLutility.handleError<Actividad>(`getActivity id=${id}`))
-    );
+    return this.http.get<Actividad>(this.detailActivityUrl, options);
   }
   
   /** GET activities */
@@ -52,20 +50,13 @@ export class ActivityService {
   //////// Save methods //////////
 
   /** POST: add a new activity to the server */
-  createActivity(newActivity: Actividad): Observable<Actividad> {
-    return this.http.post<Actividad>(this.createActivityUrl, newActivity, URLutility.httpOptions).pipe(
-      tap((newActivity: Actividad) => URLutility.log(`added activity w/ id=${newActivity.id}`)),
-      catchError(URLutility.handleError<Actividad>('createActivity'))
-    );
+  createActivity(newActivity: any): Observable<Actividad> {
+    return this.http.post<any>(this.saveActivityUrl, newActivity, URLutility.httpOptions);
   }
 
   /** PUT: update the activity on the server */
-  updateActivity(activity: Actividad): Observable<Actividad> {
-	let options = URLutility.getHttpOptionsWithParam('id', activity.id.toString());
-    return this.http.put(this.detailActivityUrl, activity, URLutility.httpOptions).pipe(
-      tap(_ => URLutility.log(`updated activity id=${activity.id}`)),
-      catchError(URLutility.handleError<any>('updateActivity'))
-    );
+  updateActivity(activity: any): Observable<Actividad> {
+    return this.http.put<any>(this.saveActivityUrl, activity, URLutility.httpOptions);
   }
 
   /**

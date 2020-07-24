@@ -19,12 +19,14 @@ class Actividad(models.Model):
 		('b', ('Baja'))
 	)
 	
+    MAX_LENGTH_COMMENT = 250;
+	
     estado = models.CharField(max_length=20, choices=ESTADO)
     prioridad = models.CharField(max_length=20, choices=PRIORIDAD)
-    comentario = models.CharField(max_length=250, null=True)
-    fechaResolucion = models.DateField(null=True)
+    comentario = models.CharField(max_length=250, null=True, blank = True)
+    fechaResolucion = models.DateField(null=True, blank = True)
     fechaAlta = models.DateField()
-    fechaRequerido = models.DateField(null=True)
+    fechaRequerido = models.DateField(null=True,blank = True)
     esSiniestro = models.BooleanField(default=False)
 	#Foreign Keys
     usuario = models.ForeignKey('auth.User', related_name="usuario", on_delete=models.CASCADE, null=True)
@@ -34,5 +36,7 @@ class Actividad(models.Model):
     actividadSuperior = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     semestre = models.ForeignKey(Semestre, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return ""
 	
 	
