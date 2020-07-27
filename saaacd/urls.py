@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^$', views.ActivityView.as_view()),
 	url(r'^allActivities/', views.ActivityView.as_view()),
 	re_path(r'^detail/(?P<id>[0-9]+)/$',views.ActivityView.getDetailUrl),
+	url(r'^create/', views.ActivityView.getCreateUrl),
 	url(r'^api/petitionActivities/', views.ActivityView.getPetitionActivities),
 	url(r'^api/detailActivity/', views.ActivityView.detailActivity),
 	url(r'^api/saveActivity/', views.ActivityView.saveActivity),

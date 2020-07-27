@@ -38,6 +38,7 @@ export class ActivityDetailComponent implements OnInit {
   isPetition: boolean = false;
   DONE : string = Actividad.STATUSES[0].id;
   MAX_LENGTH_COMMENT: number = Actividad.MAX_LENGTH_COMMENT;
+  pageTitle : string = "Nueva Actividad"; 
   
   categories: Categoria[];
   categoryHashTable: Object = Object.create(null);
@@ -48,7 +49,6 @@ export class ActivityDetailComponent implements OnInit {
   locationHashTable: Object = Object.create(null);
   locationTree: Array<any> =[];
   devicesByLocation: Dispositivo[];
-  validationGroup : FormGroup;
   isValidRequiredDate : Boolean = true;
   isValidResolutionDate : Boolean = true;
    
@@ -80,9 +80,26 @@ export class ActivityDetailComponent implements OnInit {
   categoryControl = new FormControl('', Validators.required);
   superiorCategoryControl = new FormControl('', Validators.required);
   lifeTimeControl = new FormControl();
-
   locationControl = new FormControl();
   deviceControl = new FormControl();
+  
+  validationGroup : FormGroup = new FormGroup({
+	  userControl : this.userControl,
+	  semesterControl : this.semesterControl,
+	  priorityControl : this.priorityControl,
+	  statusControl : this.statusControl,
+	  currentDateControl : this.currentDateControl, 
+	  resolutionDateControl : this.resolutionDateControl,  
+	  requiredDateControl : this.requiredDateControl,
+	  superiorActivityControl : this.superiorActivityControl,
+	  petitionControl: this.petitionControl,
+	  categoryControl: this.categoryControl,
+	  superiorCategoryControl: this.superiorCategoryControl,
+	  commentControl: this.commentControl,
+	  locationControl: this.locationControl,
+	  deviceControl: this.deviceControl,
+	  lifeTimeControl: this.lifeTimeControl
+    });
       
   //Required Messages
   requiredUserField = 'Por favor escoge un usuario.';
@@ -90,8 +107,8 @@ export class ActivityDetailComponent implements OnInit {
   requiredPriorityField = 'Por favor escoge una prioridad.';
   requiredStatusField = 'Por favor escoge un estado.';
   requiredStartDateField = 'Por favor escoge una fecha de alta.';
-  requiredCategoryField = 'Por favor escoge una categoria.';
-  requiredSuperiorCategoryField = 'Por favor escoge un tipo de categoria.';
+  requiredCategoryField = 'Por favor escoge una actividad.';
+  requiredSuperiorCategoryField = 'Por favor escoge una categoría de actividad.';
   maxLenghtCommentField = 'Por favor no exceda el número máximo de 250 caracteres.';
   dateLessValidationMessage = 'Por favor ingrese una fecha posterior a la fecha de Alta.';
   dateLessThanRequiredMessage = 'Por favor ingrese una fecha anterior a la fecha requerida.';
@@ -113,11 +130,12 @@ export class ActivityDetailComponent implements OnInit {
   ) {
     this.id = +this.route.snapshot.paramMap.get('id');
   	this.isEdition = this.id > 0; 
-	console.log(this.isEdition);
+	if(this.isEdition)
+		this.pageTitle = "Actividad " + this.id;
   }
 
   ngOnInit(): void { 
-    if(this.isEdition){
+	if(this.isEdition){
 		this.getActivity();
 	}else {
 		this.activity = {
@@ -143,7 +161,6 @@ export class ActivityDetailComponent implements OnInit {
 		this.getPetitionActivities();
 		this.createFormGroup();
 	}
-	
   }
 
   getActivity(): void {
@@ -164,23 +181,6 @@ export class ActivityDetailComponent implements OnInit {
   }
    
   createFormGroup(): void {
-	this.validationGroup = this.formBuilder.group({
-	  userControl : this.userControl,
-	  semesterControl : this.semesterControl,
-	  priorityControl : this.priorityControl,
-	  statusControl : this.statusControl,
-	  currentDateControl : this.currentDateControl, 
-	  resolutionDateControl : this.resolutionDateControl,  
-	  requiredDateControl : this.requiredDateControl,
-	  superiorActivityControl : this.superiorActivityControl,
-	  petitionControl: this.petitionControl,
-	  categoryControl: this.categoryControl,
-	  superiorCategoryControl: this.superiorCategoryControl,
-	  commentControl: this.commentControl,
-	  locationControl: this.locationControl,
-	  deviceControl: this.deviceControl,
-	  lifeTimeControl: this.lifeTimeControl
-    }); 
 	this.statusControl.setValue(this.activity.estado);
 	if(this.statusControl.value != this.DONE)
 		this.resolutionDateControl.disable();
@@ -192,7 +192,6 @@ export class ActivityDetailComponent implements OnInit {
 	}
 	
 	if(this.isEdition){
-		this.semesterControl.setValue(this.activity.semestre.id);
 		this.currentDateControl.setValue(new Date(this.activity.fechaAlta));
 		if(this.activity.fechaResolucion != null)
 			this.resolutionDateControl.setValue(new Date(this.activity.fechaResolucion));
@@ -280,7 +279,7 @@ export class ActivityDetailComponent implements OnInit {
   }
   
   hasRequiredError(fieldName: string): boolean{
-    return this.validationGroup.get(fieldName).hasError('required');
+	return this.validationGroup.get(fieldName).hasError('required');
   }
 
   hasDateError(fieldName: string): boolean {
@@ -335,7 +334,9 @@ export class ActivityDetailComponent implements OnInit {
     this.semesterService.getSemesters()
     .subscribe(semesters =>{ 
 				this.semesters = semesters;
-				if(!this.isEdition)
+				if(this.isEdition)
+				    this.semesterControl.setValue(this.activity.semestre.id);
+				else
 					this.assignDefaultSemester();
 	           },
 			   error => {
@@ -397,6 +398,17 @@ export class ActivityDetailComponent implements OnInit {
 			this.categoryTree.push(this.categoryHashTable[element.id]);
 		}
 	  });
+  }
+  
+  assignLifeTimeDevice(selectedDevice: number){
+	if(selectedDevice >0 ){
+		//const foundDevice = this.devicesByLocation.find(device => device.id == selectedDevice);
+		//this.lifeTimeControl.setValue(foundDevice.tiempoVida);
+		this.lifeTimeControl.enable();
+	}
+	else{
+		this.lifeTimeControl.disable();
+	}
   }
     
   assignCategoryList(selectedSuperiorCategory: number){

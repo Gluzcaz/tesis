@@ -34,6 +34,9 @@ class ActivityView(TemplateView):
     def getDetailUrl(request, id):
         return render(request, 'index.html', context=None)
 		
+    def getCreateUrl(request):
+        return render(request, 'index.html', context=None)
+		
 #   @login_required
     @csrf_exempt	
     def getActivities(request):
