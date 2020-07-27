@@ -159,7 +159,7 @@ export class ActivityDetailComponent implements OnInit {
 		this.getUsers();
 		this.getLocations();
 		this.getPetitionActivities();
-		this.createFormGroup();
+		this.setDefaultValuesToForms();
 	}
   }
 
@@ -172,7 +172,7 @@ export class ActivityDetailComponent implements OnInit {
 					this.getUsers();
 					this.getLocations();
 					this.getPetitionActivities();
-					this.createFormGroup();
+					this.setDefaultValuesToForms();
 					},
 				error => {
 				  catchError(this.notifyService.handleError<Actividad>('getActivityDetails'));
@@ -180,7 +180,7 @@ export class ActivityDetailComponent implements OnInit {
 				  });
   }
    
-  createFormGroup(): void {
+  setDefaultValuesToForms(): void {
 	this.statusControl.setValue(this.activity.estado);
 	if(this.statusControl.value != this.DONE)
 		this.resolutionDateControl.disable();
@@ -198,7 +198,6 @@ export class ActivityDetailComponent implements OnInit {
 		if(this.activity.fechaRequerido != null)
 			this.requiredDateControl.setValue(new Date(this.activity.fechaRequerido));
 		this.commentControl.setValue(this.activity.comentario);
-		this.userControl.setValue(this.activity.usuario.id);
 	}
 	else{
 		this.currentDateControl.setValue(new Date());
@@ -322,6 +321,8 @@ export class ActivityDetailComponent implements OnInit {
     this.userService.getUsers()
     .subscribe(users =>{ 
 				this.users = users;
+				if(this.isEdition)
+					this.userControl.setValue(this.activity.usuario.id);
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Usuario>('getUser'));
