@@ -1,4 +1,4 @@
-<div class="background-class" [ngStyle]="{backgroundImage:'url(../static/images/blocNotas.jpg)'}">
+<div class="background-class" [ngStyle]="{backgroundImage:'url(../static/media/images/blocNotas.jpg)'}">
     <div id="notebook" class="mat-elevation-z15" >
 		    <div><h2>{{pageTitle}}</h2></div>
 		<form [formGroup] = "validationGroup" (ngSubmit)="save()">
@@ -158,7 +158,7 @@
 				<mat-form-field>
 					<mat-label>Comentario:</mat-label>
 					<textarea  matInput formControlName="commentControl"></textarea>
-					<mat-hint align="end">{{commentControl.value.length + "/" + MAX_LENGTH_COMMENT}}</mat-hint>
+					<mat-hint *ngIf="commentControl.value!=null" align="end">{{commentControl.value.length + "/" + MAX_LENGTH_COMMENT}}</mat-hint>
 					<mat-error *ngIf="validationGroup.get('commentControl').hasError('maxlength')">{{maxLenghtCommentField}}</mat-error>
 				</mat-form-field>
 			</div>

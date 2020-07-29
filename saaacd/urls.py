@@ -9,6 +9,8 @@ from saaacd.subviews.LocationView import LocationView
 from saaacd.subviews.DeviceView import DeviceView
 from rest_framework import routers
 from django.urls import re_path
+from django.conf import settings 
+from django.conf.urls.static import static 
  
  
 router = routers.DefaultRouter()
@@ -28,8 +30,6 @@ urlpatterns = [
 	url(r'^api/categories/', CategoryView.getCategories),
 	url(r'^api/locations/', LocationView.getLocations),
 	url(r'^api/devices/', DeviceView.getDevicesByLocation),
-
-	
    #url(r'^.*', TemplateView.as_view(template_name="home.html"), name="home")
    # url(r'^links/$', views.LinksPageView.as_view()), # simple view
    # url(r'^getcust/$',views.Actividades.getActividad), # simple view

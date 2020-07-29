@@ -1,0 +1,27 @@
+mysql-python o pymysql
+https://johnserrano.co/blog/mysql-con-python-django
+https://medium.com/@a01207543/django-conecta-tu-proyecto-con-la-base-de-datos-mysql-2d329c73192a
+
+
+mysqlclient
+https://www.digitalocean.com/community/tutorials/how-to-create-a-django-app-and-connect-it-to-a-database
+https://riptutorial.com/es/django/example/17418/mysql---mariadb
+
+
+Xampp is a free opensource tool which provides you with the Apache server and phpMyAdmin which is the best source for beginner programmers to work with MySQL.
+https://data-flair.training/blogs/django-database/
+
+
+https://riptutorial.com/es/django/example/17418/mysql---mariadb
+
+CREATE DATABASE saacd CHARACTER SET utf8 COLLATE utf8_bin;
+CREATE USER luz@localhost IDENTIFIED BY 'luz308';
+GRANT ALL PRIVILEGES ON saacd.* TO celezte@localhost;
+FLUSH PRIVILEGES;
+
+https://www.dev2qa.com/how-to-connect-mysql-database-in-django-project/
+
+
+
+
+One think I really like of MySQL Workbench is that it allows me to see the database structure. To do so, go to Database –> Reverse Engineer… in the upper menu. Select the user to connect to the database (for example, the root user), select the taskbuster_db and click continue.

@@ -170,13 +170,13 @@ export class ActivitiesComponent implements OnInit {
 	var url='';
 	switch(priority){
 		case 'a':
-			url='../static/images/prioridadAlta.png';
+			url='../static/media/icons/prioridadAlta.png';
 			break;
 		case 'm':
-			url='../static/images/prioridadMedia.png';
+			url='../static/media/icons/prioridadMedia.png';
 			break;
 		case 'b':
-			url='../static/images/prioridadBaja.png';
+			url='../static/media/icons/prioridadBaja.png';
 			break;
 	}
 	return url;
@@ -186,13 +186,13 @@ export class ActivitiesComponent implements OnInit {
 	var url='';
 	switch(status){
 		case 'r':
-			url='../static/images/estadoRealizado.jpg';
+			url='../static/media/icons/estadoRealizado.jpg';
 			break;
 		case 'p':
-			url='../static/images/estadoPendiente.jpg';
+			url='../static/media/icons/estadoPendiente.jpg';
 			break;
 		case 'e':
-			url='../static/images/estadoProgreso.jpg';
+			url='../static/media/icons/estadoProgreso.jpg';
 			break;
 	}
 	return url;

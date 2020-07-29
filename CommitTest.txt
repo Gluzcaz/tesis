@@ -6,39 +6,40 @@ git config --global user.email luz.celezte@gmail.com
 
 cd C:\Users\LUZ\Envs\my_django_environment
 
--- crear un repositorio nuevo, entonces no tendr·s ning˙n repositorio remoto al que enviar cambios.
+-- crear un repositorio nuevo, entonces no tendr√°s ning√∫n repositorio remoto al que enviar cambios.
 git init
 
-----Una vez configurado el repositorio remoto, deber·s aÒadir una URL de repositorio remoto a tu comando git config local y
+----Una vez configurado el repositorio remoto, deber√°s a√±adir una URL de repositorio remoto a tu comando git config local y
 ---- configurar una rama de nivel superior para tus ramas locales.
 git remote add luz https://github.com/Gluzcaz/tesis.git
 
 
---AÒadir CommitTest.txt al entorno de ensayo de repositorio
+--A√±adir CommitTest.txt al entorno de ensayo de repositorio
 git add CommitTest.txt
 
---Crea una nueva confirmaciÛn con un mensaje
-git commit -m "Added toasts for notifications of result actions on activities. Added two levels to the main menu."
-
-----Crea una nueva rama llamada "feature_x" y c·mbiate a ella usando
+--Crea una nueva confirmaci√≥n con un mensaje
+git commit -m "Added Back-end Activity Creation"
+----Crea una nueva rama llamada "feature_x" y c√°mbiate a ella usando
 Crear un branch:
  git checkout -b saaacd
 Mover a ese branch:
- git checkout feature_Models_luz
+ git checkout feature_Create_Edit_Activity_Luz
 
-git push luz feature_Models_luz
+Subit los cambios a tu rama remota
+git push luz feature_Integrate_UI_Style
 
 ***********************EXTRA COMMANDS:
 git config --list
 git help config
 
---actualizar tu repositorio local al commit m·s nuevo, ejecuta
-git pull
+--actualizar tu repositorio local al commit m√°s nuevo, ejecuta
+git pull remotename branchname
+git pull luz main_saaacd
 
 --Antes de fusionar los cambios, puedes revisarlos usando
 git diff <source_branch> <target_branch>
 
---Fusionar esos conflictos manualmente al editar los archivos mostrados por git. DespuÈs de modificarlos, necesitas marcarlos como fusionados con
+--Fusionar esos conflictos manualmente al editar los archivos mostrados por git. Despu√©s de modificarlos, necesitas marcarlos como fusionados con
 git add <filename>
 
 --Para fusionar otra rama a tu rama activa (por ejemplo master), utiliza
@@ -70,7 +71,7 @@ git remote show luz
 
 ------------PROCESO CREAR RAMAS-------------
 --Crear la rama remota en la pagina web Git.
-	Nota: Cuando creas una nueva rama tomar· de base en la que estas colocado actualmente.
+	Nota: Cuando creas una nueva rama tomar√° de base en la que estas colocado actualmente.
 --Me traiga todas las ramas remotas(IMPORTANTE PARA PUSH Y MERGE)
 	git fetch luz 
 --En cmd crear la rama local con el mismo nombre de la remota:
@@ -84,11 +85,15 @@ git remote show luz
 	
 ---Hacer merge de una rama feature_Models_luz
 git checkout main_saaacd
-git merge feature_Borrar_Actividad_luz
+git merge feature_Integrate_UI_Style
 git push
 
-git branch -d feature_Models_luz
-git branch -d feature_Borrar_Actividad_luz
+---Stash
+git stash
+git stash apply
+
+feature_Create_Edit_Activity_Luz
+ feature_Integrate_UI_Style
 
 ----ERRORS:
 --fatal: refusing to merge unrelated histories
