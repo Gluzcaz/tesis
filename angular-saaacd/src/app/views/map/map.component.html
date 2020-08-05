@@ -1,0 +1,58 @@
+<!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"  crossorigin="anonymous">-->
+<script type="text/javascript" src="./jquery-1.11.0.min.js"></script>
+<!-- Openlayers -->
+<!--<script type="text/javascript" src="./ol.js"></script>-->
+<!-- ol-ext -->
+<!-- <script type="text/javascript" src="./ol-ext.min.js"></script>-->
+<body>
+    <div class="col-md-2" *ngFor="let location of locations">
+      <div class="drag-container">
+        <div class="section-heading">{{location.name}}</div>
+        <div cdkDropList id="{{location.id}}" [cdkDropListData]="location.regionList"
+          [cdkDropListConnectedTo]="connectedTo" class="item-list" (cdkDropListDropped)="drop($event)" >
+          <div class="item-box" *ngFor="let regionItem of location.regionList" cdkDrag>{{regionItem}}</div>
+        </div>
+      </div>
+    </div>
+	<div class="col-md-2">
+		<div class="drag-container">
+			<div class="section-heading">{{regions.name}}</div>
+			<div cdkDropList id="{{regions.id}}" [cdkDropListData]="regions.regionList"
+			  [cdkDropListConnectedTo]="regionsConnectedTo" class="item-list" (cdkDropListDropped)="regionDrop($event)">
+			  <button (click)="pulse($event, regionItem)" id="button-{{regionItem.id}}" class="item-box" *ngFor="let regionItem of regions.regionList" cdkDrag>{{regionItem.geometry_name}}</button>
+			</div>
+		</div>
+	</div>
+	
+    <div>
+		<!--<mat-form-field>
+			<mat-label>Mapas:</mat-label>
+			<mat-select name="map" (selectionChange)="changeMapImageUrl($event.value)">
+			  <mat-option *ngFor="let map of maps" [value]="map.id">
+				{{map.nombre}}
+			  </mat-option>
+			</mat-select>
+		</mat-form-field>-->
+		
+     		<mat-label>Mapas: </mat-label>
+			<mat-select name="map" (selectionChange)="changeMapImageUrl($event.value)">
+			   <div *ngFor="let locationType of mapTree">
+			  <mat-optgroup [label]="locationType.element.nombre" >
+						<mat-option *ngFor="let map of locationType.children" [value]="map.id" >
+									{{map.nombre}}
+						</mat-option>
+			  </mat-optgroup>
+			  </div>
+			</mat-select>
+
+		<button (click)="processMap()">Procesar Mapa</button>
+		<img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
+		<!--<img *ngIf="mapImageUrl!=''"  style="visibility: hidden"  [src]="mapImageUrl" />-->
+	</div>
+	
+	<div id="map" class="map" style="width:100%; height:100%; z-index: 0"></div>
+	<!--<div id="overlay" style="z-index:9999"></div>-->
+	
+	
+	<button (click)="save()">Guardar</button>
+</body>

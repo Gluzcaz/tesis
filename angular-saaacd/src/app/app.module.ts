@@ -5,11 +5,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { DragDropModule } from '@angular/cdk/drag-drop';
  
 import { AppRoutingModule }     from './app-routing.module'; 
  
 import { AppComponent } from './app.component';
-import { ActivitiesComponent }      from './views/activities/activities.component';
+import { ActivitiesComponent }  from './views/activities/activities.component';
 import { MessagesComponent }    from './views/messages/messages.component';
 import { ConfirmDialogComponent } from './views/confirmDialog/confirm-dialog.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -24,6 +25,7 @@ import { MatMenuModule} from '@angular/material/menu';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { ActivityDetailComponent }  from './views/activity-detail/activity-detail.component';
+import { MapComponent }  from './views/map/map.component';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
@@ -37,6 +39,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     MessagesComponent,
     ConfirmDialogComponent,
 	ActivityDetailComponent,
+	MapComponent
   ],
   imports: [
     BrowserModule,
@@ -58,6 +61,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 	MatNativeDateModule,
 	ReactiveFormsModule,
 	MatCheckboxModule,
+	DragDropModule,
 	ToastrModule.forRoot()
   ],
   providers: [{provide: MAT_DATE_LOCALE, useValue: 'es-ES'}],

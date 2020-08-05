@@ -34,7 +34,7 @@ class ActivityView(TemplateView):
     def getDetailUrl(request, id):
         return render(request, 'index.html', context=None)
 		
-    def getCreateUrl(request):
+    def keepUrl(request):
         return render(request, 'index.html', context=None)
 		
 #   @login_required

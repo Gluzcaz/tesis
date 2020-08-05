@@ -7,6 +7,7 @@ from saaacd.subviews.UserView import UserView
 from saaacd.subviews.CategoryView import CategoryView
 from saaacd.subviews.LocationView import LocationView
 from saaacd.subviews.DeviceView import DeviceView
+from saaacd.subviews.MapView import MapView
 from rest_framework import routers
 from django.urls import re_path
 from django.conf import settings 
@@ -20,7 +21,8 @@ urlpatterns = [
     url(r'^$', views.ActivityView.as_view()),
 	url(r'^allActivities/', views.ActivityView.as_view()),
 	re_path(r'^detail/(?P<id>[0-9]+)/$',views.ActivityView.getDetailUrl),
-	url(r'^create/', views.ActivityView.getCreateUrl),
+	url(r'^create/', views.ActivityView.keepUrl),
+	url(r'^map/', views.ActivityView.keepUrl),
 	url(r'^api/petitionActivities/', views.ActivityView.getPetitionActivities),
 	url(r'^api/detailActivity/', views.ActivityView.detailActivity),
 	url(r'^api/saveActivity/', views.ActivityView.saveActivity),
@@ -30,6 +32,7 @@ urlpatterns = [
 	url(r'^api/categories/', CategoryView.getCategories),
 	url(r'^api/locations/', LocationView.getLocations),
 	url(r'^api/devices/', DeviceView.getDevicesByLocation),
+	url(r'^api/maps/', MapView.getMaps),
    #url(r'^.*', TemplateView.as_view(template_name="home.html"), name="home")
    # url(r'^links/$', views.LinksPageView.as_view()), # simple view
    # url(r'^getcust/$',views.Actividades.getActividad), # simple view
