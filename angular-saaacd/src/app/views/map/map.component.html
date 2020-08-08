@@ -4,55 +4,57 @@
 <!--<script type="text/javascript" src="./ol.js"></script>-->
 <!-- ol-ext -->
 <!-- <script type="text/javascript" src="./ol-ext.min.js"></script>-->
-<body>
-    <div class="col-md-2" *ngFor="let location of locations">
-      <div class="drag-container">
-        <div class="section-heading">{{location.name}}</div>
-        <div cdkDropList id="{{location.id}}" [cdkDropListData]="location.regionList"
-          [cdkDropListConnectedTo]="connectedTo" class="item-list" (cdkDropListDropped)="drop($event)" >
-          <div class="item-box" *ngFor="let regionItem of location.regionList" cdkDrag>{{regionItem}}</div>
-        </div>
-      </div>
-    </div>
-	<div class="col-md-2">
-		<div class="drag-container">
-			<div class="section-heading">{{regions.name}}</div>
-			<div cdkDropList id="{{regions.id}}" [cdkDropListData]="regions.regionList"
-			  [cdkDropListConnectedTo]="regionsConnectedTo" class="item-list" (cdkDropListDropped)="regionDrop($event)">
-			  <button (click)="pulse($event, regionItem)" id="button-{{regionItem.id}}" class="item-box" *ngFor="let regionItem of regions.regionList" cdkDrag>{{regionItem.geometry_name}}</button>
+
+<div class="grid-three-spaces">
+	<mat-label>Mapas: </mat-label>
+	<mat-select name="map" (selectionChange)="changeMapImageUrl($event.value)">
+	   <div *ngFor="let locationType of mapTree">
+	  <mat-optgroup [label]="locationType.element.nombre" >
+				<mat-option *ngFor="let map of locationType.children" [value]="map.id" >
+							{{map.nombre}}
+				</mat-option>
+	  </mat-optgroup>
+	  </div>
+	</mat-select>
+
+	<button (click)="processMap()">Procesar Mapa</button>
+</div>
+
+<img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
+<div id="map" class="map" style="width:100%; height:100%; z-index: 0"></div>
+
+
+<div class="drag-container">
+	<div class="section-heading">{{regions.name}}</div>
+	<div cdkDropList id="{{regions.id}}" [cdkDropListData]="regions.regionList"
+	  [cdkDropListConnectedTo]="regionsConnectedTo" class="item-list" (cdkDropListDropped)="regionDrop($event)">
+	  <button id="button-{{regionItem.id}}" class="item-box" (click)="pulse($event, regionItem)" *ngFor="let regionItem of regions.regionList" cdkDrag>{{regionItem.id}}</button>
+	</div>
+</div>
+
+<div>
+	<mat-label>Ubicaciones en: </mat-label>
+	<mat-select name="superiorLocation" (selectionChange)="assignLocationList($event.value)">
+	  <mat-option *ngFor="let superiorLocation of superiorLocations" [value]="superiorLocation.id">
+		{{superiorLocation.tipoUbicacion.nombre + ' ' +superiorLocation.nombre}}
+	  </mat-option>
+	</mat-select>
+	<div class="grid-six-spaces">
+		<div *ngFor="let location of locations">
+		  <div class="drag-container-locations">
+			<div class="section-heading">{{location.name}}</div>
+			<div cdkDropList id="{{location.id}}" [cdkDropListData]="location.regionList"
+			  [cdkDropListConnectedTo]="connectedTo" class="item-list" (cdkDropListDropped)="drop($event)" >
+			  <button id="button-{{regionItem.id}}" class="item-box" (click)="pulse($event, regionItem)" *ngFor="let regionItem of location.regionList" cdkDrag>
+				{{regionItem.id}}
+			  </button>
 			</div>
+		  </div>
 		</div>
 	</div>
-	
-    <div>
-		<!--<mat-form-field>
-			<mat-label>Mapas:</mat-label>
-			<mat-select name="map" (selectionChange)="changeMapImageUrl($event.value)">
-			  <mat-option *ngFor="let map of maps" [value]="map.id">
-				{{map.nombre}}
-			  </mat-option>
-			</mat-select>
-		</mat-form-field>-->
-		
-     		<mat-label>Mapas: </mat-label>
-			<mat-select name="map" (selectionChange)="changeMapImageUrl($event.value)">
-			   <div *ngFor="let locationType of mapTree">
-			  <mat-optgroup [label]="locationType.element.nombre" >
-						<mat-option *ngFor="let map of locationType.children" [value]="map.id" >
-									{{map.nombre}}
-						</mat-option>
-			  </mat-optgroup>
-			  </div>
-			</mat-select>
+</div>
 
-		<button (click)="processMap()">Procesar Mapa</button>
-		<img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
-		<!--<img *ngIf="mapImageUrl!=''"  style="visibility: hidden"  [src]="mapImageUrl" />-->
-	</div>
-	
-	<div id="map" class="map" style="width:100%; height:100%; z-index: 0"></div>
-	<!--<div id="overlay" style="z-index:9999"></div>-->
-	
-	
-	<button (click)="save()">Guardar</button>
-</body>
+<!--<div id="overlay" style="z-index:9999"></div>-->
+
+<div><button (click)="save()">Guardar</button></div>
+

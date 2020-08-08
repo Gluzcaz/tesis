@@ -31,6 +31,8 @@ urlpatterns = [
 	url(r'^api/users/', UserView.getUsers),
 	url(r'^api/categories/', CategoryView.getCategories),
 	url(r'^api/locations/', LocationView.getLocations),
+	url(r'^api/inferiorLocations', LocationView.getInferiorLocations),
+	url(r'^api/superiorLocations', LocationView.getSuperiorLocations),
 	url(r'^api/devices/', DeviceView.getDevicesByLocation),
 	url(r'^api/maps/', MapView.getMaps),
    #url(r'^.*', TemplateView.as_view(template_name="home.html"), name="home")
