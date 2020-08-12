@@ -3,8 +3,10 @@ import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag
 import { catchError} from 'rxjs/operators';
 
 import { LocationService } from '../../services/location.service';
+import { RegionService } from '../../services/region.service';
 import { Ubicacion } from '../../models/Ubicacion';
 import { Mapa } from '../../models/Mapa';
+import { RegionGeografica } from '../../models/RegionGeografica';
 import { NotificationService } from '../../services/notification.service';
 import { MapService } from '../../services/map.service';
 import { DOCUMENT } from '@angular/common'; 
@@ -44,6 +46,7 @@ export class MapComponent implements OnInit {
   mapHashTable: Object = Object.create(null);
   mapTree: Array<any> =[];
   locationErrorMessage = 'No se ha podido mostrar las ubicaciones.';
+  regionErrorMessage = 'No se ha podido mostrar las regiones.';
   mapErrorMessage = 'No se ha podido mostrar los mapas.';
   title = 'Notificación';
   
@@ -57,6 +60,7 @@ export class MapComponent implements OnInit {
   selectedCollection = new Collection(); 
   htmlElement: HTMLElement;
   selectedButton=null;
+  selectedMap: number;
   
   ngOnInit(): void {
    console.log('ngOnInit');
@@ -78,6 +82,7 @@ export class MapComponent implements OnInit {
   
   constructor(
     private locationService: LocationService,
+	private regionService: RegionService,
   	private notifyService : NotificationService,
 	private mapService: MapService, 
 	private renderer: Renderer2,
@@ -203,7 +208,16 @@ export class MapComponent implements OnInit {
   }
   
   processMap(){
-  }
+	this.regionService.getRegionsOnMap(this.selectedMap)
+    .subscribe(regions =>{ 
+			    console.log(regions);
+	           },
+			   error => {
+				  catchError(this.notifyService.handleError<RegionGeografica>('getRegions'));
+				  this.notifyService.showErrorTimeout(this.regionErrorMessage, this.title);
+				  }
+			   );
+ }
   
   save(){
   }
@@ -394,6 +408,7 @@ addMapInteraction(){
   }
  
  getRegions(){
+	
 	this.featureCollection = { "type": "FeatureCollection","features": [
 { "type": "Feature", "id": 1, "geometry_name": 1, "geometry": { "type": "Polygon", "coordinates": [[ 
 [466,665],[465,666],[464,666],[464,667],[463,668],[463,671],[464,672],[464,890],[463,891],[463,894],[464,895],[464,896],[471,896],[472,895],[795,895],[796,896],[798,896],[799,895],[802,895],[803,894],[806,897],[806,900],[805,901],[805,952],[804,953],[804,956],[805,957],[805,958],[812,958],[813,957],[873,957],[874,958],[881,958],[881,951],[880,950],[880,906],[881,905],[881,903],[880,902],[880,899],[879,898],[883,894],[884,895],[887,895],[888,896],[890,896],[891,895],[1460,895],[1461,896],[1468,896],[1468,889],[1467,888],[1467,674],[1468,673],[1468,666],[1467,666],[1466,665],[1463,665],[1462,666],[470,666],[469,665], ]]}, "properties": {"centroid": [866,847]}},

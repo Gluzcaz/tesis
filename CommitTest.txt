@@ -18,7 +18,7 @@ git remote add luz https://github.com/Gluzcaz/tesis.git
 git add CommitTest.txt
 
 --Crea una nueva confirmación con un mensaje
-git commit -m "Added Back-end Activity Creation"
+git commit -m "Added Location select menu"
 ----Crea una nueva rama llamada "feature_x" y cámbiate a ella usando
 Crear un branch:
  git checkout -b saaacd
@@ -26,7 +26,7 @@ Mover a ese branch:
  git checkout feature_Create_Edit_Activity_Luz
 
 Subit los cambios a tu rama remota
-git push luz feature_Integrate_UI_Style
+git push luz feature_Map_Component_Luz
 
 ***********************EXTRA COMMANDS:
 git config --list

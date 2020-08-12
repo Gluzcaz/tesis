@@ -8,6 +8,7 @@ from saaacd.subviews.CategoryView import CategoryView
 from saaacd.subviews.LocationView import LocationView
 from saaacd.subviews.DeviceView import DeviceView
 from saaacd.subviews.MapView import MapView
+from saaacd.subviews.RegionView import RegionView
 from rest_framework import routers
 from django.urls import re_path
 from django.conf import settings 
@@ -35,6 +36,7 @@ urlpatterns = [
 	url(r'^api/superiorLocations', LocationView.getSuperiorLocations),
 	url(r'^api/devices/', DeviceView.getDevicesByLocation),
 	url(r'^api/maps/', MapView.getMaps),
+	url(r'^api/regions/', RegionView.getRegionsOnMap),
    #url(r'^.*', TemplateView.as_view(template_name="home.html"), name="home")
    # url(r'^links/$', views.LinksPageView.as_view()), # simple view
    # url(r'^getcust/$',views.Actividades.getActividad), # simple view

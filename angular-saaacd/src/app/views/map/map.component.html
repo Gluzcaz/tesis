@@ -7,7 +7,7 @@
 
 <div class="grid-three-spaces">
 	<mat-label>Mapas: </mat-label>
-	<mat-select name="map" (selectionChange)="changeMapImageUrl($event.value)">
+	<mat-select [(ngModel)]="selectedMap" name="map" (selectionChange)="changeMapImageUrl($event.value)">
 	   <div *ngFor="let locationType of mapTree">
 	  <mat-optgroup [label]="locationType.element.nombre" >
 				<mat-option *ngFor="let map of locationType.children" [value]="map.id" >
