@@ -36,7 +36,7 @@ import * as olEasing from 'ol/easing';
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-  mapImageUrl: string = '../static/media/mapas/findCont.png';
+  mapImageUrl: string = ''; //'../static/media/mapas/findCont.png';//QUITARLO
   maps: Mapa[];
   regions ={'id':'0', 'name': '', 'regionList':[]};
   locations = [];
@@ -49,6 +49,9 @@ export class MapComponent implements OnInit {
   regionErrorMessage = 'No se ha podido mostrar las regiones.';
   mapErrorMessage = 'No se ha podido mostrar los mapas.';
   title = 'Notificación';
+  processedRegions : RegionGeografica[];
+  processedImageId = 0;
+  processedLocations : Ubicacion[];
   
   loadedImageWidth: number = 0;
   loadedImageHeight: number = 0;
@@ -67,12 +70,6 @@ export class MapComponent implements OnInit {
    this.getMaps();
    this.getRegions();
    this.getSuperiorLocations()
-   this.regions ={
-			id: '0',
-			name: 'Regions',
-			regionList: this.featureCollection.features
-    };
-	
   }
   
   ngAfterViewInit(): void {
@@ -210,7 +207,20 @@ export class MapComponent implements OnInit {
   processMap(){
 	this.regionService.getRegionsOnMap(this.selectedMap)
     .subscribe(regions =>{ 
-			    console.log(regions);
+                if(this.processedImageId > 0)
+				{
+				  this.clearMap();
+				  console.log(this.map.getLayers().getArray());
+				}
+				this.processedRegions = regions;
+				this.regions ={
+						id: '0',
+						name: 'Regiones',
+						regionList: regions
+				};
+				this.drawElementsOnMap();
+	            this.addMapInteraction();
+				this.processedImageId = this.selectedMap;
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<RegionGeografica>('getRegions'));
@@ -225,55 +235,89 @@ export class MapComponent implements OnInit {
 /*************** MAP VISUALIZATION ******************* ***/
   
   @ViewChild('img', { static: false }) img: ElementRef;
-  onLoad() {
-   console.log((this.img.nativeElement as HTMLImageElement).naturalWidth);
-   console.log((this.img.nativeElement as HTMLImageElement).naturalHeight);
+  onLoad(){
    this.loadedImageWidth = (this.img.nativeElement as HTMLImageElement).naturalWidth;
    this.loadedImageHeight = (this.img.nativeElement as HTMLImageElement).naturalHeight;
-   this.createMap();
- }
+   console.log(this.mapImageUrl);
+   console.log(this.selectedMap);
+   if(this.mapImageUrl != ''){
+		//Check if map not already exist
+		if(this.map == null){
+		   this.createMap();
+		} 
+		else 
+		{
+			if(this.processedImageId > 0){
+				if(this.processedImageId == this.selectedMap){
+					this.regions ={
+							id: '0',
+							name: 'Regiones',
+							regionList: this.processedRegions
+					};
+					this.drawElementsOnMap();
+	                this.addMapInteraction();
+				} else {
+					this.clearMap();
+					this.regions ={
+							id: '0',
+							name: 'Regiones',
+							regionList: []
+					};
+				}
+			} 
+		    this.changeVectorLayer();
+		}
+   } else{
+		console.log('SIN IMAGEN ESPECIFICADA');
+   }
+   
+  }
   
   createMap(): void{
-	let extent = [0, 0, this.loadedImageWidth, this.loadedImageHeight]; //1485, 1061] //
-
-	let projection = new Projection({
+     let extent = [0, 0, this.loadedImageWidth, this.loadedImageHeight]; 
+	 let projection = new Projection({
 		  code: 'map-image',
 		  units: 'pixels',
 		  extent: extent
 		});
 		
-	this.view = new OlView({
+	 this.view = new OlView({
 			projection: projection,
 			center: olExtent.getCenter(extent),
 			zoom: 2,
 			maxZoom: 8
 		  });
 		  
-    let imageLayer = new ImageLayer({
+     let imageLayer = new ImageLayer({
 					source: new ImageStatic({
 							url: this.mapImageUrl,
 							projection: projection,
 							imageExtent: extent
 						  })
 				});
-	//Check if map not already exist
-   if(this.map == null)
-   {
-      this.map = new OlMap({
+     this.map = new OlMap({
 		  target: 'map',
 		  layers: [imageLayer],
 		  view: this.view
 	  });
-	  this.drawElementsOnMap();
-	  this.addMapInteraction();
-	}
-	else //Change only vectorLayer (markers)
-	{
+  }
+  
+  clearMap(){
 	 this.map.getInteractions().pop();
 	 this.map.getOverlays().clear();
 	 let oldContourVector = this.map.getLayers().getArray()[1];
+	 oldContourVector.getSource().clear();
 	 this.map.removeLayer(oldContourVector);
-	 
+  }
+  
+  changeVectorLayer(){
+     //Change only vectorLayer (markers)
+	 let extent = [0, 0, this.loadedImageWidth, this.loadedImageHeight]; 
+	 let projection = new Projection({
+		  code: 'map-image',
+		  units: 'pixels',
+		  extent: extent
+		});
 	 let oldVectorLayer = this.map.getLayers().getArray()[0];
 	 let source = new ImageStatic({
 							url: this.mapImageUrl,
@@ -281,19 +325,16 @@ export class MapComponent implements OnInit {
 							imageExtent: extent
 						  })
      oldVectorLayer.setSource(source);
-	}
-
   }
 
   
 //-------------------------DRAW ELEMENTS ON MAP
 //-------DRAW CONTOURS
   drawElementsOnMap(){
-	this.featureCollection.features.forEach(region => {
+	this.processedRegions.forEach(region => {
 					let feature = new Feature({
-						geometry: new Polygon(region.geometry.coordinates),
-						id: region.id,
-						geometry_name: region.geometry_name
+						geometry: new Polygon(JSON.parse(region.coordenada)),
+						id: region.id
 					});
 					this.vectorSource.addFeature(feature);
 					
@@ -302,17 +343,10 @@ export class MapComponent implements OnInit {
 					var newDiv = this.renderer.createElement('div');
 					// Set the id of the div
 					this.renderer.setProperty(newDiv, 'id', 'region-' + region.id);
-					//this.renderer.setProperty(newDiv,'z-index', 9999);
 					this.renderer.setProperty(newDiv, 'textContent', region.id);
-					// Append the created div to the body element
-					//this.renderer.appendChild(document.body, newDiv);
-					
-					
-					
-					let centroid = region.properties.centroid;
-					//let newDiv = angular.element("<div id='number"+index+"'></div>");
+
 					let overlay = new Overlay({
-					  position: [centroid[0],centroid[1]],
+					  position: JSON.parse(region.centroide), 
 					  positioning: 'center-center',
 					  element: newDiv,
 					  stopEvent: false,
@@ -384,27 +418,19 @@ addMapInteraction(){
 	}
 
 	var f = new Feature({
-		geometry: new Polygon(item.geometry.coordinates),
+		geometry: new Polygon(JSON.parse(item.coordenada)),
 	});
 
 	f.setStyle(new Style({
 		  fill: new Fill({
 			color: "red"
 		  })}));
-	
-	//this.selectedCollection.push(f);
-	
-	var fitOptions ={
+
+    var fitOptions ={
 	  duration: 2000,
 	  easing: olEasing["easeOut"] 
 	};
 	this.map.getView().fit(f.getGeometry(), fitOptions);
-	/*this.map.animateFeature (f
-	, new ol.featureAnimation.Zoom({
-	  fade: olEasing.easeOut, 
-	  duration: 2000,
-	  easing: olEasing["easeOut"] 
-	}));*/
   }
  
  getRegions(){

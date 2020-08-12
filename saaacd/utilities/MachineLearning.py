@@ -58,7 +58,7 @@ class MachineLearning():
             centroidX = sumCentroidX//lenghtPoints
             centroidY = sumCentroidY//lenghtPoints
             item.centroide = '[{},{}]'.format(centroidX, centroidY)
-            item.coordenada = feautureString + ']]';
+            item.coordenada = feautureString.rstrip(',') + ']]';
 			
         for i in range(contoursTotal):
                 if hierarchy[0, i, 3] == -1:    #No parent: this is the outer contour which we need to draw
