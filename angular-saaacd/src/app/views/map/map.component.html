@@ -17,7 +17,7 @@
 	  </div>
 	</mat-select>
 
-	<button (click)="processMap()" [disabled]="!initialAvailability">Procesar Mapa</button>
+	<button (click)="processMap()" [disabled]="disableButton">Procesar Mapa</button>
 </div>
 
 <img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
@@ -56,5 +56,5 @@
 
 <!--<div id="overlay" style="z-index:9999"></div>-->
 
-<div><button (click)="save()" [disabled]="!initialAvailability">Guardar</button></div>
+<div><button (click)="save()" [disabled]="disableButton">Guardar</button></div>
 

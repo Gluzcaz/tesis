@@ -64,7 +64,7 @@ export class MapComponent implements OnInit {
   htmlElement: HTMLElement;
   selectedButton=null;
   selectedMap: number;
-  initialAvailability: boolean = false;
+  disableButton: boolean = true;
   
   ngOnInit(): void {
    console.log('ngOnInit');
@@ -159,7 +159,7 @@ export class MapComponent implements OnInit {
 	if(selectedMap){
 		const foundMap = this.maps.find(map => map.id == selectedMap);
 		this.mapImageUrl ='../static/media/' + foundMap.imagen;
-		this.initialAvailability = true;
+		this.disableButton = false;
 	}else{
 		this.mapImageUrl ='';
 	}
