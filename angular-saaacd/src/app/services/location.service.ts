@@ -12,6 +12,7 @@ export class LocationService {
   private locationsUrl = '/api/locations'; 
   private inferiorLocationsUrl = '/api/inferiorLocations'; 
   private superiorLocationsUrl = '/api/superiorLocations';
+  private saveLocationsUrl = '/api/saveLocations/'
  
   constructor(private http: HttpClient) {}
   
@@ -29,6 +30,11 @@ export class LocationService {
   getLocationsBySuperiorLocation(id: number):  Observable<any> {
 	var options = URLutility.getHttpOptionsWithParam('location', id.toString());
     return this.http.get<Ubicacion[]>(this.inferiorLocationsUrl, options);
+  }
+  
+  /** PUT: update the activity on the server */
+  updateLocation(locations: any): Observable<any> {
+    return this.http.put<any>(this.saveLocationsUrl, locations, URLutility.httpOptions);
   }
  
 }

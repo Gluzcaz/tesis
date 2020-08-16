@@ -37,6 +37,8 @@ urlpatterns = [
 	url(r'^api/devices/', DeviceView.getDevicesByLocation),
 	url(r'^api/maps/', MapView.getMaps),
 	url(r'^api/regions/', RegionView.getRegionsOnMap),
+	url(r'^api/saveLocations/', LocationView.saveLocations),
+	
    #url(r'^.*', TemplateView.as_view(template_name="home.html"), name="home")
    # url(r'^links/$', views.LinksPageView.as_view()), # simple view
    # url(r'^getcust/$',views.Actividades.getActividad), # simple view

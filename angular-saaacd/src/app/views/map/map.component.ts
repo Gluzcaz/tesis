@@ -48,6 +48,8 @@ export class MapComponent implements OnInit {
   locationErrorMessage = 'No se ha podido mostrar las ubicaciones.';
   regionErrorMessage = 'No se ha podido mostrar las regiones.';
   mapErrorMessage = 'No se ha podido mostrar los mapas.';
+  updateLocationsErrorMessage = 'No se ha podido asignar las regiones geográficas a las ubicaciones.';
+  updateLocationsSuccessMessage = 'Se asignaron las regiones geográficas exitosamente.';
   title = 'Notificación';
   processedRegions : RegionGeografica[];
   processedImageId = 0;
@@ -117,7 +119,12 @@ export class MapComponent implements OnInit {
     this.locationService.getLocationsBySuperiorLocation(selectedSuperiorLocation)
     .subscribe(locations =>{ 
 				this.locations = [];
-			    locations.forEach(location => {
+				const foundSuperiorLocation = this.superiorLocations.find(superiorLocation => superiorLocation.id == selectedSuperiorLocation);
+				this.locations.push( {'id': selectedSuperiorLocation.toString(), 'name': foundSuperiorLocation.tipoUbicacion.nombre + " " + foundSuperiorLocation.nombre,'regionList':[]});
+			    this.regionsConnectedTo.push(selectedSuperiorLocation.toString());
+				this.connectedTo.push(selectedSuperiorLocation.toString());
+				
+				locations.forEach(location => {
 					this.locations.push( {'id': location.id.toString(), 'name': location.tipoUbicacion.nombre + " " + location.nombre,'regionList':[]});
 					this.regionsConnectedTo.push(location.id.toString());
 				    this.connectedTo.push(location.id.toString());
@@ -205,15 +212,20 @@ export class MapComponent implements OnInit {
 	});
   }
   
+  getSavedData
+  
   processMap(){
+	
 	this.regionService.getRegionsOnMap(this.selectedMap)
     .subscribe(regions =>{ 
+				
 				this.processedRegions = regions;
 				this.regions ={
 						id: '0',
 						name: 'Regiones',
 						regionList: regions
 				};
+
 				if(this.processedImageId > 0)
 				{
 				  this.clearMap();
@@ -228,9 +240,54 @@ export class MapComponent implements OnInit {
 				  }
 			   );
  }
+ 
+   
+  getRawLocation(locationId: number, region: RegionGeografica): any{
+	let id=null;
+	/*if(region.id)    //PENDIENTE
+		id=region.id;*/
+	let location = {
+			  'id' : locationId,
+			  'coordenada': region.coordenada,
+			  'centroide': region.centroide,
+			  'regionGeograficaId': id, 
+			  'mapaId': this.selectedMap
+			};
+	return location;
+   }
   
   save(){
+ 	let rawLocations = [];
+    this.locations.forEach(location => {
+		if(location.regionList.length > 0){
+			let rawLocation = this.getRawLocation(location.id, location.regionList[0]);
+			rawLocations.push(rawLocation);
+		}
+	});
+	
+	this.locationService.updateLocation(rawLocations)
+				  .subscribe(
+							response => {
+							  console.log(response);
+							  this.notifyService.showSuccessTimeout(this.updateLocationsSuccessMessage, this.title);
+							  },
+							error => {
+							  catchError(this.notifyService.handleError<Ubicacion>('SaveLocations'));
+							  this.notifyService.showErrorTimeout(this.updateLocationsErrorMessage, this.title);
+							  });
+	
+	
   }
+  
+  /*
+  goBack(): void {
+    this.location.back();
+  }
+  
+  cancel(event: any): void {
+	event.preventDefault();
+    this.location.back();
+  }*/
   
 /*************** MAP VISUALIZATION ******************* ***/
   
@@ -240,39 +297,34 @@ export class MapComponent implements OnInit {
    this.loadedImageHeight = (this.img.nativeElement as HTMLImageElement).naturalHeight;
    console.log(this.mapImageUrl);
    console.log(this.selectedMap);
-   if(this.mapImageUrl != ''){
-		//Check if map not already exist
-		if(this.map == null){
-		   this.createMap();
+	//Check if map not already exist
+	if(this.map == null){
+	   this.createMap();
+	} 
+	else 
+	{   
+		if(this.processedImageId > 0){
+			if(this.processedImageId == this.selectedMap){
+				this.changeVectorLayer();
+				this.regions ={
+						id: '0',
+						name: 'Regiones',
+						regionList: this.processedRegions
+				};
+				this.drawElementsOnMap();
+				this.addMapInteraction();
+			} else {
+				this.clearMap();
+				this.changeVectorLayer();
+				this.regions ={
+						id: '0',
+						name: 'Regiones',
+						regionList: []
+				};
+			}
 		} 
-		else 
-		{   
-			if(this.processedImageId > 0){
-				if(this.processedImageId == this.selectedMap){
-				    this.changeVectorLayer();
-					this.regions ={
-							id: '0',
-							name: 'Regiones',
-							regionList: this.processedRegions
-					};
-					this.drawElementsOnMap();
-	                this.addMapInteraction();
-				} else {
-					this.clearMap();
-					this.changeVectorLayer();
-					this.regions ={
-							id: '0',
-							name: 'Regiones',
-							regionList: []
-					};
-				}
-			} 
 
-		}
-   } else{
-		console.log('SIN IMAGEN ESPECIFICADA');
-   }
-   
+	}
   }
   
   createMap(): void{
