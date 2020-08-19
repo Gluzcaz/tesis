@@ -9,7 +9,7 @@ import { Mapa } from '../../models/Mapa';
 import { RegionGeografica } from '../../models/RegionGeografica';
 import { NotificationService } from '../../services/notification.service';
 import { MapService } from '../../services/map.service';
-import { DOCUMENT } from '@angular/common'; 
+import { DOCUMENT, Location} from '@angular/common';
 
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
@@ -38,7 +38,7 @@ import * as olEasing from 'ol/easing';
 export class MapComponent implements OnInit {
   mapImageUrl: string = ''; //'../static/media/mapas/findCont.png';//QUITARLO
   maps: Mapa[];
-  regions ={'id':'0', 'name': '', 'regionList':[]};
+  regions ={'id':'0', 'name': 'Regiones', 'regionList':[]};
   locations = [];
   superiorLocations : Ubicacion[];
   connectedTo = [];
@@ -70,7 +70,7 @@ export class MapComponent implements OnInit {
   disableButton: boolean = true;
   disableLocationSelection: boolean  = true;
   isMainMap: boolean = false;
-  
+   
   ngOnInit(): void {
    this.getMaps();
    this.getSuperiorLocations()
@@ -82,7 +82,8 @@ export class MapComponent implements OnInit {
   	private notifyService : NotificationService,
 	private mapService: MapService, 
 	private renderer: Renderer2,
-	@Inject(DOCUMENT) document
+	@Inject(DOCUMENT) document,
+	private navigationPlace: Location,
 	){
 	this.connectedTo.push('0');
   }
@@ -276,15 +277,11 @@ export class MapComponent implements OnInit {
 	
   }
   
-  /*
-  goBack(): void {
-    this.location.back();
-  }
-  
-  cancel(event: any): void {
+ 
+  goBack(event: any): void {
 	event.preventDefault();
-    this.location.back();
-  }*/
+    this.navigationPlace.back();
+  }
   
 /*************** MAP VISUALIZATION ******************* ***/
   

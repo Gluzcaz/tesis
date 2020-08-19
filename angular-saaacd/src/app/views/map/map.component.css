@@ -1,11 +1,6 @@
 .background-map{
-	/*
-    
-    background-size: cover;
-	z-index: 1;*/
-
 	width: 100%;
-	height: 120%;
+	height: 150%;
     background-size: cover;
 	background-image: url("/././static/media/images/location6.jpg");
 	}
@@ -18,6 +13,7 @@ button {
   padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
+  display: inline-block;
 }
 button:hover {
   background-color: #cfd8dc;
@@ -125,7 +121,13 @@ input {
 .grid-four-spaces{
   display: grid;
   grid-template-columns: auto auto auto auto;
-  width: 70%;
+  width: 60%;
+}
+
+.grid-two-spaces{
+  display: grid;
+  grid-template-columns: auto auto;
+  width: 30%;
 }
 
 .grid-six-spaces{
@@ -161,5 +163,4 @@ input {
 .map {
 width: 90%;
 height: 70%;
-/*z-index: 9999;*/
 }

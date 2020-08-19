@@ -423,7 +423,7 @@ export class ActivityDetailComponent implements OnInit {
     this.locationService.getLocations()
     .subscribe(locations =>{ 
 				this.locations = locations;
-				this.locations.push({"id": 0, "nombre": "", "ubicacionSuperior": null, "tipoUbicacion": { "id": 0, "nombre": "Ninguno"}});
+				this.locations.push({"id": 0, "nombre": "", "regionGeografica": null, "ubicacionSuperior": null, "tipoUbicacion": { "id": 0, "nombre": "Ninguno"}});
 				this.createLocationCatalogue();
 				if(this.activity.ubicacion != null){
 					this.locationControl.setValue(this.activity.ubicacion.id);
