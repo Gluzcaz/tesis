@@ -4,10 +4,11 @@
 <!--<script type="text/javascript" src="./ol.js"></script>-->
 <!-- ol-ext -->
 <!-- <script type="text/javascript" src="./ol-ext.min.js"></script>-->
-<div class="background-class" [ngStyle]="{backgroundImage:'url(../static/media/images/nauticalMap.jpg)'}">
-	<div class="grid-three-spaces">
+<!--<link href="/././/././/././/././node_modules/@angular/material/prebuilt-themes/indigo-pink.css" rel="stylesheet"/>-->
+<div class="background-map">
+	<div class="grid-four-spaces">
 		<mat-label>Mapas: </mat-label>
-		<mat-select [(ngModel)]="selectedMap" name="map" (selectionChange)="changeMapImageUrl($event.value)">
+		<mat-select [(ngModel)]="selectedMap" (selectionChange)="changeMapImageUrl($event.value)">
 		   <div *ngFor="let locationType of mapTree">
 		  <mat-optgroup [label]="locationType.element.nombre" >
 					<mat-option *ngFor="let map of locationType.children" [value]="map.id" >
@@ -16,6 +17,10 @@
 		  </mat-optgroup>
 		  </div>
 		</mat-select>
+		
+		<mat-checkbox [(ngModel)]="isMainMap">
+				<mat-label>¿Es mapa principal?</mat-label>	
+		</mat-checkbox>
 
 		<button (click)="processMap()" [disabled]="disableButton">Procesar Mapa</button>
 	</div>
@@ -34,7 +39,7 @@
 
 	<div>
 		<mat-label>Ubicaciones en: </mat-label>
-		<mat-select name="superiorLocation" (selectionChange)="assignLocationList($event.value)">
+		<mat-select [disabled]="disableLocationSelection" [(ngModel)]="selectedLocation" name="superiorLocation" (selectionChange)="assignLocationList($event.value)">
 		  <mat-option *ngFor="let superiorLocation of superiorLocations" [value]="superiorLocation.id">
 			{{superiorLocation.tipoUbicacion.nombre + ' ' +superiorLocation.nombre}}
 		  </mat-option>

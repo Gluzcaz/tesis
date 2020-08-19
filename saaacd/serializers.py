@@ -11,7 +11,7 @@ from saaacd.subserializers.DynamicFieldsModelSerializer import DynamicFieldsMode
 class ActividadSerializador(DynamicFieldsModelSerializer):
     categoria = CategoriaSerializador(read_only=True, fields=('id', 'nombre', 'categoriaSuperior')) 
     semestre = SemestreSerializador(read_only=True) 
-    ubicacion = UbicacionSerializador(read_only=True) 
+    ubicacion = UbicacionSerializador(read_only=True, fields=('id', 'nombre', 'tipoUbicacion', 'ubicacionSuperior')) 
     usuario = UsuarioSerializador(read_only=True) 
     dispositivo = DispositivoSerializador(read_only=True)
     actividadSuperior= ActividadSuperiorSerializador(read_only=True)

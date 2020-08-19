@@ -49,7 +49,7 @@ export class MapComponent implements OnInit {
   regionErrorMessage = 'No se ha podido mostrar las regiones.';
   mapErrorMessage = 'No se ha podido mostrar los mapas.';
   updateLocationsErrorMessage = 'No se ha podido asignar las regiones geográficas a las ubicaciones.';
-  updateLocationsSuccessMessage = 'Se asignaron las regiones geográficas exitosamente.';
+  updateLocationsSuccessMessage = 'Se asignaron exitosamente las regiones geográficas al mapa: ';
   title = 'Notificación';
   processedRegions : RegionGeografica[];
   processedImageId = 0;
@@ -66,19 +66,16 @@ export class MapComponent implements OnInit {
   htmlElement: HTMLElement;
   selectedButton=null;
   selectedMap: number;
+  selectedLocation: number;
   disableButton: boolean = true;
+  disableLocationSelection: boolean  = true;
+  isMainMap: boolean = false;
   
   ngOnInit(): void {
-   console.log('ngOnInit');
    this.getMaps();
    this.getSuperiorLocations()
   }
-  
-  ngAfterViewInit(): void {
-	console.log('ngAfterViewInit');
-  }
 
-  
   constructor(
     private locationService: LocationService,
 	private regionService: RegionService,
@@ -87,45 +84,38 @@ export class MapComponent implements OnInit {
 	private renderer: Renderer2,
 	@Inject(DOCUMENT) document
 	){
-	console.log('constructor');
 	this.connectedTo.push('0');
-
-   /* this.locations = [
-      {
-        id: '1',
-		name: 'J101',
-        regionList:["item 1"]
-      },{
-        id: '2',
-		name: 'J102',
-        regionList:["item 2"]
-      },{
-        id: '3',
-		name: 'J103',
-        regionList:["item 3"]
-      },{
-        id: '4',
-		name: 'J104',
-        regionList:["item 4"]
-      }
-    ];
-	for (let location of this.locations) {
-      this.regionsConnectedTo.push(location.id);
-	  this.connectedTo.push(location.id);
-    };*/
   }
   
   assignLocationList(selectedSuperiorLocation: number){
+    this.regions ={
+						id: '0',
+						name: 'Regiones',
+						regionList: []
+				    };
+    this.locations = [];
     this.locationService.getLocationsBySuperiorLocation(selectedSuperiorLocation)
     .subscribe(locations =>{ 
-				this.locations = [];
+				if(this.processedImageId > 0 )
+					this.regions.regionList= this.processedRegions.slice();
 				const foundSuperiorLocation = this.superiorLocations.find(superiorLocation => superiorLocation.id == selectedSuperiorLocation);
-				this.locations.push( {'id': selectedSuperiorLocation.toString(), 'name': foundSuperiorLocation.tipoUbicacion.nombre + " " + foundSuperiorLocation.nombre,'regionList':[]});
-			    this.regionsConnectedTo.push(selectedSuperiorLocation.toString());
-				this.connectedTo.push(selectedSuperiorLocation.toString());
-				
+				locations.push(foundSuperiorLocation);
+
 				locations.forEach(location => {
-					this.locations.push( {'id': location.id.toString(), 'name': location.tipoUbicacion.nombre + " " + location.nombre,'regionList':[]});
+					let regionList = [];
+				    if(this.processedImageId > 0 && 
+					   location.regionGeografica != null &&
+					   location.regionGeografica.mapa.id == this.processedImageId){
+						
+						const foundRegion = this.processedRegions.find(region => region.coordenada == location.regionGeografica.coordenada);
+						if(foundRegion != null){
+							location.regionGeografica.rawId = location.regionGeografica.id;
+							location.regionGeografica.id = foundRegion.id;
+							regionList.push(location.regionGeografica);
+							this.regions.regionList.splice(foundRegion.id-1, 1);
+						}
+     				}
+					this.locations.push( {'id': location.id.toString(), 'name': location.tipoUbicacion.nombre + " " + location.nombre,'regionList':regionList});
 					this.regionsConnectedTo.push(location.id.toString());
 				    this.connectedTo.push(location.id.toString());
 				});
@@ -167,6 +157,12 @@ export class MapComponent implements OnInit {
 		const foundMap = this.maps.find(map => map.id == selectedMap);
 		this.mapImageUrl ='../static/media/' + foundMap.imagen;
 		this.disableButton = false;
+		this.isMainMap = foundMap.esActivo;
+		if(selectedMap!=this.processedImageId)
+			this.disableLocationSelection = true;
+		else
+			this.disableLocationSelection = false;
+
 	}else{
 		this.mapImageUrl ='';
 	}
@@ -211,21 +207,18 @@ export class MapComponent implements OnInit {
 		this.mapHashTable[element.tipoUbicacion.id].children.push(element);
 	});
   }
-  
-  getSavedData
-  
+
   processMap(){
-	
+	this.disableLocationSelection = false;
 	this.regionService.getRegionsOnMap(this.selectedMap)
     .subscribe(regions =>{ 
 				
-				this.processedRegions = regions;
+				this.processedRegions = regions.slice();
 				this.regions ={
 						id: '0',
 						name: 'Regiones',
 						regionList: regions
 				};
-
 				if(this.processedImageId > 0)
 				{
 				  this.clearMap();
@@ -244,32 +237,36 @@ export class MapComponent implements OnInit {
    
   getRawLocation(locationId: number, region: RegionGeografica): any{
 	let id=null;
-	/*if(region.id)    //PENDIENTE
-		id=region.id;*/
+	if(region.rawId)   
+		id=region.rawId;
 	let location = {
 			  'id' : locationId,
 			  'coordenada': region.coordenada,
 			  'centroide': region.centroide,
-			  'regionGeograficaId': id, 
-			  'mapaId': this.selectedMap
+			  'regionGeograficaId': id
 			};
 	return location;
    }
   
   save(){
  	let rawLocations = [];
+	let generalData = {
+			  'mapaId' : this.selectedMap,
+			  'esActivo': this.isMainMap ? 1 : 0
+			};
+	rawLocations.push(generalData);
     this.locations.forEach(location => {
 		if(location.regionList.length > 0){
 			let rawLocation = this.getRawLocation(location.id, location.regionList[0]);
 			rawLocations.push(rawLocation);
 		}
 	});
-	
+	console.log(rawLocations);
 	this.locationService.updateLocation(rawLocations)
 				  .subscribe(
 							response => {
-							  console.log(response);
-							  this.notifyService.showSuccessTimeout(this.updateLocationsSuccessMessage, this.title);
+							  console.log(response.mapName);
+							  this.notifyService.showSuccessTimeout(this.updateLocationsSuccessMessage + response.mapName, this.title);
 							  },
 							error => {
 							  catchError(this.notifyService.handleError<Ubicacion>('SaveLocations'));
@@ -300,16 +297,19 @@ export class MapComponent implements OnInit {
 	//Check if map not already exist
 	if(this.map == null){
 	   this.createMap();
+	   
 	} 
 	else 
 	{   
 		if(this.processedImageId > 0){
+			//this.disableLocationSelection = false;
+		    let regions = this.processedRegions.slice();
 			if(this.processedImageId == this.selectedMap){
 				this.changeVectorLayer();
 				this.regions ={
 						id: '0',
 						name: 'Regiones',
-						regionList: this.processedRegions
+						regionList: regions
 				};
 				this.drawElementsOnMap();
 				this.addMapInteraction();
@@ -322,6 +322,8 @@ export class MapComponent implements OnInit {
 						regionList: []
 				};
 			}
+			this.locations = [];
+			this.selectedLocation = null;
 		} 
 
 	}

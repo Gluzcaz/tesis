@@ -3,6 +3,7 @@ from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import TemplateView
 
 from saaacd.submodels.Ubicacion import Ubicacion
+from saaacd.submodels.Mapa import Mapa
 from saaacd.submodels.RegionGeografica import RegionGeografica
 from saaacd.subserializers.UbicacionSerializador import UbicacionSerializador
  
@@ -20,14 +21,14 @@ class LocationView(TemplateView):
     def getLocations(request):
         if request.method == 'GET':
             data = Ubicacion.objects.all()
-            serializer = UbicacionSerializador(data, many=True)
+            serializer = UbicacionSerializador(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'ubicacionSuperior'))
             return JsonResponse(serializer.data, safe=False)
 	
     def getSuperiorLocations(request):
         if request.method == 'GET':
             data = Ubicacion.objects.all()
             data = data.filter(ubicacionSuperior= None)
-            serializer = UbicacionSerializador(data, many=True)
+            serializer = UbicacionSerializador(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'regionGeografica'))
             return JsonResponse(serializer.data, safe=False)
 			
     def getInferiorLocations(request):
@@ -40,7 +41,7 @@ class LocationView(TemplateView):
             data = Ubicacion.objects.all()
             if location is not None:
                 data = data.filter(ubicacionSuperior=location)
-                serializer = UbicacionSerializador(data, many=True)
+                serializer = UbicacionSerializador(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'regionGeografica'))
                 return JsonResponse(serializer.data, safe=False)
         except Exception as e:
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
@@ -49,37 +50,56 @@ class LocationView(TemplateView):
     @api_view(['PUT'])
     def saveLocations(request):
         data = JSONParser().parse(request)
-        with transaction.atomic():
-            for locationData in data:
-                try:
-                    id=locationData['id']
-                    location = Ubicacion.objects.get(id=id)
-                except Ubicacion.DoesNotExist: 
-                    return JsonResponse({'message': "Ubicacion doesn't exist."}, status=status.HTTP_404_NOT_FOUND) 
-				
-                try:
-                    regionId=locationData['regionGeograficaId']
-                    if(regionId is not None):
-                       region = RegionGeografica.objects.get(id=regionId)
-                except RegionGeografica.DoesNotExist: 
-                    return JsonResponse({'message': "Region doesn't exist."}, status=status.HTTP_404_NOT_FOUND) 
-				
-                try:
-                    if(regionId is None):
-                        newRegion = RegionGeografica(
-									coordenada = locationData['coordenada'],
-									centroide = locationData['centroide'],
-									mapa_id = locationData['mapaId'])
-                        newRegion.save()
-                        location.regionGeografica_id = newRegion.id
-                        location.save()
-                    else:
-                        location.regionGeografica_id = regionId
-                        location.save()
-                except IntegrityError as ie:
-                    return JsonResponse({'error': ie}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        generalElements = data.pop(0)
+        mapId = generalElements['mapaId']
+        isActiveMap = generalElements['esActivo']
+        try:
+            map = Mapa.objects.get(id=mapId)
+        except Mapa.DoesNotExist: 
+            return JsonResponse({'message': "Map doesn't exist."}, status=status.HTTP_404_NOT_FOUND) 
         
-        return JsonResponse({}, safe=False, status=status.HTTP_201_CREATED)
+        try:
+    	    with transaction.atomic():
+                if(map.esActivo != isActiveMap):
+                    map.esActivo = isActiveMap
+                    map.save()
+                    if( isActiveMap == 1 ):
+                        maps = Mapa.objects.all()
+                        for mapObject in maps:
+                            if(mapObject.id != mapId):
+                                mapObject.esActivo = 0
+                                mapObject.save()
+                            						
+                for locationData in data:
+                    try:
+    	                id=locationData['id']
+    	                location = Ubicacion.objects.get(id=id)
+                    except Ubicacion.DoesNotExist: 
+    	                return JsonResponse({'message': "Location doesn't exist."}, status=status.HTTP_404_NOT_FOUND) 
+					
+                    try:
+    	                regionId=locationData['regionGeograficaId']
+    	                if(regionId is not None):
+    	                   region = RegionGeografica.objects.get(id=regionId)
+                    except RegionGeografica.DoesNotExist: 
+    	                return JsonResponse({'message': "Region doesn't exist."}, status=status.HTTP_404_NOT_FOUND) 
+					
+                    if(regionId is None):
+    	                newRegion = RegionGeografica(
+										coordenada = locationData['coordenada'],
+										centroide = locationData['centroide'],
+										mapa_id = mapId)
+    	                newRegion.save()
+    	                location.regionGeografica_id = newRegion.id
+    	                location.save()
+                    else:
+    	                location.regionGeografica_id = regionId
+    	                location.save()
+    	            
+        except IntegrityError as ie: 
+            return JsonResponse({'error': ie}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return JsonResponse({'mapName': map.nombre}, safe=False, status=status.HTTP_201_CREATED)
 
 		
 		

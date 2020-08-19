@@ -6,4 +6,4 @@ class MapaSerializador(serializers.ModelSerializer):
     tipoUbicacion = TipoUbicacionSerializador(read_only=True) 
     class Meta:
         model = Mapa
-        fields = 'id', 'nombre', 'imagen', 'tipoUbicacion'
+        fields = 'id', 'nombre', 'imagen', 'tipoUbicacion', 'esActivo'

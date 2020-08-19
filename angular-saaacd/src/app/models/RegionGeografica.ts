@@ -1,6 +1,6 @@
 export class RegionGeografica {
   id: number;
-  nombre: string;
+  rawId: number;
   coordenada: string;
   centroide: string;
   mapa: number;
