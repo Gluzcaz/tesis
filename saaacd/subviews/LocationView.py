@@ -3,11 +3,15 @@ from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import TemplateView
 
 from saaacd.submodels.Ubicacion import Ubicacion
+from saaacd.submodels.Categoria import Categoria
+from saaacd.submodels.ReporteEstadistico import ReporteEstadistico
 from saaacd.submodels.Mapa import Mapa
 from saaacd.submodels.RegionGeografica import RegionGeografica
 from saaacd.subserializers.UbicacionSerializador import UbicacionSerializador
+from saaacd.subserializers.ReporteEstadisticoSerializador import ReporteEstadisticoSerializador
  
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 from rest_framework import viewsets
 from django.views.decorators.csrf import csrf_exempt
@@ -46,6 +50,62 @@ class LocationView(TemplateView):
         except Exception as e:
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
 	
+    def __addEmptyActivityCategories(data):
+        categories = Categoria.objects.filter(categoriaSuperior = None).order_by('categoriaSuperior')
+        categoryDict = {}
+        for i in categories:
+            categoryDict[i.id]=0
+        for object in data:
+            attributes = object['data'].split(',')
+            stadistics = categoryDict.copy()
+            for element in attributes:
+                frequencies = element.split(':')
+                stadistics[int(frequencies[0])]=int(frequencies[1])
+            object['data'] = json.dumps(list(stadistics.values()))
+        return data
+			
+    def getActivityStadisticByInfLocation(request):
+        if request.method == 'GET':
+            semesterId = request.GET['semesterId']
+            data = ReporteEstadistico.objects.raw('''SELECT ubicacion_id as id, nombre, centroide,
+				GROUP_CONCAT(CONCAT(category_classifier, ":", frequencies) SEPARATOR ",") as data
+				FROM (
+					SELECT c.category_classifier, ubicacion_id, u.nombre, rg.centroide, count(*) as frequencies from saaacd_actividad a INNER JOIN 
+					(SELECT sss.id, IF(ss.categoriaSuperior_id>0, ss.categoriaSuperior_id, sss.categoriaSuperior_id) as category_classifier
+					 FROM saacd.saaacd_categoria sss  
+					LEFT JOIN saacd.saaacd_categoria ss ON sss.categoriaSuperior_id=ss.id
+					LEFT JOIN saacd.saaacd_categoria s ON s.id=ss.categoriaSuperior_id) as c ON a.categoria_id = c.id
+					INNER JOIN saacd.saaacd_ubicacion u ON a.ubicacion_id = u.id 
+					INNER JOIN saacd.saaacd_regiongeografica rg ON u.regionGeografica_id = rg.id
+					WHERE a.semestre_id =%s AND rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
+					GROUP BY category_classifier, ubicacion_id) a
+					GROUP BY ubicacion_id	''', [semesterId])
+            serializer = ReporteEstadisticoSerializador(data, many=True)
+            data = LocationView.__addEmptyActivityCategories(serializer.data)
+            return JsonResponse(data, safe=False)
+	
+    def getActivityStadisticBySupLocation(request):
+        if request.method == 'GET':
+            semesterId = request.GET['semesterId']
+            data = ReporteEstadistico.objects.raw('''SELECT location AS id, nombre, centroide,
+				GROUP_CONCAT(CONCAT(category_classifier, ":", frequencies) SEPARATOR ',') AS data
+				FROM (
+						SELECT rg.centroide, c.category_classifier, a.location, u.nombre, count(*) as frequencies from 
+						(SELECT a.semestre_id, a.categoria_id, IF(u.ubicacionSuperior_id>0, u.ubicacionSuperior_id, u.id) as location 
+						from saaacd_actividad a INNER JOIN saacd.saaacd_ubicacion u ON u.id = a.ubicacion_id) AS a
+						INNER JOIN (SELECT sss.id, IF(ss.categoriaSuperior_id>0, ss.categoriaSuperior_id, sss.categoriaSuperior_id) as category_classifier
+						 FROM saacd.saaacd_categoria sss 
+						LEFT JOIN saacd.saaacd_categoria ss ON sss.categoriaSuperior_id=ss.id
+						LEFT JOIN saacd.saaacd_categoria s ON s.id=ss.categoriaSuperior_id) AS c ON a.categoria_id = c.id
+						INNER JOIN saacd.saaacd_ubicacion u ON a.location = u.id 
+						INNER JOIN saacd.saaacd_regiongeografica rg ON u.regionGeografica_id = rg.id
+						WHERE a.semestre_id =%s AND rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
+						GROUP BY category_classifier, a.location) a
+					GROUP BY location''', [semesterId])
+            serializer = ReporteEstadisticoSerializador(data, many=True)
+            data = LocationView.__addEmptyActivityCategories(serializer.data)
+            return JsonResponse(data, safe=False)
+
     @csrf_exempt
     @api_view(['PUT'])
     def saveLocations(request):

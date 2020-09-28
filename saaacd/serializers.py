@@ -23,8 +23,6 @@ class ActividadSerializador(DynamicFieldsModelSerializer):
         """
         Check that the start is before the stop.
         """
-        for k, v in attrs.items():
-            print(k, v)
         if(attrs['fechaAlta'] is None):
             raise serializers.ValidationError("Start date is required.")
         if(attrs['estado'] is None):

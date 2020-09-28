@@ -30,6 +30,7 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ActivityStatisticsComponent } from './views/activity-statistics/activity-statistics.component';
 
  
 @NgModule({
@@ -39,7 +40,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     MessagesComponent,
     ConfirmDialogComponent,
 	ActivityDetailComponent,
-	MapComponent
+	MapComponent,
+	ActivityStatisticsComponent
   ],
   imports: [
     BrowserModule,

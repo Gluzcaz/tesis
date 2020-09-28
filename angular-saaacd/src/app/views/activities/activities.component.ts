@@ -228,21 +228,12 @@ export class ActivitiesComponent implements OnInit {
 		activityText = " -> " + activity.fechaResolucion;
 	return activityText;
   }
-  
-  assignDefaultSemester(){
-    for (var i=0; i<this.semesters.length; i++) {
-      if(this.semesters[i].esActivo){
-		this.selectedSemester=this.semesters[i].id;
-		break;
-	  }
-    }
-  }
    
   getSemesters(){
     this.semesterService.getSemesters()
     .subscribe(semesters =>{ 
 				this.semesters = semesters;
-				this.assignDefaultSemester();
+				this.selectedSemester = this.semesterService.getDefaultSemester( this.semesters );
 				this.semesters.push({"id": 0, "nombre": "Todos", "esActivo": false});
 	           },
 			   error => {

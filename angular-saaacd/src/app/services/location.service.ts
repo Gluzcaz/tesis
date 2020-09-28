@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 import { Ubicacion } from '../models/Ubicacion';
+import { ReporteEstadistico } from '../models/ReporteEstadistico';
 import { URLutility } from '../utilities/URLutility';
 
 @Injectable({ providedIn: 'root' })
@@ -30,6 +31,14 @@ export class LocationService {
   getLocationsBySuperiorLocation(id: number):  Observable<any> {
 	var options = URLutility.getHttpOptionsWithParam('location', id.toString());
     return this.http.get<Ubicacion[]>(this.inferiorLocationsUrl, options);
+  }
+  
+  getActivityStadisticByLocation(semesterId: number, locationType: boolean): Observable<any>{
+	 var options = URLutility.getHttpOptionsWithParam('semesterId', semesterId.toString());
+     var url = 'api/activityStadisticBySupLocation/';
+	 if(locationType)
+		url = 'api/activityStadisticByInfLocation/'
+	 return this.http.get<ReporteEstadistico[]>(url, options);
   }
   
   /** PUT: update the activity on the server */

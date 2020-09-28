@@ -234,7 +234,6 @@ export class MapComponent implements OnInit {
 				  }
 			   );
  }
- 
    
   getRawLocation(locationId: number, region: RegionGeografica): any{
 	let id=null;

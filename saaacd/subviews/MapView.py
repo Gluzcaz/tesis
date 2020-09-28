@@ -15,4 +15,11 @@ class MapView(TemplateView):
             data = Mapa.objects.all()
             serializer =  MapaSerializador(data, many=True)
             return JsonResponse(serializer.data, safe=False)
+			
+    def getActiveMap(request):
+        if request.method == 'GET':
+            data= Mapa.objects.get(esActivo=True)
+            serializer =  MapaSerializador(data)
+            return JsonResponse(serializer.data, safe=False)
+	
 	

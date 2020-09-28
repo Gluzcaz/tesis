@@ -4,14 +4,15 @@ import { Routes, RouterModule } from '@angular/router';
 import { ActivitiesComponent }      from './views/activities/activities.component';
 import { ActivityDetailComponent }  from './views/activity-detail/activity-detail.component';
 import { MapComponent }      from './views/map/map.component';
+import { ActivityStatisticsComponent } from './views/activity-statistics/activity-statistics.component';
 
 const routes: Routes = [
 { path: '', redirectTo: 'allActivities', pathMatch: 'full' },
 { path: 'allActivities', component: ActivitiesComponent },
 { path: 'create', component: ActivityDetailComponent },
 { path: 'detail/:id', component: ActivityDetailComponent },
-{ path: 'map', component: MapComponent }
-
+{ path: 'map', component: MapComponent },
+{ path: 'activityStadistic', component: ActivityStatisticsComponent }
 ];
 
 @NgModule({

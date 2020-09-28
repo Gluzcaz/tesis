@@ -19,4 +19,12 @@ export class SemesterService {
   getSemesters(): Observable<Semestre[]> {
     return this.http.get<Semestre[]>(this.semestersUrl);
   }
+  
+  getDefaultSemester(semesters){
+    for (var i=0; i< semesters.length; i++) {
+      if(semesters[i].esActivo){
+		return semesters[i].id;
+	  }
+    }
+  }
 }

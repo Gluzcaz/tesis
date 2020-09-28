@@ -1,0 +1,27 @@
+
+<mat-label>Semestre:</mat-label>
+<mat-select [(ngModel)]="selectedSemester" (selectionChange)="filterStadistics()">
+  <mat-option *ngFor="let semester of semesters" [value]="semester.id">
+	{{semester.nombre}}
+  </mat-option>
+</mat-select>
+
+<mat-label>Tipo de ubicaciones: </mat-label>
+<mat-select [(ngModel)]="selectedLocationType"(selectionChange)="filterStadistics()">
+  <mat-option *ngFor="let locationType of locationTypes" [value]="locationType.value">
+	{{locationType.key}}
+  </mat-option>
+</mat-select>
+
+<mat-label>Tipos de gráficas: </mat-label>
+<mat-select [(ngModel)]="selectedChartType"(selectionChange)="changeChartType($event.value)">
+  <mat-option *ngFor="let charType of charTypes" [value]="charType.value">
+	{{charType.key}}
+  </mat-option>
+</mat-select>
+
+<img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
+ <div id="map" class="map"></div>
+
+
+  
