@@ -11,6 +11,8 @@ import { NotificationService } from './notification.service';
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
   private categoriesUrl = '/api/categories';  // URL to web api
+  private superiorCategoriesUrl = '/api/superiorCategories';
+  
   constructor(
     private http: HttpClient,
 	private notifyService : NotificationService) {}
@@ -18,5 +20,10 @@ export class CategoryService {
  /** GET categories */
   getCategories(): Observable<Categoria[]> {
     return this.http.get<Categoria[]>(this.categoriesUrl);
+  }
+  
+  /** GET superior categories */
+  getSuperiorCategories(): Observable<Categoria[]> {
+    return this.http.get<Categoria[]>(this.superiorCategoriesUrl);
   }
 }

@@ -22,6 +22,9 @@ import { Semestre } from '../../models/Semestre';
 import { SemesterService } from '../../services/semester.service';
 import { Mapa } from '../../models/Mapa';
 import { MapService } from '../../services/map.service';
+import { Categoria } from '../../models/Categoria';
+import { CategoryService } from '../../services/category.service';
+
 
 @Component({
   selector: 'app-activity-statistics',
@@ -38,6 +41,7 @@ export class ActivityStatisticsComponent implements OnInit {
   map: OlMap;
   selectedSemester: number;
   semesters: Semestre[];
+  superiorCategories: Categoria[];
   selectedChartType: string = "pie";
   charTypes = [{ key:   "Circular", value: "pie"},
 			  { key:   "Circular 3D", value: "pie3D"},
@@ -48,22 +52,26 @@ export class ActivityStatisticsComponent implements OnInit {
   locationTypes = [{ key:   "Superior", value: false},
 			  { key:   "Inferior", value: true}
 			 ];
+  chartColors = ["#ffa500","blue","red","green","cyan","magenta","yellow","#0f0"]
   
   
   title = 'Notificación';
   locationErrorMessage = 'No se ha podido mostrar los datos estadísticos.';
   semesterErrorMessage = 'No se ha podido mostrar los semestres';
   mapErrorMessage = 'No se ha podido mostrar el mapa activo.';
+  categoryErrorMessage = 'No se ha podido mostrar las categorias de actividad.';
 
   constructor( private locationService: LocationService,
     	       private notifyService : NotificationService,
 			   private semesterService: SemesterService,
 			   private mapService: MapService,
-			   private renderer: Renderer2
+			   private renderer: Renderer2,
+			   private categoryService: CategoryService
 			   ) { }
 
   ngOnInit(): void {
     this.getActiveMap();
+	this.getSuperiorCategories();
   }
   
   getFeatureStyle(feature, sel){	
@@ -118,6 +126,7 @@ export class ActivityStatisticsComponent implements OnInit {
   getStadisticData(){
 	this.locationService.getActivityStadisticByLocation(this.selectedSemester, this.selectedLocationType)
     .subscribe(locations =>{ 
+				console.log(locations)
 			    for (var i = 0; i < locations.length; i++) { 
 					var stadistics = JSON.parse(locations[i].data);
 					var sum = 0
@@ -217,6 +226,18 @@ export class ActivityStatisticsComponent implements OnInit {
 			   );
   }  
   
+  getSuperiorCategories(){
+    this.categoryService.getSuperiorCategories()
+    .subscribe(categories =>{ 
+				this.superiorCategories = categories;	
+	           },
+			   error => {
+				  catchError(this.notifyService.handleError<Categoria>('getCategory'));
+				  this.notifyService.showErrorTimeout(this.categoryErrorMessage, this.title);
+				  }
+			   );
+  } 
+  
   clearMap(){
 	 this.map.getInteractions().pop();
 	 this.map.getOverlays().clear();
@@ -234,7 +255,6 @@ export class ActivityStatisticsComponent implements OnInit {
   
   @ViewChild('img', { static: false }) img: ElementRef;
   onLoad(){
-   console.log("onload");
    this.loadedImageWidth = (this.img.nativeElement as HTMLImageElement).naturalWidth;
    this.loadedImageHeight = (this.img.nativeElement as HTMLImageElement).naturalHeight;
    this.createMap();
@@ -273,7 +293,6 @@ export class ActivityStatisticsComponent implements OnInit {
 //-------------------------DRAW ELEMENTS ON MAP
 // Style function
 changeChartType(selectedChartType: string){
-	var oldLayer = this.map.getLayers().getArray()[1];
 	var features = this.vectorSource.getFeatures();
 	for (var i = 0; i < features.length; i++) { 
 		features[i].style=this.getFeatureStyle(features[i], false);

@@ -32,6 +32,7 @@ urlpatterns = [
 	url(r'^api/semesters/', SemesterView.getSemesters),
 	url(r'^api/users/', UserView.getUsers),
 	url(r'^api/categories/', CategoryView.getCategories),
+	url(r'^api/superiorCategories/', CategoryView.getSuperiorCategories),
 	url(r'^api/locations/', LocationView.getLocations),
 	url(r'^api/activityStadisticByInfLocation/', LocationView.getActivityStadisticByInfLocation),
 	url(r'^api/activityStadisticBySupLocation/', LocationView.getActivityStadisticBySupLocation),

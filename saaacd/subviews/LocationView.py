@@ -79,7 +79,7 @@ class LocationView(TemplateView):
 					INNER JOIN saacd.saaacd_regiongeografica rg ON u.regionGeografica_id = rg.id
 					WHERE a.semestre_id =%s AND rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
 					GROUP BY category_classifier, ubicacion_id) a
-					GROUP BY ubicacion_id	''', [semesterId])
+					GROUP BY ubicacion_id''', [semesterId])
             serializer = ReporteEstadisticoSerializador(data, many=True)
             data = LocationView.__addEmptyActivityCategories(serializer.data)
             return JsonResponse(data, safe=False)

@@ -16,3 +16,9 @@ class CategoryView(TemplateView):
             serializer =  CategoriaSerializador(data, many=True, fields=('id', 'nombre', 'categoriaSuperior'))
             return JsonResponse(serializer.data, safe=False)
 
+    def getSuperiorCategories(request):
+        if request.method == 'GET':
+            data = Categoria.objects.filter(categoriaSuperior = None).order_by('id')
+            serializer =  CategoriaSerializador(data, many=True, fields=('id', 'nombre'))
+            return JsonResponse(serializer.data, safe=False)
+

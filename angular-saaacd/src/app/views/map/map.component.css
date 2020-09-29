@@ -125,18 +125,20 @@ input {
   display: grid;
   grid-template-columns: auto auto auto auto;
   width: 60%;
+  padding: 10px;
 }
 
 .grid-two-spaces{
   display: grid;
   grid-template-columns: auto auto;
   width: 30%;
+  padding: 15px;
 }
 
 .grid-six-spaces{
   display: grid;
   grid-template-columns: auto auto auto auto auto auto;
-}
+  }
 
 
 /*******MAP VISUALIZATION*****/
