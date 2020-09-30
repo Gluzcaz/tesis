@@ -33,7 +33,7 @@ import { CategoryService } from '../../services/category.service';
 })
 export class ActivityStatisticsComponent implements OnInit {
 
-  mapImageUrl: string =''; //= '../static/media/mapas/findCont.png'; //'../static/media/mapas/findCont.png';//PENDIENTE
+  mapImageUrl: string =''; 
   loadedImageWidth: number = 0;
   loadedImageHeight: number = 0;
   view: OlView = new OlView();
@@ -123,16 +123,16 @@ export class ActivityStatisticsComponent implements OnInit {
     return style;
 }
  
-  getStadisticData(){
-	this.locationService.getActivityStadisticByLocation(this.selectedSemester, this.selectedLocationType)
+  getStatisticData(){
+	this.locationService.getActivityStatisticByLocation(this.selectedSemester, this.selectedLocationType)
     .subscribe(locations =>{ 
 				console.log(locations)
 			    for (var i = 0; i < locations.length; i++) { 
-					var stadistics = JSON.parse(locations[i].data);
+					var statistics = JSON.parse(locations[i].data);
 					var sum = 0
-					for (var k=0; k<stadistics.length; k++) 
+					for (var k=0; k<statistics.length; k++) 
 						{	
-							sum += stadistics[k];
+							sum += statistics[k];
 						}
 						
 					var centroid = JSON.parse(locations[i].centroide);
@@ -140,7 +140,7 @@ export class ActivityStatisticsComponent implements OnInit {
 						geometry: new Point([centroid[0],centroid[1]]),
 						id: locations[i].id,
 						geometry_name: locations[i].nombre,
-						data: stadistics,
+						data: statistics,
 						sum: sum, //Total
 						style: null,
 						styleText: null
@@ -153,7 +153,7 @@ export class ActivityStatisticsComponent implements OnInit {
 				this.assignFeaturesToMap()
 	           },
 			   error => {
-				  catchError(this.notifyService.handleError<ReporteEstadistico>('getActivityStadisticByLocation'));
+				  catchError(this.notifyService.handleError<ReporteEstadistico>('getActivityStatisticsByLocation'));
 				  this.notifyService.showErrorTimeout(this.locationErrorMessage, this.title);
 				  }
 			   );
@@ -217,7 +217,7 @@ export class ActivityStatisticsComponent implements OnInit {
     .subscribe(semesters =>{ 
 				this.semesters = semesters;
 				this.selectedSemester = this.semesterService.getDefaultSemester(this.semesters);
-				this.getStadisticData();
+				this.getStatisticData();
 			   },
 			   error => {
 				  catchError(this.notifyService.handleError<Semestre>('getSemester'));
@@ -246,9 +246,9 @@ export class ActivityStatisticsComponent implements OnInit {
 	 this.map.removeLayer(oldLayer);
   }
   
-  filterStadistics(){
+  filterStatistics(){
 	this.clearMap()
-	this.getStadisticData()
+	this.getStatisticData()
   }
     
   /*************** MAP VISUALIZATION ******************* ***/

@@ -5,6 +5,7 @@ import { ActivitiesComponent }      from './views/activities/activities.componen
 import { ActivityDetailComponent }  from './views/activity-detail/activity-detail.component';
 import { MapComponent }      from './views/map/map.component';
 import { ActivityStatisticsComponent } from './views/activity-statistics/activity-statistics.component';
+import { MaterialStatisticsComponent } from './views/material-statistics/material-statistics.component';
 
 const routes: Routes = [
 { path: '', redirectTo: 'allActivities', pathMatch: 'full' },
@@ -12,7 +13,8 @@ const routes: Routes = [
 { path: 'create', component: ActivityDetailComponent },
 { path: 'detail/:id', component: ActivityDetailComponent },
 { path: 'map', component: MapComponent },
-{ path: 'activityStadistic', component: ActivityStatisticsComponent }
+{ path: 'activityStatistic', component: ActivityStatisticsComponent },
+{ path: 'materialStatistic', component: MaterialStatisticsComponent }
 ];
 
 @NgModule({

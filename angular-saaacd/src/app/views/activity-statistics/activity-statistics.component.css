@@ -42,8 +42,3 @@
   padding: 15px;
 }
 
-.grid-two{
-  display: grid;
-  grid-template-columns: auto auto;
-  padding: 10px;
-}

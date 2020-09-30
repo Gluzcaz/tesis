@@ -33,11 +33,19 @@ export class LocationService {
     return this.http.get<Ubicacion[]>(this.inferiorLocationsUrl, options);
   }
   
-  getActivityStadisticByLocation(semesterId: number, locationType: boolean): Observable<any>{
+  getActivityStatisticByLocation(semesterId: number, locationType: boolean): Observable<any>{
 	 var options = URLutility.getHttpOptionsWithParam('semesterId', semesterId.toString());
-     var url = 'api/activityStadisticBySupLocation/';
+     var url = 'api/activityStatisticBySupLocation/';
 	 if(locationType)
-		url = 'api/activityStadisticByInfLocation/'
+		url = 'api/activityStatisticByInfLocation/'
+	 return this.http.get<ReporteEstadistico[]>(url, options);
+  }
+  
+  getMaterialStatisticByLocation(semesterId: number, locationType: boolean): Observable<any>{
+	 var options = URLutility.getHttpOptionsWithParam('semesterId', semesterId.toString());
+     var url = 'api/materialStatisticBySupLocation/';
+	 if(locationType)
+		url = 'api/materialStatisticByInfLocation/'
 	 return this.http.get<ReporteEstadistico[]>(url, options);
   }
   

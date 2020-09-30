@@ -1,13 +1,13 @@
 <div class="grid-two-spaces">
 	<mat-label>Semestre:</mat-label>
-	<mat-select [(ngModel)]="selectedSemester" (selectionChange)="filterStadistics()">
+	<mat-select [(ngModel)]="selectedSemester" (selectionChange)="filterStatistics()">
 	  <mat-option *ngFor="let semester of semesters" [value]="semester.id">
 		{{semester.nombre}}
 	  </mat-option>
 	</mat-select>
 
 	<mat-label>Tipo de ubicaciones: </mat-label>
-	<mat-select [(ngModel)]="selectedLocationType"(selectionChange)="filterStadistics()">
+	<mat-select [(ngModel)]="selectedLocationType"(selectionChange)="filterStatistics()">
 	  <mat-option *ngFor="let locationType of locationTypes" [value]="locationType.value">
 		{{locationType.key}}
 	  </mat-option>
