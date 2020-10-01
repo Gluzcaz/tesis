@@ -32,6 +32,7 @@ import {MAT_DATE_LOCALE} from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivityStatisticsComponent } from './views/activity-statistics/activity-statistics.component';
 import { MaterialStatisticsComponent } from './views/material-statistics/material-statistics.component';
+import { ActivityMonitoringComponent } from './views/activity-monitoring/activity-monitoring.component';
 
  
 @NgModule({
@@ -43,7 +44,8 @@ import { MaterialStatisticsComponent } from './views/material-statistics/materia
 	ActivityDetailComponent,
 	MapComponent,
 	ActivityStatisticsComponent,
-	MaterialStatisticsComponent
+	MaterialStatisticsComponent,
+	ActivityMonitoringComponent
   ],
   imports: [
     BrowserModule,

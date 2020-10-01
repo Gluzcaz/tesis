@@ -169,13 +169,13 @@ export class ActivitiesComponent implements OnInit {
   getPriorityImageUrl(priority: string): string{
 	var url='';
 	switch(priority){
-		case 'a':
+		case Actividad.PRIORITIES[0].id:
 			url='../static/media/icons/prioridadAlta.png';
 			break;
-		case 'm':
+		case Actividad.PRIORITIES[1].id:
 			url='../static/media/icons/prioridadMedia.png';
 			break;
-		case 'b':
+		case Actividad.PRIORITIES[2].id:
 			url='../static/media/icons/prioridadBaja.png';
 			break;
 	}
@@ -185,13 +185,13 @@ export class ActivitiesComponent implements OnInit {
   getStatusImageUrl(status: string): string{
 	var url='';
 	switch(status){
-		case 'r':
+		case Actividad.STATUSES[0].id:
 			url='../static/media/icons/estadoRealizado.jpg';
 			break;
-		case 'p':
+		case Actividad.STATUSES[1].id:
 			url='../static/media/icons/estadoPendiente.jpg';
 			break;
-		case 'e':
+		case Actividad.STATUSES[2].id:
 			url='../static/media/icons/estadoProgreso.jpg';
 			break;
 	}

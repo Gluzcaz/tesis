@@ -4,14 +4,14 @@ from django.views.generic import TemplateView
 
 from saaacd.submodels.Ubicacion import Ubicacion
 from saaacd.submodels.Categoria import Categoria
-from saaacd.submodels.ReporteEstadistico import ReporteEstadistico
 from saaacd.submodels.Mapa import Mapa
 from saaacd.submodels.RegionGeografica import RegionGeografica
 from saaacd.subserializers.UbicacionSerializador import UbicacionSerializador
-from saaacd.subserializers.ReporteEstadisticoSerializador import ReporteEstadisticoSerializador
  
 from django.views.decorators.csrf import csrf_exempt
 import json
+from collections import namedtuple
+from django.db import connection
 
 from rest_framework import viewsets
 from django.views.decorators.csrf import csrf_exempt
@@ -51,36 +51,47 @@ class LocationView(TemplateView):
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
 	
     def __addEmptyActivityCategories(data):
-        categories = Categoria.objects.filter(categoriaSuperior = None).order_by('categoriaSuperior')
+        categories = Categoria.objects.filter(categoriaSuperior = None).order_by('id')
         categoryDict = {}
         for i in categories:
             categoryDict[i.id]=0
         for object in data:
             attributes = object['data'].split(',')
-            stadistics = categoryDict.copy()
+            statistics = categoryDict.copy()
+            values = []
             for element in attributes:
                 frequencies = element.split(':')
-                stadistics[int(frequencies[0])]=int(frequencies[1])
-            object['data'] = json.dumps(list(stadistics.values()))
-        print(stadistics)
-        print(stadistics.values())
+                statistics[int(frequencies[0])]=int(frequencies[1])
+            for key in sorted(statistics.keys()) :
+                values.append(statistics[key])
+            object['data'] = json.dumps(values)
+        print(values)
         return data
 		
     def __addEmptyMaterialCategories(data):
-        categoryDict = {'Extravío':0,'Falla':0,'Queja':0}
+        categories = [0,0,0] #Extravío,'Falla','Queja'
         for object in data:
             attributes = object['data'].split(',')
-            stadistics = categoryDict.copy()
+            stadistics = categories[:]
             for element in attributes:
                 frequencies = element.split(':')
-                stadistics[frequencies[0]]=int(frequencies[1])
-            object['data'] = json.dumps(list(stadistics.values()))
+                stadistics[int(frequencies[0])]=int(frequencies[1])
+            object['data'] = json.dumps(stadistics)
         return data
+	
+    def __dictfetchall(cursor):
+        #"Return all rows from a cursor as a dict"
+        columns = [col[0] for col in cursor.description]
+        return [
+            dict(zip(columns, row))
+            for row in cursor.fetchall()
+        ]
 			
     def getActivityStadisticByInfLocation(request):
         if request.method == 'GET':
             semesterId = request.GET['semesterId']
-            data = ReporteEstadistico.objects.raw('''SELECT ubicacion_id as id, nombre, centroide,
+            cursor = connection.cursor()
+            cursor.execute('''SELECT ubicacion_id as id, nombre, centroide,
 				GROUP_CONCAT(CONCAT(category_classifier, ":", frequencies) SEPARATOR ",") as data
 				FROM (
 					SELECT c.category_classifier, ubicacion_id, u.nombre, rg.centroide, count(*) as frequencies from saaacd_actividad a INNER JOIN 
@@ -93,14 +104,15 @@ class LocationView(TemplateView):
 					WHERE a.semestre_id =%s AND rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
 					GROUP BY category_classifier, ubicacion_id) a
 					GROUP BY ubicacion_id''', [semesterId])
-            serializer = ReporteEstadisticoSerializador(data, many=True)
-            data = LocationView.__addEmptyActivityCategories(serializer.data)
+            data = LocationView.__dictfetchall(cursor)
+            data = LocationView.__addEmptyActivityCategories(data)
             return JsonResponse(data, safe=False)
 	
     def getActivityStadisticBySupLocation(request):
         if request.method == 'GET':
             semesterId = request.GET['semesterId']
-            data = ReporteEstadistico.objects.raw('''SELECT location AS id, nombre, centroide,
+            cursor = connection.cursor()
+            cursor.execute('''SELECT location AS id, nombre, centroide,
 				GROUP_CONCAT(CONCAT(category_classifier, ":", frequencies) SEPARATOR ',') AS data
 				FROM (
 						SELECT rg.centroide, c.category_classifier, a.location, u.nombre, count(*) as frequencies from 
@@ -115,30 +127,31 @@ class LocationView(TemplateView):
 						WHERE a.semestre_id =%s AND rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
 						GROUP BY category_classifier, a.location) a
 					GROUP BY location''', [semesterId])
-            serializer = ReporteEstadisticoSerializador(data, many=True)
-            data = LocationView.__addEmptyActivityCategories(serializer.data)
+            data = LocationView.__dictfetchall(cursor)
+            data = LocationView.__addEmptyActivityCategories(data)
             return JsonResponse(data, safe=False)
 	
     def getMaterialStadisticByInfLocation(request):
         if request.method == 'GET':
-            semesterId = str(3)#request.GET['semesterId']
-            data = ReporteEstadistico.objects.raw('''SELECT  ubicacion_id AS id, locationName AS nombre, rg.centroide,
+            semesterId = request.GET['semesterId']
+            cursor = connection.cursor()
+            cursor.execute('''SELECT  ubicacion_id AS id, locationName AS nombre, rg.centroide,
 			GROUP_CONCAT(CONCAT(categoryName, ":", frequencies) SEPARATOR ",") as data
 			 FROM 
 			(
-				SELECT 'Extravío' as categoryName, u.regionGeografica_id as regionId, a.ubicacion_id, u.nombre as locationName, count(*) frequencies FROM saacd.saaacd_actividad a 
+				SELECT '0' as categoryName, u.regionGeografica_id as regionId, a.ubicacion_id, u.nombre as locationName, count(*) frequencies FROM saacd.saaacd_actividad a 
 				INNER JOIN saacd.saaacd_categoria c ON a.categoria_id=c.id 
 				INNER JOIN saacd.saaacd_ubicacion u ON a.ubicacion_id=u.id 
 				WHERE a.esSiniestro = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "EXTRAVÍO") > 0
 				GROUP BY a.ubicacion_id
 				UNION
-				(SELECT 'Falla' as categoryName, u.regionGeografica_id as regionId,  a.ubicacion_id, u.nombre as locationName, count(*) frequencies FROM saacd.saaacd_actividad a 
+				(SELECT '1' as categoryName, u.regionGeografica_id as regionId,  a.ubicacion_id, u.nombre as locationName, count(*) frequencies FROM saacd.saaacd_actividad a 
 				INNER JOIN saacd.saaacd_categoria c ON a.categoria_id=c.id 
 				INNER JOIN saacd.saaacd_ubicacion u ON a.ubicacion_id=u.id 
 				WHERE a.esSiniestro = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "FALLA") > 0
 				GROUP BY a.ubicacion_id)
 				UNION
-				(SELECT 'Queja' as categoryName, u.regionGeografica_id as regionId,  a.ubicacion_id, u.nombre as locationName, count(*) frequencies
+				(SELECT '2' as categoryName, u.regionGeografica_id as regionId,  a.ubicacion_id, u.nombre as locationName, count(*) frequencies
 				 FROM saacd.saaacd_actividad a 
 				 INNER JOIN saacd.saaacd_categoria c ON a.categoria_id=c.id 
 				 INNER JOIN saacd.saaacd_ubicacion u ON a.ubicacion_id=u.id 
@@ -146,20 +159,21 @@ class LocationView(TemplateView):
 				 GROUP BY a.ubicacion_id)
 			 ) b
 			 INNER JOIN saacd.saaacd_regiongeografica rg ON rg.id = b.regionId
-			 WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=True)
+			 WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
 			GROUP BY id''', [semesterId, semesterId, semesterId])
-            serializer = ReporteEstadisticoSerializador(data, many=True)
-            data = LocationView.__addEmptyMaterialCategories(serializer.data)
+            data = LocationView.__dictfetchall(cursor)
+            data = LocationView.__addEmptyMaterialCategories(data)
             return JsonResponse(data, safe=False)
-	
+			
     def getMaterialStadisticBySupLocation(request):
         if request.method == 'GET':
-            semesterId = 3#request.GET['semesterId']
-            data = ReporteEstadistico.objects.raw('''SELECT  ubicacion_id AS id, locationName AS nombre, rg.centroide,
+            semesterId = request.GET['semesterId']
+            cursor = connection.cursor()
+            cursor.execute('''SELECT  ubicacion_id AS id, locationName AS nombre, rg.centroide,
 			GROUP_CONCAT(CONCAT(categoryName, ":", frequencies) SEPARATOR ",") as data
 			 FROM 
 			(
-				SELECT 'Extravío' as categoryName, su.regionGeografica_id as regionId, count(*) frequencies,
+				SELECT '0' as categoryName, su.regionGeografica_id as regionId, count(*) frequencies,
 					IF(u.ubicacionSuperior_id>0, su.nombre, u.nombre) as locationName, 
 					IF(u.ubicacionSuperior_id>0, u.ubicacionSuperior_id, u.id) AS ubicacion_id
 				FROM saacd.saaacd_actividad a 
@@ -169,7 +183,7 @@ class LocationView(TemplateView):
 				WHERE a.esSiniestro = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "EXTRAVÍO") > 0
 				GROUP BY a.ubicacion_id
 				UNION
-				(SELECT 'Falla' as categoryName, su.regionGeografica_id as regionId, count(*) frequencies,
+				(SELECT '1' as categoryName, su.regionGeografica_id as regionId, count(*) frequencies,
 					IF(u.ubicacionSuperior_id>0, su.nombre, u.nombre) as locationName, 
 					IF(u.ubicacionSuperior_id>0, u.ubicacionSuperior_id, u.id) AS ubicacion_id 
 				FROM saacd.saaacd_actividad a 
@@ -179,7 +193,7 @@ class LocationView(TemplateView):
 				WHERE a.esSiniestro = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "FALLA") > 0
 				GROUP BY a.ubicacion_id)
 				UNION
-				(SELECT 'Queja' as categoryName, su.regionGeografica_id as regionId, count(*) frequencies,
+				(SELECT '2' as categoryName, su.regionGeografica_id as regionId, count(*) frequencies,
 					IF(u.ubicacionSuperior_id>0, su.nombre, u.nombre) as locationName, 
 					IF(u.ubicacionSuperior_id>0, u.ubicacionSuperior_id, u.id) AS ubicacion_id
 				 FROM saacd.saaacd_actividad a 
@@ -190,13 +204,25 @@ class LocationView(TemplateView):
 				 GROUP BY a.ubicacion_id)
 			 ) b
 			 INNER JOIN saacd.saaacd_regiongeografica rg ON rg.id = b.regionId
-			 WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=True)
+			 WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
 			GROUP BY id''', [semesterId, semesterId, semesterId])
-            serializer = ReporteEstadisticoSerializador(data, many=True)
-            data = LocationView.__addEmptyMaterialCategories(serializer.data)
+            data = LocationView.__dictfetchall(cursor)
+            data = LocationView.__addEmptyMaterialCategories(data)
             return JsonResponse(data, safe=False)
+    
+    def getActivityMonitoringByLocation(request):
+        if request.method == 'GET':
+            cursor = connection.cursor()
+            cursor.execute('''SELECT DISTINCT(a.ubicacion_id) AS id, a.prioridad AS data, u.nombre, rg.coordenada, rg.centroide
+			FROM (SELECT count(*) frequencies, ubicacion_id, prioridad FROM saacd.saaacd_actividad 
+					WHERE semestre_id=(SELECT id FROM saacd.saaacd_semestre WHERE esActivo=1) AND ubicacion_id IS NOT NULL AND esSiniestro = 0
+					GROUP BY ubicacion_id, prioridad ORDER BY prioridad) a
+			INNER JOIN saaacd_ubicacion u ON u.id = a.ubicacion_id
+			INNER JOIN saaacd_regiongeografica rg ON rg.id = u.regionGeografica_id
+			WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)''')
+            data = LocationView.__dictfetchall(cursor)
+            return JsonResponse(data, safe=False)        
 	
-
     @csrf_exempt
     @api_view(['PUT'])
     def saveLocations(request):

@@ -5,7 +5,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 import { Ubicacion } from '../models/Ubicacion';
-import { ReporteEstadistico } from '../models/ReporteEstadistico';
+import { Reporte } from '../models/Reporte';
 import { URLutility } from '../utilities/URLutility';
 
 @Injectable({ providedIn: 'root' })
@@ -13,7 +13,8 @@ export class LocationService {
   private locationsUrl = '/api/locations'; 
   private inferiorLocationsUrl = '/api/inferiorLocations'; 
   private superiorLocationsUrl = '/api/superiorLocations';
-  private saveLocationsUrl = '/api/saveLocations/'
+  private saveLocationsUrl = '/api/saveLocations/';
+  private activityMonitoringByLocationUrl = '/api/activityMonitoringByLocation/'
  
   constructor(private http: HttpClient) {}
   
@@ -38,15 +39,19 @@ export class LocationService {
      var url = 'api/activityStatisticBySupLocation/';
 	 if(locationType)
 		url = 'api/activityStatisticByInfLocation/'
-	 return this.http.get<ReporteEstadistico[]>(url, options);
+	 return this.http.get<Reporte[]>(url, options);
   }
-  
+ 
   getMaterialStatisticByLocation(semesterId: number, locationType: boolean): Observable<any>{
 	 var options = URLutility.getHttpOptionsWithParam('semesterId', semesterId.toString());
      var url = 'api/materialStatisticBySupLocation/';
 	 if(locationType)
 		url = 'api/materialStatisticByInfLocation/'
-	 return this.http.get<ReporteEstadistico[]>(url, options);
+	 return this.http.get<Reporte[]>(url, options);
+  }
+  
+  getActivityMonitoringByLocation(): Observable<Reporte[]> {
+    return this.http.get<Reporte[]>(this.activityMonitoringByLocationUrl);
   }
   
   /** PUT: update the activity on the server */

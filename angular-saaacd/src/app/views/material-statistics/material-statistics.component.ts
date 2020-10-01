@@ -17,7 +17,7 @@ import Overlay from 'ol/Overlay';
 import { LocationService } from '../../services/location.service';
 import { NotificationService } from '../../services/notification.service';
 import { catchError} from 'rxjs/operators';
-import { ReporteEstadistico } from '../../models/ReporteEstadistico';
+import { Reporte } from '../../models/Reporte';
 import { Semestre } from '../../models/Semestre';
 import { SemesterService } from '../../services/semester.service';
 import { Mapa } from '../../models/Mapa';
@@ -121,7 +121,6 @@ export class MaterialStatisticsComponent implements OnInit {
   getStatisticData(){
 	this.locationService.getMaterialStatisticByLocation(this.selectedSemester, this.selectedLocationType)
     .subscribe(locations =>{ 
-				console.log(locations)
 			    for (var i = 0; i < locations.length; i++) { 
 					var statistics = JSON.parse(locations[i].data);
 					var sum = 0
@@ -148,7 +147,7 @@ export class MaterialStatisticsComponent implements OnInit {
 				this.assignFeaturesToMap()
 	           },
 			   error => {
-				  catchError(this.notifyService.handleError<ReporteEstadistico>('getActivityStadisticByLocation'));
+				  catchError(this.notifyService.handleError<Reporte>('getActivityStadisticByLocation'));
 				  this.notifyService.showErrorTimeout(this.locationErrorMessage, this.title);
 				  }
 			   );

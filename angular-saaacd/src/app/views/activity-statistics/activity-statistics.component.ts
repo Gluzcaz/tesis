@@ -17,7 +17,7 @@ import Overlay from 'ol/Overlay';
 import { LocationService } from '../../services/location.service';
 import { NotificationService } from '../../services/notification.service';
 import { catchError} from 'rxjs/operators';
-import { ReporteEstadistico } from '../../models/ReporteEstadistico';
+import { Reporte } from '../../models/Reporte';
 import { Semestre } from '../../models/Semestre';
 import { SemesterService } from '../../services/semester.service';
 import { Mapa } from '../../models/Mapa';
@@ -153,7 +153,7 @@ export class ActivityStatisticsComponent implements OnInit {
 				this.assignFeaturesToMap()
 	           },
 			   error => {
-				  catchError(this.notifyService.handleError<ReporteEstadistico>('getActivityStatisticsByLocation'));
+				  catchError(this.notifyService.handleError<Reporte>('getActivityStatisticsByLocation'));
 				  this.notifyService.showErrorTimeout(this.locationErrorMessage, this.title);
 				  }
 			   );
