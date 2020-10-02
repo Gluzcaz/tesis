@@ -14,6 +14,7 @@ import Vector from 'ol/source/Vector';
 import Polygon from 'ol/geom/Polygon';
 import Overlay from 'ol/Overlay';
 import Popup from 'ol-ext/Overlay/Popup';
+import Notification from 'ol-ext/control/Notification';
 
 import { LocationService } from '../../services/location.service';
 import { NotificationService } from '../../services/notification.service';
@@ -38,16 +39,32 @@ export class ActivityMonitoringComponent implements OnInit {
   view: OlView = new OlView();
   vectorSource = new Vector();
   map: OlMap;
+  popup: Popup = new Popup (
+		{	popupClass: "default", //"tooltips", "warning" "black" "default", "tips", "shadow",
+			closeBox: true,
+			onclose: function(){},
+			positioning: "top-center",
+			autoPan: true,
+			autoPanAnimation: { duration: 100 },
+			Offset:[0, -55]
+		});
+	 ;
   selectedSemester: number;
   semester: Semestre;
-  warningStyle =  new Style(
+  priorityMessage = "";
+  pasiveStyle =  new Style(
 		{	stroke: new Stroke({ width:3, color:'yellow' }),
 			fill: new Fill({ color:'yellow' })
+		});
+  warningStyle =  new Style(
+		{	stroke: new Stroke({ width:3, color:'orange' }),
+			fill: new Fill({ color:'orange' })
 		});
   dangerousStyle =  new Style(
 		{	stroke: new Stroke({ width:3, color:'red' }),
 			fill: new Fill({ color:'red' })
 		});
+  
    
   title = 'Notificación';
   semesterErrorMessage = 'No se ha podido obtener el semestre activo';
@@ -65,29 +82,33 @@ export class ActivityMonitoringComponent implements OnInit {
 	this.getActiveMap();
   }
   
-    getStatisticData(){
+  getStatisticData(){
 	this.locationService.getActivityMonitoringByLocation()
     .subscribe(locations =>{ 
-
+				
 			    for (var i = 0; i < locations.length; i++) { 
 					var feature = new Feature({
+					    type: 'click',
 						geometry: new Polygon(JSON.parse(locations[i].coordenada)),
 						id: locations[i].id,
-						geometry_name: locations[i].nombre
+						geometry_name: locations[i].nombre,
+						centroid : JSON.parse(locations[i].centroide),
+					    getActivityDetails: this.testFuncion
 					});
 					
 					var priority= locations[i].data;
 					switch(priority) { 
-					   case Actividad.PRIORITIES[0].id: 
+					   case Actividad.PRIORITIES[0].id:{
 						  feature.setStyle(this.dangerousStyle)
 						  break; 
 					   } 
 					   case Actividad.PRIORITIES[1].id: { 
-						  feature.setStyle(this.warningStyle)
+						  feature.setStyle(this.warningStyle);
+						  this.priorityMessage += locations[i] + ","
 						  break; 
 					   }
 					   case Actividad.PRIORITIES[2].id: { 
-						  //statements; 
+						   feature.setStyle(this.pasiveStyle)
 						  break; 
 					   } 					   
 					   default: { 
@@ -107,48 +128,10 @@ export class ActivityMonitoringComponent implements OnInit {
 			   );
   }
   
-  assignTitleToLocation(region){
-	// Use Angular's Renderer2 to create the div element
-	var newDiv = this.renderer.createElement('div');
-	// Set the id of the div
-	this.renderer.addClass(newDiv, 'placeName');
-	this.renderer.setProperty(newDiv, 'id', 'region-' + region.id);
-	this.renderer.setProperty(newDiv, 'textContent', region.nombre);
-	var centroid = JSON.parse(region.centroide);
-	let overlay = new Overlay({
-	  position: [centroid[0],centroid[1]], 
-	  positioning: 'center-center',
-	  element: newDiv,
-	  stopEvent: false,
-	});
-	this.map.addOverlay(overlay);
-  }
-  
-    assignFeaturesToMap(){
-	// Fit to extent
-	var extent = this.vectorSource.getExtent();
-	if (!(extent[0] == Number.POSITIVE_INFINITY || extent[0] == Number.NEGATIVE_INFINITY)) {
-	  this.view.fit(extent);
-	}
-	
-	var vectorLayer = new VectorLayer({
-		source: this.vectorSource
-	});
-	this.map.addLayer(vectorLayer);
-	
-	// Control Select to add percentage text
-	var select = new Select({
-						style: function(f) { 
-							return f.styleText; }
-		  });
-	this.map.addInteraction(select);
-}
-  
   getActiveMap(){
     this.mapService.getActiveMap()
     .subscribe(map =>{ 
 				this.mapImageUrl = '../static/media/'+map.imagen;
-				console.log(this.mapImageUrl)
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Mapa>('getActiveMap'));
@@ -189,23 +172,62 @@ export class ActivityMonitoringComponent implements OnInit {
 							imageExtent: extent
 						  })
 				});
-				
-	  // Popup overlay with popupClass=anim
-	  var popup = new Popup (
-		{	popupClass: "default anim", //"tooltips", "warning" "black" "default", "tips", "shadow",
-			closeBox: true,
-			onclose: function(){ console.log("You close the box"); },
-			positioning: "top-center",
-			autoPan: true,
-			autoPanAnimation: { duration: 100 }
-		});
-	 
+
      this.map = new OlMap({
 		  target: 'map',
 		  layers: [imageLayer],
 		  view: this.view,
-		  overlays: [popup]
+		  overlays: [this.popup]
 	  });
+	  
+  this.map.on('click', function(evt) {
+	var f = evt.map.forEachFeatureAtPixel(
+			evt.pixel,
+			function(ft, layer){return ft;}
+    );
+	if (f && f.get('type') == 'click') {
+		f.get('getActivityDetails')(f.values_.id);
+	}
+  });
+ }
+ 
+  testFuncion(id){
+	console.log("Dentro de características");
+	alert ("Hello World!"+id);
+  }
+  
+  assignTitleToLocation(region){
+	// Use Angular's Renderer2 to create the div element
+	var newDiv = this.renderer.createElement('div');
+	this.renderer.addClass(newDiv, 'placeName');
+	this.renderer.setProperty(newDiv, 'id', 'region-' + region.id);
+	this.renderer.setProperty(newDiv, 'textContent', region.nombre);
+	var centroid = JSON.parse(region.centroide);
+	
+	let overlay = new Overlay({
+	  position: [centroid[0],centroid[1]], 
+	  positioning: 'center-center',
+	  element: newDiv,
+	  stopEvent: false,
+	});
+	this.map.addOverlay(overlay);
+  }
+  
+  assignFeaturesToMap(){
+	// Fit to extent
+	var extent = this.vectorSource.getExtent();
+	if (!(extent[0] == Number.POSITIVE_INFINITY || extent[0] == Number.NEGATIVE_INFINITY)) {
+	  this.view.fit(extent);
+	}
+	
+	var vectorLayer = new VectorLayer({
+		source: this.vectorSource
+	});
+	this.map.addLayer(vectorLayer);
+	
+	/*var notification = new Notification('holi');
+	this.map.addControl(notification);
+	notification.show("Revisar salones:" + this.priorityMessage);*/
   }
 
 }
