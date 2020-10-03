@@ -25,6 +25,9 @@ import { SemesterService } from '../../services/semester.service';
 import { Mapa } from '../../models/Mapa';
 import { MapService } from '../../services/map.service';
 import { Actividad } from '../../models/Actividad';
+import { MonitorDialogModel, MonitorDialogComponent } from '../monitor-dialog/monitor-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-activity-monitoring',
@@ -75,6 +78,7 @@ export class ActivityMonitoringComponent implements OnInit {
 		   private notifyService : NotificationService,
 		   private semesterService: SemesterService,
 		   private mapService: MapService,
+		   public dialog: MatDialog,
 		   private renderer: Renderer2
 		   ) { }
 
@@ -93,7 +97,8 @@ export class ActivityMonitoringComponent implements OnInit {
 						id: locations[i].id,
 						geometry_name: locations[i].nombre,
 						centroid : JSON.parse(locations[i].centroide),
-					    getActivityDetails: this.testFuncion
+					    callMonitorDialog: this.openDialog,
+						dialog: this.dialog
 					});
 					
 					var priority= locations[i].data;
@@ -186,14 +191,21 @@ export class ActivityMonitoringComponent implements OnInit {
 			function(ft, layer){return ft;}
     );
 	if (f && f.get('type') == 'click') {
-		f.get('getActivityDetails')(f.values_.id);
+		var dialog = f.get('dialog');
+		f.get('callMonitorDialog')(f.values_.id, f.values_.geometry_name, dialog);
 	}
   });
  }
  
-  testFuncion(id){
-	console.log("Dentro de características");
-	alert ("Hello World!"+id);
+  openDialog(id, title, dialog): Observable<any>{
+	//this.monitorService.openDialog(id, title, true);
+	const dialogData = new MonitorDialogModel(id, title, true);
+    const dialogRef = dialog.open(MonitorDialogComponent, {
+      maxWidth: "400px",
+      data: dialogData
+    });
+	
+	return dialogRef.afterClosed();
   }
   
   assignTitleToLocation(region){
@@ -202,10 +214,9 @@ export class ActivityMonitoringComponent implements OnInit {
 	this.renderer.addClass(newDiv, 'placeName');
 	this.renderer.setProperty(newDiv, 'id', 'region-' + region.id);
 	this.renderer.setProperty(newDiv, 'textContent', region.nombre);
-	var centroid = JSON.parse(region.centroide);
-	
+
 	let overlay = new Overlay({
-	  position: [centroid[0],centroid[1]], 
+	  position: JSON.parse(region.centroide), 
 	  positioning: 'center-center',
 	  element: newDiv,
 	  stopEvent: false,
@@ -224,10 +235,6 @@ export class ActivityMonitoringComponent implements OnInit {
 		source: this.vectorSource
 	});
 	this.map.addLayer(vectorLayer);
-	
-	/*var notification = new Notification('holi');
-	this.map.addControl(notification);
-	notification.show("Revisar salones:" + this.priorityMessage);*/
   }
 
 }

@@ -33,6 +33,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ActivityStatisticsComponent } from './views/activity-statistics/activity-statistics.component';
 import { MaterialStatisticsComponent } from './views/material-statistics/material-statistics.component';
 import { ActivityMonitoringComponent } from './views/activity-monitoring/activity-monitoring.component';
+import { MonitorDialogComponent } from './views/monitor-dialog/monitor-dialog.component';
 
  
 @NgModule({
@@ -45,7 +46,8 @@ import { ActivityMonitoringComponent } from './views/activity-monitoring/activit
 	MapComponent,
 	ActivityStatisticsComponent,
 	MaterialStatisticsComponent,
-	ActivityMonitoringComponent
+	ActivityMonitoringComponent,
+	MonitorDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -71,7 +73,7 @@ import { ActivityMonitoringComponent } from './views/activity-monitoring/activit
 	ToastrModule.forRoot()
   ],
   providers: [{provide: MAT_DATE_LOCALE, useValue: 'es-ES'}],
-  entryComponents: [ConfirmDialogComponent],
+  entryComponents: [ConfirmDialogComponent,	MonitorDialogComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
