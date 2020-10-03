@@ -28,6 +28,7 @@ urlpatterns = [
 	url(r'^activityMonitoring/', views.ActivityView.keepUrl),
 	url(r'^map/', views.ActivityView.keepUrl),
 	url(r'^api/petitionActivities/', views.ActivityView.getPetitionActivities),
+	url(r'^api/activitiesByLocation/', views.ActivityView.getActivitiesByLocation),
 	url(r'^api/detailActivity/', views.ActivityView.detailActivity),
 	url(r'^api/saveActivity/', views.ActivityView.saveActivity),
 	url(r'^api/activities/', views.ActivityView.getActivities),

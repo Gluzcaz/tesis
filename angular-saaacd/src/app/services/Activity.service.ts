@@ -13,6 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
   private activitiesUrl = '/api/activities'; 
+  private activitiesByLocationUrl = '/api/activitiesByLocation'; 
   private petitionActivitiesUrl = '/api/petitionActivities/'; 
   private detailActivityUrl = '/api/detailActivity/';
   private createActivityUrl = '/api/createActivity/';
@@ -40,6 +41,11 @@ export class ActivityService {
   /** GET activities */
   getActivities(): Observable<Actividad[]> {
     return this.http.get<Actividad[]>(this.activitiesUrl);
+  }
+  
+  getActivitiesByLocation(id: number): Observable<any> {
+    let options = URLutility.getHttpOptionsWithParam('locationId', id.toString());
+    return this.http.get<Actividad[]>(this.activitiesByLocationUrl, options);
   }
   
   /** GET  petition activities */

@@ -55,7 +55,9 @@ export class ActivitiesComponent implements OnInit {
   semesterErrorMessage = 'No se ha podido mostrar los semestres';
   activityErrorMessage = 'No se ha podido mostrar las actividades';
   
-  constructor(private activityService: ActivityService, private semesterService: SemesterService, private notifyService : NotificationService) {   
+  constructor(private activityService: ActivityService, 
+			  private semesterService: SemesterService, 
+			  private notifyService : NotificationService) {   
   }
   
   ngOnInit() {

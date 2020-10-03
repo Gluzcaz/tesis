@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 
 from saaacd.submodels.Ubicacion import Ubicacion
 from saaacd.submodels.Categoria import Categoria
+from saaacd.models import Actividad
 from saaacd.submodels.Mapa import Mapa
 from saaacd.submodels.RegionGeografica import RegionGeografica
 from saaacd.subserializers.UbicacionSerializador import UbicacionSerializador
@@ -79,7 +80,7 @@ class LocationView(TemplateView):
             object['data'] = json.dumps(stadistics)
         return data
 	
-    def __dictfetchall(cursor):
+    def __dictFetchAll(cursor):
         #"Return all rows from a cursor as a dict"
         columns = [col[0] for col in cursor.description]
         return [
@@ -104,7 +105,7 @@ class LocationView(TemplateView):
 					WHERE a.semestre_id =%s AND rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
 					GROUP BY category_classifier, ubicacion_id) a
 					GROUP BY ubicacion_id''', [semesterId])
-            data = LocationView.__dictfetchall(cursor)
+            data = LocationView.__dictFetchAll(cursor)
             data = LocationView.__addEmptyActivityCategories(data)
             return JsonResponse(data, safe=False)
 	
@@ -127,7 +128,7 @@ class LocationView(TemplateView):
 						WHERE a.semestre_id =%s AND rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
 						GROUP BY category_classifier, a.location) a
 					GROUP BY location''', [semesterId])
-            data = LocationView.__dictfetchall(cursor)
+            data = LocationView.__dictFetchAll(cursor)
             data = LocationView.__addEmptyActivityCategories(data)
             return JsonResponse(data, safe=False)
 	
@@ -161,7 +162,7 @@ class LocationView(TemplateView):
 			 INNER JOIN saacd.saaacd_regiongeografica rg ON rg.id = b.regionId
 			 WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
 			GROUP BY id''', [semesterId, semesterId, semesterId])
-            data = LocationView.__dictfetchall(cursor)
+            data = LocationView.__dictFetchAll(cursor)
             data = LocationView.__addEmptyMaterialCategories(data)
             return JsonResponse(data, safe=False)
 			
@@ -206,7 +207,7 @@ class LocationView(TemplateView):
 			 INNER JOIN saacd.saaacd_regiongeografica rg ON rg.id = b.regionId
 			 WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
 			GROUP BY id''', [semesterId, semesterId, semesterId])
-            data = LocationView.__dictfetchall(cursor)
+            data = LocationView.__dictFetchAll(cursor)
             data = LocationView.__addEmptyMaterialCategories(data)
             return JsonResponse(data, safe=False)
     
@@ -215,12 +216,15 @@ class LocationView(TemplateView):
             cursor = connection.cursor()
             cursor.execute('''SELECT DISTINCT(a.ubicacion_id) AS id, a.prioridad AS data, u.nombre, rg.coordenada, rg.centroide
 			FROM (SELECT count(*) frequencies, ubicacion_id, prioridad FROM saacd.saaacd_actividad 
-					WHERE semestre_id=(SELECT id FROM saacd.saaacd_semestre WHERE esActivo=1) AND ubicacion_id IS NOT NULL AND esSiniestro = 0
+					WHERE semestre_id=(SELECT id FROM saacd.saaacd_semestre WHERE esActivo=1) 
+					      AND ubicacion_id IS NOT NULL 
+						  AND esSiniestro = 0
+						  AND estado != %s
 					GROUP BY ubicacion_id, prioridad ORDER BY prioridad) a
 			INNER JOIN saaacd_ubicacion u ON u.id = a.ubicacion_id
 			INNER JOIN saaacd_regiongeografica rg ON rg.id = u.regionGeografica_id
-			WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)''')
-            data = LocationView.__dictfetchall(cursor)
+			WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)''',[Actividad.ESTADO.r])
+            data = LocationView.__dictFetchAll(cursor)
             return JsonResponse(data, safe=False)        
 	
     @csrf_exempt

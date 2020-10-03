@@ -13,8 +13,6 @@ import VectorLayer from 'ol/layer/Vector';
 import Vector from 'ol/source/Vector';
 import Polygon from 'ol/geom/Polygon';
 import Overlay from 'ol/Overlay';
-import Popup from 'ol-ext/Overlay/Popup';
-import Notification from 'ol-ext/control/Notification';
 
 import { LocationService } from '../../services/location.service';
 import { NotificationService } from '../../services/notification.service';
@@ -42,16 +40,6 @@ export class ActivityMonitoringComponent implements OnInit {
   view: OlView = new OlView();
   vectorSource = new Vector();
   map: OlMap;
-  popup: Popup = new Popup (
-		{	popupClass: "default", //"tooltips", "warning" "black" "default", "tips", "shadow",
-			closeBox: true,
-			onclose: function(){},
-			positioning: "top-center",
-			autoPan: true,
-			autoPanAnimation: { duration: 100 },
-			Offset:[0, -55]
-		});
-	 ;
   selectedSemester: number;
   semester: Semestre;
   priorityMessage = "";
@@ -181,8 +169,7 @@ export class ActivityMonitoringComponent implements OnInit {
      this.map = new OlMap({
 		  target: 'map',
 		  layers: [imageLayer],
-		  view: this.view,
-		  overlays: [this.popup]
+		  view: this.view
 	  });
 	  
   this.map.on('click', function(evt) {
@@ -201,7 +188,8 @@ export class ActivityMonitoringComponent implements OnInit {
 	//this.monitorService.openDialog(id, title, true);
 	const dialogData = new MonitorDialogModel(id, title, true);
     const dialogRef = dialog.open(MonitorDialogComponent, {
-      maxWidth: "400px",
+      maxWidth: "70%",
+	  maxHeight: "50%",
       data: dialogData
     });
 	

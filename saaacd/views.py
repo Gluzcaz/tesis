@@ -44,6 +44,17 @@ class ActivityView(TemplateView):
             data = Actividad.objects.all()
             serializer =  ActividadSerializador(data, many=True, fields=('id', 'estado','prioridad', 'comentario', 'fechaResolucion', 'fechaAlta', 'fechaRequerido', 'esSiniestro', 'actividadSuperior', 'categoria', 'semestre', 'ubicacion', 'usuario', 'dispositivo'))
             return JsonResponse(serializer.data, safe=False)
+			
+    @api_view(['GET'])
+    def getActivitiesByLocation(request):
+        try:
+            locationId=request.GET['locationId']
+            semesterId = Semestre.objects.get(esActivo=1)
+            data = Actividad.objects.filter(ubicacion_id=locationId).filter(semestre_id=semesterId).exclude(estado=Actividad.ESTADO.r).filter(esSiniestro=0)
+            serializer = ActividadSerializador(data, many=True, fields=('id','categoria','usuario','estado','prioridad', 'fechaAlta','fechaRequerido','dispositivo'))
+            return JsonResponse(serializer.data, safe=False)
+        except Exception as e:
+            return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
 	
     @csrf_exempt	
     @api_view(['GET'])
