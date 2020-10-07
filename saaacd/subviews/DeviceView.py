@@ -7,6 +7,7 @@ from saaacd.serializers import DispositivoSerializador
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
+from django.db import connection
 
 class DeviceView(generics.ListAPIView):
     @csrf_exempt		
@@ -25,5 +26,29 @@ class DeviceView(generics.ListAPIView):
                 return JsonResponse(serializer.data, safe=False)
         except Exception as e:
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
-            
+
+    def __dictFetchAll(cursor):
+        #"Return all rows from a cursor as a dict"
+        columns = [col[0] for col in cursor.description]
+        return [
+            dict(zip(columns, row))
+            for row in cursor.fetchall()
+        ]
+     
+    def getExpiredDevices(request):
+        if request.method == 'GET':
+            cursor = connection.cursor()
+            cursor.execute('''SELECT d.id, 
+				CONCAT(tp.nombre, " ", ma.nombre," ", mo.nombre ) AS nombre, 
+				ft.precio,
+				ft.existenciaInventario as cantidad
+				FROM saacd.saaacd_dispositivo d 
+				INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
+				INNER JOIN saacd.saaacd_tipodispositivo tp ON tp.id = d.tipoDispositivo_id
+				INNER JOIN saacd.saaacd_modelo mo ON mo.id = ft.modelo_id
+				INNER JOIN saacd.saaacd_marca ma ON ma.id = mo.marca_id
+				WHERE d.fechaBaja IS NULL 
+				AND ft.garantiaFabricante IS NOT NULL ''')
+            data = DeviceView.__dictFetchAll(cursor)
+            return JsonResponse(data, safe=False)  	 
 

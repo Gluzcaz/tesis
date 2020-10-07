@@ -21,6 +21,8 @@ from rest_framework.parsers import JSONParser
 from rest_framework import status
 from django.db import transaction
 from django.db import IntegrityError
+from datetime import datetime
+from datetime import date
 
 class LocationView(TemplateView):
     def getLocations(request):
@@ -225,7 +227,89 @@ class LocationView(TemplateView):
 			INNER JOIN saaacd_regiongeografica rg ON rg.id = u.regionGeografica_id
 			WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)''',[Actividad.ESTADO.r])
             data = LocationView.__dictFetchAll(cursor)
-            return JsonResponse(data, safe=False)        
+            return JsonResponse(data, safe=False) 
+			
+    def getLifeTimeDeviceByLocation(request):
+        if request.method == 'GET':
+            locationId = request.GET['locationId']
+            cursor = connection.cursor()
+            cursor.execute('''SELECT d.id, CONCAT(tp.nombre, " ", ma.nombre," ", mo.nombre ) AS nombre ,
+					IF( (ft.tiempoVida * 100/ ft.garantiaFabricante) >= 100, 100, (ft.tiempoVida * 100)/ ft.garantiaFabricante)  AS data
+					FROM saacd.saaacd_dispositivo d 
+					INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
+                    INNER JOIN saacd.saaacd_tipodispositivo tp ON tp.id = d.tipoDispositivo_id
+					INNER JOIN saacd.saaacd_modelo mo ON mo.id = ft.modelo_id
+                    INNER JOIN saacd.saaacd_marca ma ON ma.id = mo.marca_id
+					WHERE d.fechaBaja IS NULL 
+					AND ft.garantiaFabricante IS NOT NULL 
+                    AND  d.ubicacion_id = %s
+                    ORDER BY tiempoVida DESC''',[locationId])
+            data = LocationView.__dictFetchAll(cursor)
+            return JsonResponse(data, safe=False) 
+
+    def __getDeltaLifeTime(data):
+        dateFormat ="%Y-%m-%d"
+        todayDate = datetime.strptime(str(date.today()), 
+                                dateFormat)
+        baseDate = datetime.strptime(futureDate, 
+                                dateFormat)
+        totalHours = 0
+        if( baseDate == todayDate):
+            return totalHours
+        if(baseDate < todayDate):
+            return JsonResponse({'message': "The prediction date is after today."}, status=status.HTTP_404_NOT_FOUND) 
+        elif(baseDate > todayDate):
+            weekHours = [8,7,9,6,7,3,2] #PENDIENTE
+            weekDay = datetime.isoweekday(todayDate)				
+            delta = baseDate - todayDate
+            deltaDays = delta.days
+            if deltaDays < 7:
+                for i in range((weekDay-1),7):
+                    totalHours += weekHours[i]
+                    deltaDays -= 1
+                if deltaDays > 0:
+                    for i in range(0, deltaDays+1):
+                       totalHours += weekHours[i]
+            else:
+                auxDelta = 0
+                for i in range((weekDay-1),7):
+                    totalHours += weekHours[i]	
+                    auxDelta += 1
+
+                deltaDays -= auxDelta
+                deltaWeeks = deltaDays//7
+				
+                sumWeekHours = 0
+                for i in weekHours:
+                    sumWeekHours += i
+                totalHours += deltaWeeks * sumWeekHours	
+			
+                extraDeltaDays = deltaDays%7
+                for j in range(extraDeltaDays+1):
+                    totalHours += weekHours[j]
+        return totalHours
+
+        	
+    def getMaterialMonitoringByLocation(request):
+        if request.method == 'GET':
+            futureDate = '2020-10-14'#request.GET['date']
+            MAXIMUM_DELTA_TIME = 240 #hours = 10 days
+            cursor = connection.cursor()
+            cursor.execute('''SELECT DISTINCT (a.ubicacion_id) AS id, a.prioridad AS data, u.nombre, rg.coordenada, rg.centroide
+			FROM (
+				SELECT d.id, d.ubicacion_id, 
+					IF(ft.tiempoVida >=  ft.garantiaFabricante, 1, 
+					IF(ft.tiempoVida + %s >= ft.garantiaFabricante, 2, 0)) as prioridad 
+					FROM saacd.saaacd_dispositivo d 
+					INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
+					WHERE fechaBaja IS NULL AND 
+					ft.garantiaFabricante IS NOT NULL ORDER BY prioridad
+			) a
+			INNER JOIN saaacd_ubicacion u ON u.id = a.ubicacion_id
+			INNER JOIN saaacd_regiongeografica rg ON rg.id = u.regionGeografica_id
+			WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)''',[MAXIMUM_DELTA_TIME])
+            data = LocationView.__dictFetchAll(cursor)
+            return JsonResponse(data, safe=False)       
 	
     @csrf_exempt
     @api_view(['PUT'])

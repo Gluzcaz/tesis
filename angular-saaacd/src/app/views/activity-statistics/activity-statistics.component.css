@@ -1,3 +1,12 @@
+.title{
+	height:40px;
+	line-height:40px;
+	text-align:center;
+	color:#D4AC0D; 
+	font-weight: bold;
+	text-decoration: underline overline #D4AC0D; 
+}
+
 .ol-overlay-container {
       width: 20px;
       height: 20px;
@@ -11,10 +20,9 @@
     }
 
 .map {
-	width: 80%;
 	height:70%;
-	display: inline-block;
-	padding: 15px;
+	border: 3px solid #D4AC0D;
+	margin: 15px;
   }
   
 .placeName {
@@ -23,22 +31,26 @@
 }
 
 .circleList {
-      width: 50px;
-      height: 50px;
+      width: 40px;
+      height: 40px;
       -webkit-border-radius: 25px;
       -moz-border-radius: 25px;
       border-radius: 25px;
-	  padding: 10px;
+	  margin: 10px;
 }
 
-.categories{
-	padding: 10px;
+.grid-three-spaces{
+  display: grid;
+  grid-template-columns: auto auto auto;
+  margin: 15px;
+  grid-gap: 50px;
 }
 
 .grid-two-spaces{
   display: grid;
-  grid-template-columns: auto auto;
-  width: 30%;
-  padding: 15px;
+  grid-template-columns: 80% 20%;
+  grid-gap: 10px;
+  width: 95%;
+  height: 100%;
 }
 

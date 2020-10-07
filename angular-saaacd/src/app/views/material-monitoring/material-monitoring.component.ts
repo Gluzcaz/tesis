@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, OnInit,Renderer2 } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit,Renderer2,Inject } from '@angular/core';
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
 import Feature from 'ol/Feature';
@@ -14,6 +14,7 @@ import Vector from 'ol/source/Vector';
 import Polygon from 'ol/geom/Polygon';
 import Overlay from 'ol/Overlay';
 
+import { DeviceService } from '../../services/device.service';
 import { LocationService } from '../../services/location.service';
 import { NotificationService } from '../../services/notification.service';
 import { catchError} from 'rxjs/operators';
@@ -25,13 +26,19 @@ import { MonitorDialogModel, MonitorDialogComponent } from '../monitor-dialog/mo
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, of } from 'rxjs';
 
-@Component({
-  selector: 'app-activity-monitoring',
-  templateUrl: './activity-monitoring.component.html',
-  styleUrls: ['./activity-monitoring.component.css']
-})
-export class ActivityMonitoringComponent implements OnInit {
+import { ExpiredDevice } from '../../models/ExpiredDevice';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSort} from '@angular/material/sort';
 
+@Component({
+  selector: 'app-material-monitoring',
+  templateUrl: './material-monitoring.component.html',
+  styleUrls: ['./material-monitoring.component.css']
+})
+export class MaterialMonitoringComponent implements OnInit {
+  devices: ExpiredDevice[];
+  totalPriceDevices = 0;
   mapImageUrl: string =''; 
   loadedImageWidth: number = 0;
   loadedImageHeight: number = 0;
@@ -51,13 +58,19 @@ export class ActivityMonitoringComponent implements OnInit {
 		{	stroke: new Stroke({ width:3, color:'red' }),
 			fill: new Fill({ color:'red' })
 		});
-  
+  //Table Elements
+  displayedColumns: string[] =['id','nombre','cantidad', 'precio']
+  dataSource: MatTableDataSource<any>;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
    
   title = 'Notificación';
   locationErrorMessage = 'No se ha podido mostrar los datos estadísticos.';
   mapErrorMessage = 'No se ha podido identificar el mapa.';
+  deviceErrorMessage = 'No se ha podido mostrar los dispositivos expirados.';
  
-  constructor( private locationService: LocationService,
+  constructor( private deviceService: DeviceService,
+           private locationService: LocationService,
 		   private notifyService : NotificationService,
 		   private mapService: MapService,
 		   public dialog: MatDialog,
@@ -66,10 +79,11 @@ export class ActivityMonitoringComponent implements OnInit {
 
   ngOnInit(): void {
 	this.getActiveMap();
+	this.getExpiredDevices();
   }
   
-  getStatisticData(){
-	this.locationService.getActivityMonitoringByLocation()
+  getMaterialMonitoringData(){
+	this.locationService.getMaterialMonitoringByLocation()
     .subscribe(locations =>{ 
 				
 			    for (var i = 0; i < locations.length; i++) { 
@@ -83,21 +97,18 @@ export class ActivityMonitoringComponent implements OnInit {
 						dialog: this.dialog
 					});
 					
-					var priority= locations[i].data;
+					var priority= parseInt(locations[i].data, 10);
+					console.log(priority)
 					switch(priority) { 
-					   case Actividad.PRIORITIES[0].id:{
+					   case 1:{
 						  feature.setStyle(this.dangerousStyle)
 						  break; 
 					   } 
-					   case Actividad.PRIORITIES[1].id: { 
+					   case 2: { 
 						  feature.setStyle(this.warningStyle);
 						  break; 
 					   }
-					   case Actividad.PRIORITIES[2].id: { 
-						   feature.setStyle(this.pasiveStyle)
-						  break; 
-					   } 					   
-					   default: { 
+     				   default: { 
 						  //statements; 
 						  break; 
 					   } 
@@ -113,6 +124,50 @@ export class ActivityMonitoringComponent implements OnInit {
 				  }
 			   );
   }
+  
+  getExpiredDevices(){
+	this.deviceService.getExpiredDevices()
+    .subscribe(devices =>{ 
+			   this.devices = devices;
+			   for (var i = 0; i < devices.length; i++) { 
+					this.totalPriceDevices += devices[i].precio*devices[i].cantidad
+			   }
+			   this.setDataSource();
+	          },
+			   error => {
+				  catchError(this.notifyService.handleError<ExpiredDevice>('getExpiredDevices'));
+				  this.notifyService.showErrorTimeout(this.deviceErrorMessage, this.title);
+				  }
+			   );
+	
+  }
+  
+   setDataSource(){
+    // Assign the data to the data source for the table to render
+    this.dataSource = new MatTableDataSource(this.devices);
+	this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+	this.dataSource.sortingDataAccessor = (item, property) => {
+			var sortingData= null;
+			switch(property){
+				case 'id':
+					sortingData = item.id;
+					break;
+				case 'nombre':
+					sortingData = item.nombre;
+					break;
+				case 'cantidad':
+					sortingData = item.cantidad;
+				case 'precio':
+					sortingData = item.precio;
+				default:
+					sortingData = item[property];
+					break;
+			}
+			return sortingData;
+	};
+  }
+
   
   getActiveMap(){
     this.mapService.getActiveMap()
@@ -133,7 +188,7 @@ export class ActivityMonitoringComponent implements OnInit {
    this.loadedImageWidth = (this.img.nativeElement as HTMLImageElement).naturalWidth;
    this.loadedImageHeight = (this.img.nativeElement as HTMLImageElement).naturalHeight;
    this.createMap();
-   this.getStatisticData();
+   this.getMaterialMonitoringData();
   }
   
    createMap(): void{
@@ -178,8 +233,7 @@ export class ActivityMonitoringComponent implements OnInit {
  }
  
   openDialog(id, title, dialog): Observable<any>{
-	//this.monitorService.openDialog(id, title, true);
-	const dialogData = new MonitorDialogModel(id, title, true);
+    const dialogData = new MonitorDialogModel(id, title, false);
     const dialogRef = dialog.open(MonitorDialogComponent, {
       maxWidth: "70%",
 	  maxHeight: "50%",

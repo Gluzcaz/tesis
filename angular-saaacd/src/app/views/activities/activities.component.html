@@ -1,25 +1,11 @@
-<!-- <ul class="activities">
-  <li *ngFor="let activity of activities">
-    <a routerLink="/detail/{{activity.id}}">
-      <span class="badge">{{activity.id}}</span> {{activity.comentario}}
-    </a>
-    <button class="delete" title="delete activity"
-      (click)="delete(activity)">x</button>
-  </li>
-</ul>-->
-<link  href="http://fonts.googleapis.com/css?family=Reenie+Beanie:regular" rel="stylesheet" type="text/css"> 
+<br/><h1 class="title">BITÁCORA</h1>
 
 <div class="table-container">
-	  <!-- (click) passes input value to add() and then clears the input 
-	  <button (click)="add(activityName.value); activityName.value=''">
-		add
-	  </button>-->
-
     <div class="grid-container">
 	  <div class="actions">
-		<button mat-raised-button color="primary" routerLink="/create/">Crear</button>
-	    <button mat-raised-button color="primary" [routerLink]="getDetailActivityUrl()"  [disabled]="isActivitySelected()">Editar</button>
-		<button mat-raised-button color="primary" (click)="confirmDialog()"  [disabled]="isActivitySelected()">Borrar</button>
+		<button mat-raised-button routerLink="/create/">Crear</button>
+	    <button mat-raised-button [routerLink]="getDetailActivityUrl()"  [disabled]="isActivitySelected()">Editar</button>
+		<button mat-raised-button (click)="confirmDialog()"  [disabled]="isActivitySelected()">Borrar</button>
 	  </div>
 	  
 	  <div>

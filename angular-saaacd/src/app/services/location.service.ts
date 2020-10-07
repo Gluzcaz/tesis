@@ -15,6 +15,7 @@ export class LocationService {
   private superiorLocationsUrl = '/api/superiorLocations';
   private saveLocationsUrl = '/api/saveLocations/';
   private activityMonitoringByLocationUrl = '/api/activityMonitoringByLocation/'
+  private materialMonitoringByLocationUrl = '/api/materialMonitoringByLocation/'
  
   constructor(private http: HttpClient) {}
   
@@ -52,6 +53,10 @@ export class LocationService {
   
   getActivityMonitoringByLocation(): Observable<Reporte[]> {
     return this.http.get<Reporte[]>(this.activityMonitoringByLocationUrl);
+  }
+  
+  getMaterialMonitoringByLocation(): Observable<Reporte[]> {
+    return this.http.get<Reporte[]>(this.materialMonitoringByLocationUrl);
   }
   
   /** PUT: update the activity on the server */

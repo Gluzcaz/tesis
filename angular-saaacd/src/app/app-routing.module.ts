@@ -7,6 +7,7 @@ import { MapComponent }      from './views/map/map.component';
 import { ActivityStatisticsComponent } from './views/activity-statistics/activity-statistics.component';
 import { MaterialStatisticsComponent } from './views/material-statistics/material-statistics.component';
 import { ActivityMonitoringComponent } from './views/activity-monitoring/activity-monitoring.component';
+import { MaterialMonitoringComponent } from './views/material-monitoring/material-monitoring.component';
 
 const routes: Routes = [
 { path: '', redirectTo: 'allActivities', pathMatch: 'full' },
@@ -16,7 +17,8 @@ const routes: Routes = [
 { path: 'map', component: MapComponent },
 { path: 'activityStatistic', component: ActivityStatisticsComponent },
 { path: 'materialStatistic', component: MaterialStatisticsComponent },
-{ path: 'activityMonitoring', component: ActivityMonitoringComponent }
+{ path: 'activityMonitoring', component: ActivityMonitoringComponent },
+{ path: 'materialMonitoring', component: MaterialMonitoringComponent }
 ];
 
 @NgModule({

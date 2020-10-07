@@ -1,4 +1,21 @@
-/* HeroesComponent's private CSS styles */
+/* latin */
+@font-face {
+  font-family: 'Reenie Beanie';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Reenie Beanie'), local('ReenieBeanie'), url(http://fonts.gstatic.com/s/reeniebeanie/v11/z7NSdR76eDkaJKZJFkkjuvWxXPq1qw.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+.title{
+	height:40px;
+	line-height:40px;
+	text-align:center;
+	color:#D4AC0D; 
+	font-weight: bold;
+	text-decoration: underline overline #D4AC0D; 
+}
+
 .activities {
   margin: 0 0 2em 0;
   list-style-type: none;
@@ -51,17 +68,19 @@
 }
 
 button {
-  background-color: #eee;
+  background-color: #1B4B63;
   border: none;
   padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
   cursor: hand;
   font-family: Arial;
+  font-weight: bold;
+  color: #FFF;
 }
 
 button:hover {
-  background-color: #cfd8dc;
+  background-color:#D4AC0D;
 }
 
 button.delete {

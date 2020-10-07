@@ -1,24 +1,57 @@
-<h1>{{title}}</h1>
-<nav>
-	<button mat-button routerLink="/allActivities">Bitácora</button>
-	<button mat-button [matMenuTriggerFor]="reports_menu">Reportes</button>
-	<mat-menu #reports_menu="matMenu">
-	  <ng-container>
-		<button mat-menu-item [matMenuTriggerFor]="estadistico_menu">Estadístico</button>
-		<mat-menu #estadistico_menu="matMenu">
-		   <button mat-menu-item routerLink="/activityStatistic">Actividades</button>
-		   <button mat-menu-item routerLink="/materialStatistic">Material</button>
-		</mat-menu>
-		<button mat-menu-item [matMenuTriggerFor]="monitoreo_menu">Monitoreo</button>
-		<mat-menu #monitoreo_menu="matMenu">
-		   <button mat-menu-item routerLink="/activityMonitoring">Actividades</button>
-		   <button mat-menu-item>Material</button>
-		</mat-menu>
-	  </ng-container>
-	</mat-menu>
-
-	<button mat-button routerLink="/map">Mapa</button>
-</nav>
+<header class="super-cabecera">
+	<div class="topnav" id="myTopnav">
+		<img id="logo_unam" src="\.\./static/media/images/logoUNAM.png"/>
+		<div id="title">
+			<h2>SAAACD</h2>
+			<h3>Sistema de Administración de Actividades del Área de Cómputo para la Docencia </h3>
+		</div>
+		<img id="logo_fi" src="\.\./static/media/images/escudoFiBlanco.png"/>
+	</div>
+	<span class="long-border"></span>
+	<nav>
+		<ul><!--
+			--><li><a routerLink="/allActivities">
+				<img src="\.\./static/media/images/bitacora.png"/>
+				<span class="borde"></span>
+				<span class="texto">BITÁCORA</span>
+				</a>
+			  </li><!--
+			--><li>
+				<div [matMenuTriggerFor]="estadistico_menu">
+					<img src="\.\./static/media/images/statistics.png"/>
+					<span class="borde"></span>
+					<span class="texto">ESTADÍSTICAS</span>
+				</div>
+				<div style="margin-top:0px;">
+			    <mat-menu  #estadistico_menu="matMenu">
+				   <span  mat-menu-item routerLink="/activityStatistic" class="texto">Actividades</span>
+				   <span  mat-menu-item routerLink="/materialStatistic" class="texto">Material</span>
+				</mat-menu>
+				</div>
+			</li><!--
+			--><li>
+				<div [matMenuTriggerFor]="monitoreo_menu">
+					<img src="\.\./static/media/images/monitor.png"/>
+					<span class="borde"></span>
+					<span class="texto">MONITOREO</span>
+				</div>
+				<div style="background-color:#D4AC0D;" >
+				<mat-menu #monitoreo_menu="matMenu">
+				   <span class="texto" mat-menu-item routerLink="/activityMonitoring">Actividades</span>
+				   <span class="texto" mat-menu-item routerLink="/materialMonitoring">Material</span>
+				</mat-menu>
+			    </div>
+			   
+			   </li><!--
+			--><li><a  routerLink="/map">
+					<img src="\.\./static/media/images/map.png"/>
+					<span class="borde"></span>
+					<span class="texto">MAPA</span>
+				</a>
+			</li><!--
+		--></ul>
+	</nav>
+</header>
 
 <router-outlet></router-outlet>
 <app-messages></app-messages>

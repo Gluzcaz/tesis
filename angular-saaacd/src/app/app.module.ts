@@ -29,11 +29,13 @@ import { MapComponent }  from './views/map/map.component';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivityStatisticsComponent } from './views/activity-statistics/activity-statistics.component';
 import { MaterialStatisticsComponent } from './views/material-statistics/material-statistics.component';
 import { ActivityMonitoringComponent } from './views/activity-monitoring/activity-monitoring.component';
 import { MonitorDialogComponent } from './views/monitor-dialog/monitor-dialog.component';
+import { MaterialMonitoringComponent } from './views/material-monitoring/material-monitoring.component';
 
  
 @NgModule({
@@ -47,7 +49,8 @@ import { MonitorDialogComponent } from './views/monitor-dialog/monitor-dialog.co
 	ActivityStatisticsComponent,
 	MaterialStatisticsComponent,
 	ActivityMonitoringComponent,
-	MonitorDialogComponent
+	MonitorDialogComponent,
+	MaterialMonitoringComponent
   ],
   imports: [
     BrowserModule,
@@ -69,6 +72,7 @@ import { MonitorDialogComponent } from './views/monitor-dialog/monitor-dialog.co
 	MatNativeDateModule,
 	ReactiveFormsModule,
 	MatCheckboxModule,
+	MatProgressBarModule,
 	DragDropModule,
 	ToastrModule.forRoot()
   ],

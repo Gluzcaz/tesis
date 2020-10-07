@@ -1,4 +1,4 @@
-/* AppComponent's private CSS styles */
+/* AppComponent's private CSS styles 
 h1 {
   font-size: 1.2em;
   margin-bottom: 0;
@@ -25,4 +25,138 @@ nav a:hover {
 }
 nav a.active {
   color: #039be5;
+}*/
+#logo_unam{
+    width:20%;
+	height:20%;
+	float: left !important;
+	margin-top: .5%;
+    margin-left: .5%;
+	display:inline-block;
+}
+
+#logo_fi{
+    width:5%;
+	height:5%;
+	margin-top: .5%;
+	margin-right: 2%;
+	float: right !important;
+	display:inline-block;
+}
+
+#title{
+    text-align:center !important;
+	display:inline-block;
+	margin-left: 3%;
+	color:#FFF;
+}
+.topnav {
+  background-color: #1B4B63;
+  overflow: hidden;
+}
+
+.long-border{
+	background-color:#F1C40F;
+	display:block;
+	height:8px;
+}
+
+html,
+body{
+margin:0;
+padding:0;
+}
+
+.super-cabecera{
+	position:relative;
+}
+
+.super-cabecera nav{
+	position:relative;
+	width:70%;
+	/*max-width:1000px; */
+	margin:0 auto;
+}
+
+.super-cabecera nav ul{
+	margin:0;
+	padding:0;
+	list-style:none;
+}
+
+.super-cabecera nav ul li{
+	position:relative;
+	display:inline-block;
+	vertical-align:top;
+	/*padding:10px 0 0 0;*/
+	margin:0;
+	width:20%;
+}
+
+.super-cabecera nav ul li img{
+
+	margin-left:20%;
+	
+}
+
+.borde{
+	display:block;
+	height:4px;
+	background-color:#F1C40F;
+	margin-top:10px;
+}
+
+.texto{
+	display:block;
+	height:40px;
+	line-height:40px;
+	text-align:center;
+	background-color:#1B4B63;
+	color:#FFF;
+	font-weight: bold;
+}
+
+.super-cabecera nav ul li a{
+	text-decoration:none;
+
+}
+/* Transiciones en efecto Hover */
+
+.super-cabecera li,
+.super-cabecera li *{
+transition:400ms;
+}
+
+.super-cabecera nav ul li:hover{
+	background-color:#FFF;
+}
+
+.borde:hover {
+	background-color:#B7950B;
+}
+
+.texto:hover{
+	color:#FFF;
+	font-weight: bold;
+	background-color:#D4AC0D;
+}
+
+.super-cabecera nav ul li:hover{
+	background-color:#FFF;
+}
+
+.super-cabecera nav ul li:hover span.borde{
+	background-color:#B7950B;
+}
+
+.super-cabecera nav ul li:hover a .texto{
+	color:#FFF;
+	font-weight: bold;
+	background-color:#D4AC0D;
+}
+
+.super-cabecera nav ul li div:hover span.texto{
+	color:#FFF;
+	font-weight: bold;
+	background-color:#D4AC0D;
 }

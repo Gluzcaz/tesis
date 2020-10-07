@@ -1,7 +1,9 @@
 import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { ActivityService } from '../../services/Activity.service';
+import { DeviceService } from '../../services/device.service';
 import { Actividad } from '../../models/Actividad';
+import { Reporte } from '../../models/Reporte';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
@@ -18,10 +20,11 @@ export class MonitorDialogComponent{
   locationId: number;
   isActivityMonitoring : boolean;
   activities: Actividad[];
+  devices: Reporte[];
   selectedActivity : Actividad;
   //Table Elements
-  displayedColumns: string[] = [ 'id', 'prioridad', 'fechaAlta', 'usuario', 'categoria', 'dispositivo', 'estado', 'edit'];
-  dataSource: MatTableDataSource<Actividad>;
+  displayedColumns: string[];
+  dataSource: MatTableDataSource<any>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   //Notification Elements
@@ -29,6 +32,7 @@ export class MonitorDialogComponent{
   activityErrorMessage = 'No se ha podido mostrar las actividades';
   
   constructor(private activityService: ActivityService,
+              private deviceService: DeviceService,
 			  private notifyService : NotificationService, 
 			  public dialogRef: MatDialogRef<MonitorDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public data: MonitorDialogModel) {
@@ -37,7 +41,15 @@ export class MonitorDialogComponent{
     this.locationId = data.locationId;
     this.isActivityMonitoring = data.isActivityMonitoring;
 	
-	this.getActivitiesByLocation(this.locationId);
+	if(this.isActivityMonitoring){
+		this.getActivitiesByLocation(this.locationId);
+		this.displayedColumns=[ 'id', 'prioridad', 'fechaAlta', 'usuario', 'categoria', 'dispositivo', 'estado', 'edit'];
+
+	} else {
+		this.getMaterialByLocation(this.locationId)
+		this.displayedColumns=[ 'id', 'nombre', 'tiempoVida'];
+	}
+	
   }
 
   onConfirm(): void {
@@ -54,10 +66,23 @@ export class MonitorDialogComponent{
 	this.activityService.getActivitiesByLocation(locationId)
 	.subscribe(activities =>{ 
 			this.activities = activities;
-		    this.setDataSource();
+		    this.setDataSource(this.activities );
 			},
 		error => {
 			catchError(this.notifyService.handleError<Actividad>('getActivities'));
+			this.notifyService.showErrorTimeout(this.activityErrorMessage, this.title);
+	    }
+	);
+  }
+  
+  getMaterialByLocation(locationId){
+	this.deviceService.getLifeTimeDeviceByLocation(locationId)
+	.subscribe(devices =>{ 
+			this.devices = devices;
+		    this.setDataSource(this.devices);
+			},
+		error => {
+			catchError(this.notifyService.handleError<Reporte>('getActivities'));
 			this.notifyService.showErrorTimeout(this.activityErrorMessage, this.title);
 	    }
 	);
@@ -127,33 +152,54 @@ export class MonitorDialogComponent{
 	return url;
   }
   
-  setDataSource(){
+  setDataSource(data){
     // Assign the data to the data source for the table to render
-    this.dataSource = new MatTableDataSource(this.activities);
+    this.dataSource = new MatTableDataSource(data);
 	this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
 	
-	this.dataSource.sortingDataAccessor = (item, property) => {
-		var sortingData= null;
-		switch(property){
-			case 'categoria':
-				sortingData = item.categoria.nombre;
-				break;
-			case 'usuario':
-				sortingData = item.usuario.first_name;
-				break;
-			case 'dispositivo':
-				sortingData = this.getDispositivoText(item);
-				break;
-			case 'fechaAlta':
-				sortingData = new Date(item.fechaAlta).getTime();
-				break;
-			default:
-				sortingData = item[property];
-				break;
-		}
-		return sortingData;
-	};
+	if(this.isActivityMonitoring){
+		this.dataSource.sortingDataAccessor = (item, property) => {
+			var sortingData= null;
+			switch(property){
+				case 'categoria':
+					sortingData = item.categoria.nombre;
+					break;
+				case 'usuario':
+					sortingData = item.usuario.first_name;
+					break;
+				case 'dispositivo':
+					sortingData = this.getDispositivoText(item);
+					break;
+				case 'fechaAlta':
+					sortingData = new Date(item.fechaAlta).getTime();
+					break;
+				default:
+					sortingData = item[property];
+					break;
+			}
+			return sortingData;
+		};
+	} else{
+		this.dataSource.sortingDataAccessor = (item, property) => {
+			var sortingData= null;
+			switch(property){
+				case 'id':
+					sortingData = item.id;
+					break;
+				case 'nombre':
+					sortingData = item.nombre;
+					break;
+				case 'tiempoVida':
+					sortingData = item.data;
+				default:
+					sortingData = item[property];
+					break;
+			}
+			return sortingData;
+		};
+	
+	}
 
   }
 }

@@ -1,35 +1,47 @@
-<div class="grid-two-spaces">
-	<mat-label>Semestre:</mat-label>
-	<mat-select [(ngModel)]="selectedSemester" (selectionChange)="filterStatistics()">
-	  <mat-option *ngFor="let semester of semesters" [value]="semester.id">
-		{{semester.nombre}}
-	  </mat-option>
-	</mat-select>
+<br/><h1 class="title">Estadística de Actividades</h1>
+<div class="grid-three-spaces">
+	<mat-form-field appearance="fill">
+		<mat-label>Semestre:</mat-label>
+		<mat-select appearance="fill" [(ngModel)]="selectedSemester" (selectionChange)="filterStatistics()">
+		  <mat-option *ngFor="let semester of semesters" [value]="semester.id">
+			{{semester.nombre}}
+		  </mat-option>
+		</mat-select>
+	</mat-form-field>
 
-	<mat-label>Tipo de ubicaciones: </mat-label>
-	<mat-select [(ngModel)]="selectedLocationType"(selectionChange)="filterStatistics()">
-	  <mat-option *ngFor="let locationType of locationTypes" [value]="locationType.value">
-		{{locationType.key}}
-	  </mat-option>
-	</mat-select>
+	<mat-form-field appearance="fill">
+		<mat-label>Tipo de ubicaciones: </mat-label>
+		<mat-select [(ngModel)]="selectedLocationType"(selectionChange)="filterStatistics()">
+		  <mat-option *ngFor="let locationType of locationTypes" [value]="locationType.value">
+			{{locationType.key}}
+		  </mat-option>
+		</mat-select>
+	</mat-form-field>
 
-	<mat-label>Tipos de gráficas: </mat-label>
-	<mat-select [(ngModel)]="selectedChartType"(selectionChange)="changeChartType($event.value)">
-	  <mat-option *ngFor="let charType of charTypes" [value]="charType.value">
-		{{charType.key}}
-	  </mat-option>
-	</mat-select>
+	<mat-form-field appearance="fill">
+		<mat-label>Tipos de gráficas: </mat-label>
+		<mat-select [(ngModel)]="selectedChartType"(selectionChange)="changeChartType($event.value)">
+		  <mat-option *ngFor="let charType of charTypes" [value]="charType.value">
+			{{charType.key}}
+		  </mat-option>
+		</mat-select>
+	</mat-form-field>
+
 </div>
 
-<img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
-<div id="map" class="map" ></div>
+<div  class="grid-two-spaces">
+	<div>
+		<img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
+		<div id="map" class="map" ></div>
+	</div>
 
-<table style='width:20%; display: inline-block;'>
-  <tr *ngFor="let category of superiorCategories; let i = index">
-	<td><div class='circleList' style="background-color:{{chartColors[i]}};"></div></td>
-	<td class='categories'>{{ category.nombre }}</td>
-  </tr>
-</table>
+	<table>
+	  <tr *ngFor="let category of superiorCategories; let i = index">
+		<td><div class='circleList' style="background-color:{{chartColors[i]}};"></div></td>
+		<td>{{ category.nombre }}</td>
+	  </tr>
+	</table>
+</div>
 
 
 

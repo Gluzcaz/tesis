@@ -15,7 +15,7 @@ export class URLutility {
 		
   public static getHttpOptionsWithParam(parameterName: string, parameterValue: string): any{
 	let httpParams = new HttpParams().set(parameterName, parameterValue);
-	let httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json', "X-CSRFToken": "tqtNQwEqAjhwC2AQcUp7oq6MPAwkcE1h4Vky3wPqPwrjLsNwKiyGgjmrPhnWLSsx"})
+	let httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json',"X-CSRFToken": "F2jJcSOlbEQlmeEODBlLtwKWpwV9kK5MYAb2HLLraAtBN8xvGBtKjlpa4vna3zWs"});
 	let options = { params: httpParams,
 					headers: httpHeaders };
     return options;
