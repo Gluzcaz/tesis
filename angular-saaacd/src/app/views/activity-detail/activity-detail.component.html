@@ -1,6 +1,6 @@
 <div class="background-class" [ngStyle]="{backgroundImage:'url(../static/media/images/blocNotas.jpg)'}">
     <div id="notebook" class="mat-elevation-z15" >
-		    <div><h2>{{pageTitle}}</h2></div>
+		 <div class="title"><h2>{{pageTitle}}</h2></div>
 		<form [formGroup] = "validationGroup" (ngSubmit)="save()">
 			<div class="grid-dates-container">
 				<mat-form-field>
@@ -163,7 +163,7 @@
 				</mat-form-field>
 			</div>
 		
-			<div>
+			<div class="actions">
 				<button (click)="cancel($event)">Cancelar</button>
 				<button type="submit">Guardar</button>
 			</div>

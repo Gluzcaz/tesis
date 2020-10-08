@@ -71,7 +71,7 @@ export class ActivityService {
   openDialog(activity: Actividad): Observable<any> {
     const message = "¿Realmente quieres eliminar la siguiente actividad?\n"
 						+ activity.id + ".- " + activity.usuario.first_name + " reporta " + activity.categoria.nombre;
-	const title = `Confirmación de eliminación`;
+	const title = `Confirmación`;
 	
     const dialogData = new ConfirmDialogModel(title , message);
  

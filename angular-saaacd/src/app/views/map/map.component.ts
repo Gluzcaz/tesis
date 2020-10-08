@@ -36,7 +36,7 @@ import * as olEasing from 'ol/easing';
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-  mapImageUrl: string = ''; //'../static/media/mapas/findCont.png';//QUITARLO
+  mapImageUrl: string = '';//../static/media/images/location6.jpg';
   maps: Mapa[];
   regions ={'id':'0', 'name': 'Regiones', 'regionList':[]};
   locations = [];
@@ -288,12 +288,9 @@ export class MapComponent implements OnInit {
   onLoad(){
    this.loadedImageWidth = (this.img.nativeElement as HTMLImageElement).naturalWidth;
    this.loadedImageHeight = (this.img.nativeElement as HTMLImageElement).naturalHeight;
-   console.log(this.mapImageUrl);
-   console.log(this.selectedMap);
 	//Check if map not already exist
 	if(this.map == null){
 	   this.createMap();
-	   
 	} 
 	else 
 	{   
@@ -396,7 +393,7 @@ export class MapComponent implements OnInit {
 					// Set the id of the div
 					this.renderer.setProperty(newDiv, 'id', 'region-' + region.id);
 					this.renderer.setProperty(newDiv, 'textContent', region.id);
-
+					this.renderer.addClass(newDiv, 'placeName');
 					let overlay = new Overlay({
 					  position: JSON.parse(region.centroide), 
 					  positioning: 'center-center',
@@ -432,7 +429,7 @@ addMapInteraction(){
 	  style: function(f) {
 			return new Style({
 			  fill: new Fill({
-				color: "#40E0D0"
+				color: "#D4AC0D"
 			  })})}
 	});
 	this.map.addInteraction(selectInteraction);

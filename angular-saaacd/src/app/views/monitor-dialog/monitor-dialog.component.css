@@ -63,6 +63,8 @@
 
 .title {
   text-align: center;
+  color:#D4AC0D;
+  text-decoration: underline overline #D4AC0D; 
 }
 
 .actions{
@@ -88,4 +90,20 @@
 .attach-icon{
 	 width: 40%; 
 	 height: 40%;
+}
+
+button {
+  background-color: #1B4B63;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  cursor: hand;
+  font-family: Arial;
+  font-weight: bold;
+  color: #FFF;
+}
+
+button:hover {
+  background-color:#D4AC0D;
 }

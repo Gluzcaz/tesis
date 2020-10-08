@@ -58,7 +58,7 @@
 			<ng-container matColumnDef="edit">
 				<th mat-header-cell *matHeaderCellDef></th>
 				<td mat-cell *matCellDef="let row" > 
-					 <button mat-raised-button (click)="onConfirm()" color="primary" [routerLink]="getDetailActivityUrl(row.id)">Editar</button>
+					 <button mat-raised-button (click)="onConfirm()" [routerLink]="getDetailActivityUrl(row.id)">Editar</button>
 				</td>
 			</ng-container>
 			
@@ -99,6 +99,6 @@
 
 <div class="actions"> 
 	<div mat-dialog-actions >
-	  <button mat-raised-button color="primary" (click)="onConfirm()">Cerrar</button>
+	  <button mat-raised-button (click)="onConfirm()">Cerrar</button>
 	</div>
 </div>

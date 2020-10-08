@@ -1,12 +1,6 @@
-<!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"  crossorigin="anonymous">-->
-<!--<script type="text/javascript" src="./jquery-1.11.0.min.js"></script>-->
-<!-- Openlayers -->
-<!--<script type="text/javascript" src="./ol.js"></script>-->
-<!-- ol-ext -->
-<!-- <script type="text/javascript" src="./ol-ext.min.js"></script>-->
-<!--<link href="/././/././/././/././node_modules/@angular/material/prebuilt-themes/indigo-pink.css" rel="stylesheet"/>-->
-<div class="background-map">
-	<div class="grid-four-spaces">
+<h1 class="title">Mapa</h1>
+<div class="grid-three-spaces">
+	<mat-form-field appearance="fill">
 		<mat-label>Mapas: </mat-label>
 		<mat-select [(ngModel)]="selectedMap" (selectionChange)="changeMapImageUrl($event.value)">
 		   <div *ngFor="let locationType of mapTree">
@@ -17,52 +11,52 @@
 		  </mat-optgroup>
 		  </div>
 		</mat-select>
-		
-		<mat-checkbox [(ngModel)]="isMainMap">
-				<mat-label>¿Es mapa principal?</mat-label>	
-		</mat-checkbox>
+	</mat-form-field>
+	
+	<mat-checkbox [(ngModel)]="isMainMap">
+			<mat-label>¿Es mapa principal?</mat-label>	
+	</mat-checkbox>
 
-		<button (click)="processMap()" [disabled]="disableButton">Procesar Mapa</button>
+	<button id="processButton" (click)="processMap()" [disabled]="disableButton">Procesar Mapa</button>
+</div>
+
+<img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
+<div id="map" class="map"></div>
+
+<br/>
+<br/>
+<div class="drag-container">
+	<div class="section-heading"><h3>{{regions.name}}</h3></div>
+	<div cdkDropList id="{{regions.id}}" [cdkDropListData]="regions.regionList"
+	  [cdkDropListConnectedTo]="regionsConnectedTo" class="item-list" (cdkDropListDropped)="regionDrop($event)">
+	  <button id="button-{{regionItem.id}}" class="item-box" (click)="pulse($event, regionItem)" *ngFor="let regionItem of regions.regionList" cdkDrag>{{regionItem.id}}</button>
 	</div>
-
-	<img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
-	<div id="map" class="map"></div>
-
-	<br/>
-	<br/>
-	<div class="drag-container">
-		<div class="section-heading">{{regions.name}}</div>
-		<div cdkDropList id="{{regions.id}}" [cdkDropListData]="regions.regionList"
-		  [cdkDropListConnectedTo]="regionsConnectedTo" class="item-list" (cdkDropListDropped)="regionDrop($event)">
-		  <button id="button-{{regionItem.id}}" class="item-box" (click)="pulse($event, regionItem)" *ngFor="let regionItem of regions.regionList" cdkDrag>{{regionItem.id}}</button>
-		</div>
-	</div>
-	<br/>
-	<div class="grid-two-spaces">
+</div>
+<div id="locations">
+	<mat-form-field appearance="fill">
 		<mat-label>Ubicaciones en: </mat-label>
 		<mat-select [disabled]="disableLocationSelection" [(ngModel)]="selectedLocation"(selectionChange)="assignLocationList($event.value)">
 		  <mat-option *ngFor="let superiorLocation of superiorLocations" [value]="superiorLocation.id">
 			{{superiorLocation.tipoUbicacion.nombre + ' ' +superiorLocation.nombre}}
 		  </mat-option>
 		</mat-select>
-	</div>
-	<div class="grid-six-spaces">
-		<div *ngFor="let location of locations">
-		  <div class="drag-container-locations">
-			<div class="section-heading">{{location.name}}</div>
-			<div cdkDropList id="{{location.id}}" [cdkDropListData]="location.regionList"
-			  [cdkDropListConnectedTo]="connectedTo" class="item-list" (cdkDropListDropped)="drop($event)" >
-			  <button id="button-{{regionItem.id}}" class="item-box" (click)="pulse($event, regionItem)" *ngFor="let regionItem of location.regionList" cdkDrag>
-				{{regionItem.id}}
-			  </button>
-			</div>
-		  </div>
-		</div>
-	</div>
-
-
-	<!--<div id="overlay" style="z-index:9999"></div>-->
-
-	<div><button (click)="save()" [disabled]="disableButton">Guardar</button>
-	<button (click)="goBack($event)">Regresar</button></div>
+	</mat-form-field>
 </div>
+<div class="grid-six-spaces">
+	<div *ngFor="let location of locations">
+	  <div class="drag-container-locations">
+		<div class="section-heading">{{location.name}}</div>
+		<div cdkDropList id="{{location.id}}" [cdkDropListData]="location.regionList"
+		  [cdkDropListConnectedTo]="connectedTo" class="item-list" (cdkDropListDropped)="drop($event)" >
+		  <button id="button-{{regionItem.id}}" class="item-box" (click)="pulse($event, regionItem)" *ngFor="let regionItem of location.regionList" cdkDrag>
+			{{regionItem.id}}
+		  </button>
+		</div>
+	  </div>
+	</div>
+</div>
+<div class="actions">
+	<button (click)="save()" [disabled]="disableButton">Guardar</button>
+	<button (click)="goBack($event)">Regresar</button>
+</div>
+

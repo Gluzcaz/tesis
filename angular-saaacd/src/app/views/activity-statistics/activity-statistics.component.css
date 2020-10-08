@@ -5,6 +5,7 @@
 	color:#D4AC0D; 
 	font-weight: bold;
 	text-decoration: underline overline #D4AC0D; 
+    margin: 20px;
 }
 
 .ol-overlay-container {
@@ -20,7 +21,7 @@
     }
 
 .map {
-	height:70%;
+	height:100%;
 	border: 3px solid #D4AC0D;
 	margin: 15px;
   }
@@ -42,15 +43,14 @@
 .grid-three-spaces{
   display: grid;
   grid-template-columns: auto auto auto;
-  margin: 15px;
+  margin: 10px;
   grid-gap: 50px;
 }
 
 .grid-two-spaces{
   display: grid;
-  grid-template-columns: 80% 20%;
-  grid-gap: 10px;
-  width: 95%;
+  grid-template-columns: 80% 18%;
+  grid-gap: 5px;
   height: 100%;
 }
 

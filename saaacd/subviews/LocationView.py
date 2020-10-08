@@ -68,7 +68,6 @@ class LocationView(TemplateView):
             for key in sorted(statistics.keys()) :
                 values.append(statistics[key])
             object['data'] = json.dumps(values)
-        print(values)
         return data
 		
     def __addEmptyMaterialCategories(data):

@@ -51,8 +51,10 @@ export class ActivityMonitoringComponent implements OnInit {
 		{	stroke: new Stroke({ width:3, color:'red' }),
 			fill: new Fill({ color:'red' })
 		});
-  
-   
+  superiorCategories: string[] = ['Alta','Media','Baja'];
+  chartColors = ["red","orange","yellow"]
+
+ 
   title = 'Notificación';
   locationErrorMessage = 'No se ha podido mostrar los datos estadísticos.';
   mapErrorMessage = 'No se ha podido identificar el mapa.';
@@ -192,7 +194,10 @@ export class ActivityMonitoringComponent implements OnInit {
   assignTitleToLocation(region){
 	// Use Angular's Renderer2 to create the div element
 	var newDiv = this.renderer.createElement('div');
-	this.renderer.addClass(newDiv, 'placeName');
+	if(region.data == Actividad.PRIORITIES[0].id)
+		this.renderer.addClass(newDiv, 'pulsePlaceName');
+	else
+		this.renderer.addClass(newDiv, 'placeName');
 	this.renderer.setProperty(newDiv, 'id', 'region-' + region.id);
 	this.renderer.setProperty(newDiv, 'textContent', region.nombre);
 

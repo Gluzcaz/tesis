@@ -1,4 +1,4 @@
-<br/><h1 class="title">Estadística de Actividades</h1>
+<h1 class="title">Estadística de actividades</h1>
 <div class="grid-three-spaces">
 	<mat-form-field appearance="fill">
 		<mat-label>Semestre:</mat-label>
@@ -35,12 +35,15 @@
 		<div id="map" class="map" ></div>
 	</div>
 
-	<table>
-	  <tr *ngFor="let category of superiorCategories; let i = index">
-		<td><div class='circleList' style="background-color:{{chartColors[i]}};"></div></td>
-		<td>{{ category.nombre }}</td>
-	  </tr>
-	</table>
+	<div>
+		<h4>Categorías:</h4>
+		<table>
+		  <tr *ngFor="let category of superiorCategories; let i = index">
+			<td><div class='circleList' style="background-color:{{chartColors[i]}};"></div></td>
+			<td>{{ category.nombre }}</td>
+		  </tr>
+		</table>
+	</div>
 </div>
 
 

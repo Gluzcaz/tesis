@@ -1,12 +1,52 @@
-.map {
-	width: 80%;
-	height:70%;
-	display: inline-block;
-	padding: 15px;
+.title{
+	height:40px;
+	line-height:40px;
+	text-align:center;
+	color:#D4AC0D; 
+	font-weight: bold;
+	text-decoration: underline overline #D4AC0D; 
+	margin-top: 20px;
 }
+
+.map {
+	height:100%;
+	border: 3px solid #D4AC0D;
+	margin: 15px;
+  }
   
 .placeName {
 	font-family: Arial, Helvetica, sans-serif;
 	font-weight: bold;
+}
+  
+.pulsePlaceName {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+    animation: pulseMove 3s infinite;
+}
+
+@keyframes pulseMove {
+ 0% {
+    box-shadow: 0 0 0 20px rgba(150, 40, 27, 1);
+  }
+  100% {
+    box-shadow: 0 0 0 40px rgba(0, 0, 0, 0);
+  }
+}
+
+.grid-two-spaces{
+  display: grid;
+  grid-template-columns: 90% 10%;
+  grid-gap: 5px;
+  height: 100%;
+}
+
+.circleList {
+      width: 40px;
+      height: 40px;
+      -webkit-border-radius: 25px;
+      -moz-border-radius: 25px;
+      border-radius: 25px;
+	  margin: 10px;
 }
   

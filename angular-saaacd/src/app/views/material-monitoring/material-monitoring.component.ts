@@ -38,7 +38,7 @@ import {MatSort} from '@angular/material/sort';
 })
 export class MaterialMonitoringComponent implements OnInit {
   devices: ExpiredDevice[];
-  totalPriceDevices = 0;
+  deviceTotalPrice = 0;
   mapImageUrl: string =''; 
   loadedImageWidth: number = 0;
   loadedImageHeight: number = 0;
@@ -58,6 +58,8 @@ export class MaterialMonitoringComponent implements OnInit {
 		{	stroke: new Stroke({ width:3, color:'red' }),
 			fill: new Fill({ color:'red' })
 		});
+  superiorCategories: string[] = ['Material vencido','Material por expirar en un mes'];
+  chartColors = ["red","yellow"]
   //Table Elements
   displayedColumns: string[] =['id','nombre','cantidad', 'precio']
   dataSource: MatTableDataSource<any>;
@@ -98,7 +100,6 @@ export class MaterialMonitoringComponent implements OnInit {
 					});
 					
 					var priority= parseInt(locations[i].data, 10);
-					console.log(priority)
 					switch(priority) { 
 					   case 1:{
 						  feature.setStyle(this.dangerousStyle)
@@ -130,7 +131,7 @@ export class MaterialMonitoringComponent implements OnInit {
     .subscribe(devices =>{ 
 			   this.devices = devices;
 			   for (var i = 0; i < devices.length; i++) { 
-					this.totalPriceDevices += devices[i].precio*devices[i].cantidad
+					this.deviceTotalPrice += devices[i].precio*devices[i].cantidad
 			   }
 			   this.setDataSource();
 	          },
@@ -246,7 +247,10 @@ export class MaterialMonitoringComponent implements OnInit {
   assignTitleToLocation(region){
 	// Use Angular's Renderer2 to create the div element
 	var newDiv = this.renderer.createElement('div');
-	this.renderer.addClass(newDiv, 'placeName');
+	if(parseInt(region.data,10) == 1)
+		this.renderer.addClass(newDiv, 'pulsePlaceName');
+	else
+		this.renderer.addClass(newDiv, 'placeName');
 	this.renderer.setProperty(newDiv, 'id', 'region-' + region.id);
 	this.renderer.setProperty(newDiv, 'textContent', region.nombre);
 

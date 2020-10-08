@@ -1,2 +1,16 @@
-<img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
-<div id="map" class="map" ></div>
+<h1 class="title">Monitoreo de actividades</h1>
+<div  class="grid-two-spaces">
+	<div>
+		<img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
+		<div id="map" class="map" ></div>
+	</div>
+    <div>
+		<h4>Prioridades:</h4>
+		<table>
+		  <tr *ngFor="let category of superiorCategories; let i = index">
+			<td><div class='circleList' style="background-color:{{chartColors[i]}};"></div></td>
+			<td>{{ category }}</td>
+		  </tr>
+		</table>
+	</div>
+</div>

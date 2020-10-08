@@ -176,6 +176,7 @@ export class MonitorDialogComponent{
 					break;
 				default:
 					sortingData = item[property];
+					console.log(item);
 					break;
 			}
 			return sortingData;
@@ -183,6 +184,8 @@ export class MonitorDialogComponent{
 	} else{
 		this.dataSource.sortingDataAccessor = (item, property) => {
 			var sortingData= null;
+			console.log(item);
+			console.log(property);
 			switch(property){
 				case 'id':
 					sortingData = item.id;
