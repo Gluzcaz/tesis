@@ -36,7 +36,7 @@ import { MaterialStatisticsComponent } from './views/material-statistics/materia
 import { ActivityMonitoringComponent } from './views/activity-monitoring/activity-monitoring.component';
 import { MonitorDialogComponent } from './views/monitor-dialog/monitor-dialog.component';
 import { MaterialMonitoringComponent } from './views/material-monitoring/material-monitoring.component';
-
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
  
 @NgModule({
   declarations: [
@@ -73,6 +73,7 @@ import { MaterialMonitoringComponent } from './views/material-monitoring/materia
 	ReactiveFormsModule,
 	MatCheckboxModule,
 	MatProgressBarModule,
+	MatProgressSpinnerModule,
 	DragDropModule,
 	ToastrModule.forRoot()
   ],

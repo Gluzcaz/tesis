@@ -33,8 +33,9 @@
 	</div>
 </div>
 <div id="locations">
+	<span class="placeName">Relaciona las regiones con las ubicaciones en: </span>
 	<mat-form-field appearance="fill">
-		<mat-label>Ubicaciones en: </mat-label>
+		<mat-label></mat-label>
 		<mat-select [disabled]="disableLocationSelection" [(ngModel)]="selectedLocation"(selectionChange)="assignLocationList($event.value)">
 		  <mat-option *ngFor="let superiorLocation of superiorLocations" [value]="superiorLocation.id">
 			{{superiorLocation.tipoUbicacion.nombre + ' ' +superiorLocation.nombre}}
@@ -59,4 +60,11 @@
 	<button (click)="save()" [disabled]="disableButton">Guardar</button>
 	<button (click)="goBack($event)">Regresar</button>
 </div>
+<div class="overlay" *ngIf="processInProgress">
+	<div class="center">
+		<mat-progress-spinner mode="indeterminate">
+		</mat-progress-spinner>
+	</div>
+</div>
+
 

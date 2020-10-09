@@ -36,7 +36,7 @@ import * as olEasing from 'ol/easing';
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-  mapImageUrl: string = '';//../static/media/images/location6.jpg';
+  mapImageUrl: string = '../static/media/images/location6.jpg';
   maps: Mapa[];
   regions ={'id':'0', 'name': 'Regiones', 'regionList':[]};
   locations = [];
@@ -70,6 +70,7 @@ export class MapComponent implements OnInit {
   disableButton: boolean = true;
   disableLocationSelection: boolean  = true;
   isMainMap: boolean = false;
+  processInProgress = false;
    
   ngOnInit(): void {
    this.getMaps();
@@ -89,6 +90,7 @@ export class MapComponent implements OnInit {
   }
   
   assignLocationList(selectedSuperiorLocation: number){
+    this.processInProgress = true; 
     this.regions ={
 						id: '0',
 						name: 'Regiones',
@@ -120,10 +122,12 @@ export class MapComponent implements OnInit {
 					this.regionsConnectedTo.push(location.id.toString());
 				    this.connectedTo.push(location.id.toString());
 				});
+				this.processInProgress = false; 
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Ubicacion>('getLocation'));
 				  this.notifyService.showErrorTimeout(this.locationErrorMessage, this.title);
+				  this.processInProgress = false; 
 				  }
 			   );
   } 
@@ -159,13 +163,13 @@ export class MapComponent implements OnInit {
 		this.mapImageUrl ='../static/media/' + foundMap.imagen;
 		this.disableButton = false;
 		this.isMainMap = foundMap.esActivo;
-		if(selectedMap!=this.processedImageId)
+		if(selectedMap!=this.processedImageId){
 			this.disableLocationSelection = true;
-		else
+		}else{
 			this.disableLocationSelection = false;
-
+		}
 	}else{
-		this.mapImageUrl ='';
+		this.mapImageUrl = '';//'../static/media/images/location6.jpg';
 	}
   }
 
@@ -210,10 +214,10 @@ export class MapComponent implements OnInit {
   }
 
   processMap(){
+	this.processInProgress = true;  
 	this.disableLocationSelection = false;
 	this.regionService.getRegionsOnMap(this.selectedMap)
     .subscribe(regions =>{ 
-				
 				this.processedRegions = regions.slice();
 				this.regions ={
 						id: '0',
@@ -227,10 +231,12 @@ export class MapComponent implements OnInit {
 				this.drawElementsOnMap();
 	            this.addMapInteraction();
 				this.processedImageId = this.selectedMap;
+				this.processInProgress = false; 
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<RegionGeografica>('getRegions'));
 				  this.notifyService.showErrorTimeout(this.regionErrorMessage, this.title);
+				  this.processInProgress = false; 
 				  }
 			   );
  }
@@ -249,6 +255,7 @@ export class MapComponent implements OnInit {
    }
   
   save(){
+    this.processInProgress = true; 
  	let rawLocations = [];
 	let generalData = {
 			  'mapaId' : this.selectedMap,
@@ -265,12 +272,13 @@ export class MapComponent implements OnInit {
 	this.locationService.updateLocation(rawLocations)
 				  .subscribe(
 							response => {
-							  console.log(response.mapName);
 							  this.notifyService.showSuccessTimeout(this.updateLocationsSuccessMessage + response.mapName, this.title);
+							  this.processInProgress = false; 
 							  },
 							error => {
 							  catchError(this.notifyService.handleError<Ubicacion>('SaveLocations'));
 							  this.notifyService.showErrorTimeout(this.updateLocationsErrorMessage, this.title);
+							  this.processInProgress = false; 
 							  });
 	
 	
@@ -317,7 +325,9 @@ export class MapComponent implements OnInit {
 			}
 			this.locations = [];
 			this.selectedLocation = null;
-		} 
+		} else{
+			this.changeVectorLayer();
+		}
 
 	}
   }

@@ -16,7 +16,6 @@ from django.conf.urls.static import static
  
  
 router = routers.DefaultRouter()
-#router.register(r'customers', views.CustViewSet) 
  
 urlpatterns = [
     url(r'^$', views.ActivityView.as_view()),
@@ -53,9 +52,4 @@ urlpatterns = [
 	url(r'^api/activeMap/', MapView.getActiveMap),
 	url(r'^api/regions/', RegionView.getRegionsOnMap),
 	url(r'^api/saveLocations/', LocationView.saveLocations),
-	
-   #url(r'^.*', TemplateView.as_view(template_name="home.html"), name="home")
-   # url(r'^links/$', views.LinksPageView.as_view()), # simple view
-   # url(r'^getcust/$',views.Actividades.getActividad), # simple view
-   # url(r'^apitest/$',views.CalcTest), # for REST API test
 ]

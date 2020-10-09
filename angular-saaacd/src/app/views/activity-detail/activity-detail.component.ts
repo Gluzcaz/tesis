@@ -38,7 +38,7 @@ export class ActivityDetailComponent implements OnInit {
   isPetition: boolean = false;
   DONE : string = Actividad.STATUSES[0].id;
   MAX_LENGTH_COMMENT: number = Actividad.MAX_LENGTH_COMMENT;
-  pageTitle : string = "Nueva Actividad"; 
+  pageTitle : string = "Nueva actividad"; 
   
   categories: Categoria[];
   categoryHashTable: Object = Object.create(null);

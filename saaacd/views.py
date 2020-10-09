@@ -85,6 +85,7 @@ class ActivityView(TemplateView):
         except Exception as e:
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
 
+    @csrf_exempt
     @api_view(['POST', 'PUT'])
     def saveActivity(request, format=None):
         try:
