@@ -97,39 +97,39 @@ export class MapComponent implements OnInit {
 						regionList: []
 				    };
     this.locations = [];
-    this.locationService.getLocationsBySuperiorLocation(selectedSuperiorLocation)
-    .subscribe(locations =>{ 
-				if(this.processedImageId > 0 )
+	if(this.processedImageId > 0){
+		this.locationService.getLocationsBySuperiorLocation(selectedSuperiorLocation, this.processedImageId)
+		.subscribe(locations =>{ 
 					this.regions.regionList= this.processedRegions.slice();
-				const foundSuperiorLocation = this.superiorLocations.find(superiorLocation => superiorLocation.id == selectedSuperiorLocation);
-				locations.push(foundSuperiorLocation);
 
-				locations.forEach(location => {
-					let regionList = [];
-				    if(this.processedImageId > 0 && 
-					   location.regionGeografica != null &&
-					   location.regionGeografica.mapa.id == this.processedImageId){
-						
-						const foundRegion = this.processedRegions.find(region => region.coordenada == location.regionGeografica.coordenada);
-						if(foundRegion != null){
+					//Add superior location
+					const foundSuperiorLocation = this.superiorLocations.find(superiorLocation => superiorLocation.id == selectedSuperiorLocation);
+				    locations.push(foundSuperiorLocation);
+
+					//Add inferior locations
+					locations.forEach(location => {
+					    let dropList = [];
+						const foundRegionIndex = this.regions.regionList.findIndex(region => region.coordenada == location.regionGeografica.coordenada);
+						if(foundRegionIndex > -1){
+							const foundRegion = this.regions.regionList[foundRegionIndex];
 							location.regionGeografica.rawId = location.regionGeografica.id;
 							location.regionGeografica.id = foundRegion.id;
-							regionList.push(location.regionGeografica);
-							this.regions.regionList.splice(foundRegion.id-1, 1);
+							dropList.push(location.regionGeografica);
+							this.regions.regionList.splice(foundRegionIndex, 1);
 						}
-     				}
-					this.locations.push( {'id': location.id.toString(), 'name': location.tipoUbicacion.nombre + " " + location.nombre,'regionList':regionList});
-					this.regionsConnectedTo.push(location.id.toString());
-				    this.connectedTo.push(location.id.toString());
-				});
-				this.processInProgress = false; 
-	           },
-			   error => {
-				  catchError(this.notifyService.handleError<Ubicacion>('getLocation'));
-				  this.notifyService.showErrorTimeout(this.locationErrorMessage, this.title);
-				  this.processInProgress = false; 
-				  }
-			   );
+						this.locations.push( {'id': location.id.toString(), 'name': location.tipoUbicacion.nombre + " " + location.nombre,'regionList':dropList});
+						this.regionsConnectedTo.push(location.id.toString());
+						this.connectedTo.push(location.id.toString());
+					});
+					this.processInProgress = false; 
+				   },
+				   error => {
+					  catchError(this.notifyService.handleError<Ubicacion>('getLocation'));
+					  this.notifyService.showErrorTimeout(this.locationErrorMessage, this.title);
+					  this.processInProgress = false; 
+					  }
+				   );
+	}
   } 
   
   getSuperiorLocations(){

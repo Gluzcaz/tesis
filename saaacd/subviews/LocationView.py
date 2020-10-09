@@ -40,14 +40,15 @@ class LocationView(TemplateView):
 			
     def getInferiorLocations(request):
         try:
+            mapId=request.GET['mapId']
             location=request.GET['location']
             locationObject = Ubicacion.objects.get(id=location)
         except Ubicacion.DoesNotExist: 
             return JsonResponse({'message': 'La ubicación superior no existe.'}, status=status.HTTP_404_NOT_FOUND) 
         try:
             data = Ubicacion.objects.all()
-            if location is not None:
-                data = data.filter(ubicacionSuperior=location)
+            if location is not None and mapId is not None:
+                data = data.filter(ubicacionSuperior=location).filter(regionGeografica__mapa=mapId)
                 serializer = UbicacionSerializador(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'regionGeografica'))
                 return JsonResponse(serializer.data, safe=False)
         except Exception as e:

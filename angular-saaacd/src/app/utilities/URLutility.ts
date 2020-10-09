@@ -20,6 +20,16 @@ export class URLutility {
 					headers: httpHeaders };
     return options;
   }
+  //PENDIENTE , QUITAR Y DEJAR UNO
+  public static getHttpOptionsWith2Params(parameterName1: string, parameterValue1: string, parameterName2: string, parameterValue2: string): any{
+	let httpParams = new HttpParams();
+	httpParams = httpParams.append(parameterName1, parameterValue1);
+	httpParams = httpParams.append(parameterName2, parameterValue2);
+	let httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json',"X-CSRFToken": "F2jJcSOlbEQlmeEODBlLtwKWpwV9kK5MYAb2HLLraAtBN8xvGBtKjlpa4vna3zWs"});
+	let options = { params: httpParams,
+					headers: httpHeaders };
+    return options;
+  }
   
    /**
    * Handle Http operation that failed.

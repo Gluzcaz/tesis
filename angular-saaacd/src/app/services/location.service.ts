@@ -30,8 +30,9 @@ export class LocationService {
   }
   
    /** GET Locations By Superior Location */
-  getLocationsBySuperiorLocation(id: number):  Observable<any> {
-	var options = URLutility.getHttpOptionsWithParam('location', id.toString());
+  getLocationsBySuperiorLocation(id: number, mapId: number):  Observable<any> {
+	var options = URLutility.getHttpOptionsWith2Params('location', id.toString(),'mapId', mapId.toString());
+	console.log(options);
     return this.http.get<Ubicacion[]>(this.inferiorLocationsUrl, options);
   }
   
