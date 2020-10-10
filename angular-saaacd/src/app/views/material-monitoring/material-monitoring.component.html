@@ -2,10 +2,12 @@
 <div class="controlStyle">
 	<mat-form-field appearance="fill">
 	  <mat-label>Fecha de Pronóstico</mat-label>
-	  <input matInput [matDatepicker]="picker">
+	  <input matInput (dateChange)="changeFutureDate($event)" [min]="minDate" [max]="maxDate" [matDatepicker]="picker">
 	  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
 	  <mat-datepicker #picker></mat-datepicker>
 	</mat-form-field>
+	
+	<button id="exportButton" (click)="downloadPDF()" [disabled]="false">Exportar PDF</button>
 </div>
 
 <div class="grid-two-spaces">
@@ -25,7 +27,7 @@
 	</div>
 </div>
 
-<div class="tableStyle">
+<div id="htmlData" class="tableStyle">
 	<h3 class="title">Material requerido</h3>
 	<table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort >
 		<!-- ID Column -->
@@ -61,4 +63,11 @@
 		<tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
 	</table>
 	<mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+</div>
+
+<div class="overlay" *ngIf="actionInProgress">
+	<div class="center">
+		<mat-progress-spinner mode="indeterminate">
+		</mat-progress-spinner>
+	</div>
 </div>

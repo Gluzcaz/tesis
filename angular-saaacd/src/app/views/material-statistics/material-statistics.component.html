@@ -1,5 +1,5 @@
 <h1 class="title">Estadística de Material</h1>
-<div class="grid-three-spaces">
+<div class="grid-four-spaces">
 	<mat-form-field appearance="fill">
 		<mat-label>Semestre:</mat-label>
 		<mat-select [(ngModel)]="selectedSemester" (selectionChange)="filterStatistics()">
@@ -26,9 +26,12 @@
 		  </mat-option>
 		</mat-select>
 	</mat-form-field>
+	
+    <button id="exportButton" (click)="downloadPDF()" [disabled]="false">Exportar PDF</button>
+
 </div>
 
-<div  class="grid-two-spaces">
+<div id="htmlData" class="grid-two-spaces">
 	<div>
 		<img #img [src]="mapImageUrl" (load)="onLoad()" style="display: none;"/>
 		<div id="map" class="map" ></div>
@@ -42,5 +45,12 @@
 			<td>{{ category }}</td>
 		  </tr>
 		</table>
+	</div>
+</div>
+
+<div class="overlay" *ngIf="actionInProgress">
+	<div class="center">
+		<mat-progress-spinner mode="indeterminate">
+		</mat-progress-spinner>
 	</div>
 </div>

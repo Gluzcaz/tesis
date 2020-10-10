@@ -25,6 +25,9 @@ import { MapService } from '../../services/map.service';
 import { Categoria } from '../../models/Categoria';
 import { CategoryService } from '../../services/category.service';
 
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { DOCUMENT, Location} from '@angular/common';
 
 @Component({
   selector: 'app-activity-statistics',
@@ -53,7 +56,7 @@ export class ActivityStatisticsComponent implements OnInit {
 			  { key:   "Inferior", value: true}
 			 ];
   chartColors = ["#ffa500","blue","red","green","cyan","magenta","yellow","#0f0"]
-  
+  actionInProgress = false;
   
   title = 'Notificación';
   locationErrorMessage = 'No se ha podido mostrar los datos estadísticos.';
@@ -302,6 +305,38 @@ changeChartType(selectedChartType: string){
 	this.vectorSource.changed();
 	
 }
+
+//---------------------------PDF
+	public downloadPDF(): void {
+	    this.actionInProgress =true;
+	    const DATA = document.getElementById('htmlData');
+		const doc = new jsPDF('l', 'pt', 'a4');
+	    const options = {
+		  background: 'white',
+		  scale: 3
+		};
+		html2canvas(DATA, options).then((canvas) => {
+		  const img = canvas.toDataURL('image/PNG');
+
+		  // Add image Canvas to PDF
+		  const bufferX = 15;
+		  const bufferY = 15;
+		  const imgProps = (doc as any).getImageProperties(img);
+		  const pdfWidth = doc.internal.pageSize.getWidth() - 2 * bufferX;
+		  const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+		  doc.addImage(img, 'PNG', bufferX, bufferY, pdfWidth, pdfHeight, undefined, 'FAST');
+		  
+		  doc.setTextColor(212, 172, 13);
+	      var text = 'Estadística de actividades';
+          var xOffset = (doc.internal.pageSize.width / 2) - (doc.getStringUnitWidth(text) * doc.internal.getFontSize() / 2); 
+          doc.text(text, xOffset, 20);
+		  
+		  return doc;
+		}).then((docResult) => {
+		  this.actionInProgress =false;
+		  docResult.save('EstadísticaActividades.pdf');
+		});
+	}
 	
 	
 

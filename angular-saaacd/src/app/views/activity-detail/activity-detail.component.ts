@@ -252,7 +252,6 @@ export class ActivityDetailComponent implements OnInit {
 		if (this.resolutionDateControl.value!=null  
 			&&  currentDate > this.resolutionDateControl.value) {
 			this.currentDateControl.setErrors({ isLessThanResolutionDate: true });
-			console.log('validacion3');
 		}
 		else {
 			this.currentDateControl.setErrors(null);
@@ -262,8 +261,10 @@ export class ActivityDetailComponent implements OnInit {
    	  
   this.statusControl.valueChanges.subscribe(status => {
 	//Resolution date is required to register Done state
-	if(status != this.DONE)
+	if(status != this.DONE){
+	    this.resolutionDateControl.setValue(null);
 		this.resolutionDateControl.disable();
+	}
 	else{ 
 		this.resolutionDateControl.enable();
 	    if(this.resolutionDateControl.value == null) {

@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, OnInit,Renderer2 } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit,Renderer2, Inject } from '@angular/core';
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
 import Feature from 'ol/Feature';
@@ -22,6 +22,10 @@ import { Semestre } from '../../models/Semestre';
 import { SemesterService } from '../../services/semester.service';
 import { Mapa } from '../../models/Mapa';
 import { MapService } from '../../services/map.service';
+
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { DOCUMENT, Location} from '@angular/common';
 
 @Component({
   selector: 'app-material-statistics',
@@ -49,8 +53,8 @@ export class MaterialStatisticsComponent implements OnInit {
   locationTypes = [{ key:   "Superior", value: false},
 			  { key:   "Inferior", value: true}
 			 ];
-  chartColors = ["#ffa500","blue","red","green","cyan","magenta","yellow","#0f0"]
-  
+  chartColors = ["#ffa500","blue","red","green","cyan","magenta","yellow","#0f0"]  
+  actionInProgress = false;
   
   title = 'Notificación';
   locationErrorMessage = 'No se ha podido mostrar los datos estadísticos.';
@@ -62,7 +66,8 @@ export class MaterialStatisticsComponent implements OnInit {
 		   private notifyService : NotificationService,
 		   private semesterService: SemesterService,
 		   private mapService: MapService,
-		   private renderer: Renderer2
+		   private renderer: Renderer2,
+		   @Inject(DOCUMENT) document
 		   ) { }
 
   ngOnInit(): void {
@@ -283,4 +288,36 @@ export class MaterialStatisticsComponent implements OnInit {
 
 		this.vectorSource.changed();
 	}
+	//---------------------------PDF
+	public downloadPDF(): void {
+	    this.actionInProgress =true;
+	    const DATA = document.getElementById('htmlData');
+		const doc = new jsPDF('l', 'pt', 'a4');
+	    const options = {
+		  background: 'white',
+		  scale: 3
+		};
+		html2canvas(DATA, options).then((canvas) => {
+		  const img = canvas.toDataURL('image/PNG');
+
+		  // Add image Canvas to PDF
+		  const bufferX = 15;
+		  const bufferY = 15;
+		  const imgProps = (doc as any).getImageProperties(img);
+		  const pdfWidth = doc.internal.pageSize.getWidth() - 2 * bufferX;
+		  const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+		  doc.addImage(img, 'PNG', bufferX, bufferY, pdfWidth, pdfHeight, undefined, 'FAST');
+		  
+		  doc.setTextColor(212, 172, 13);
+	      var text = 'Estadística de material';
+          var xOffset = (doc.internal.pageSize.width / 2) - (doc.getStringUnitWidth(text) * doc.internal.getFontSize() / 2); 
+          doc.text(text, xOffset, 20);
+		  
+		  return doc;
+		}).then((docResult) => {
+		  this.actionInProgress =false;
+		  docResult.save('EstadísticaMaterial.pdf');
+		});
+	}
+	 
 }

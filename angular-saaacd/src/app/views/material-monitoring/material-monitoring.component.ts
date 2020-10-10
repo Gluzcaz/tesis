@@ -31,6 +31,10 @@ import {MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { DOCUMENT, Location} from '@angular/common';
+
 @Component({
   selector: 'app-material-monitoring',
   templateUrl: './material-monitoring.component.html',
@@ -46,6 +50,9 @@ export class MaterialMonitoringComponent implements OnInit {
   vectorSource = new Vector();
   map: OlMap;
   selectedSemester: number;
+  actionInProgress =false;
+  minDate: Date;
+  maxDate: Date;
   pasiveStyle =  new Style(
 		{	stroke: new Stroke({ width:3, color:'yellow' }),
 			fill: new Fill({ color:'yellow' })
@@ -58,7 +65,7 @@ export class MaterialMonitoringComponent implements OnInit {
 		{	stroke: new Stroke({ width:3, color:'red' }),
 			fill: new Fill({ color:'red' })
 		});
-  superiorCategories: string[] = ['Material vencido','Material por expirar en un mes'];
+  superiorCategories: string[] = ['Material expirado','Material por expirar en un mes'];
   chartColors = ["red","yellow"]
   //Table Elements
   displayedColumns: string[] =['id','nombre','cantidad', 'precio']
@@ -76,8 +83,17 @@ export class MaterialMonitoringComponent implements OnInit {
 		   private notifyService : NotificationService,
 		   private mapService: MapService,
 		   public dialog: MatDialog,
-		   private renderer: Renderer2
-		   ) { }
+		   private renderer: Renderer2,
+		   @Inject(DOCUMENT) document
+		   ) { 
+	var today = new Date();
+    var year = today.getFullYear();
+	var month = today.getMonth();
+	var day = today.getDay();
+	
+    this.minDate = today;
+    this.maxDate = new Date(year + 2, month, day);	   
+	}
 
   ngOnInit(): void {
 	this.getActiveMap();
@@ -168,7 +184,6 @@ export class MaterialMonitoringComponent implements OnInit {
 			return sortingData;
 	};
   }
-
   
   getActiveMap(){
     this.mapService.getActiveMap()
@@ -181,6 +196,10 @@ export class MaterialMonitoringComponent implements OnInit {
 				  }
 			   );
   } 
+  
+  changeFutureDate(event) {
+    console.log(event.value);
+  }
   
     /*************** MAP VISUALIZATION ******************* ***/
   
@@ -274,6 +293,33 @@ export class MaterialMonitoringComponent implements OnInit {
 		source: this.vectorSource
 	});
 	this.map.addLayer(vectorLayer);
+  }
+  
+  //---------------------------PDF
+	public downloadPDF(): void {
+		this.actionInProgress = true;
+		const DATA = document.getElementById('htmlData');
+		const doc = new jsPDF('p', 'pt', 'a4');
+		//doc.text('Monitoreo de Material', 12, 12);
+		const options = {
+		  background: 'white',
+		  scale: 3
+		};
+		html2canvas(DATA, options).then((canvas) => {
+		  const img = canvas.toDataURL('image/PNG');
+
+		  // Add image Canvas to PDF
+		  const bufferX = 15;
+		  const bufferY = 15;
+		  const imgProps = (doc as any).getImageProperties(img);
+		  const pdfWidth = doc.internal.pageSize.getWidth() - 2 * bufferX;
+		  const pdfHeight = doc.internal.pageSize.getHeight() - 4 * bufferY;//(imgProps.height * pdfWidth) / imgProps.width;
+		  doc.addImage(img, 'PNG', bufferX, bufferY, pdfWidth, pdfHeight, undefined, 'FAST');
+		  return doc;
+		}).then((docResult) => {
+		  this.actionInProgress =false;
+		  docResult.save('MoniteroMaterial.pdf');
+		});
   }
 
 }

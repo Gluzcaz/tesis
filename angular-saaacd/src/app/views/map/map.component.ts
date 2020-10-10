@@ -98,7 +98,7 @@ export class MapComponent implements OnInit {
 				    };
     this.locations = [];
 	if(this.processedImageId > 0){
-		this.locationService.getLocationsBySuperiorLocation(selectedSuperiorLocation, this.processedImageId)
+		this.locationService.getLocationsBySuperiorLocation(selectedSuperiorLocation)
 		.subscribe(locations =>{ 
 					this.regions.regionList= this.processedRegions.slice();
 
@@ -109,13 +109,16 @@ export class MapComponent implements OnInit {
 					//Add inferior locations
 					locations.forEach(location => {
 					    let dropList = [];
-						const foundRegionIndex = this.regions.regionList.findIndex(region => region.coordenada == location.regionGeografica.coordenada);
-						if(foundRegionIndex > -1){
-							const foundRegion = this.regions.regionList[foundRegionIndex];
-							location.regionGeografica.rawId = location.regionGeografica.id;
-							location.regionGeografica.id = foundRegion.id;
-							dropList.push(location.regionGeografica);
-							this.regions.regionList.splice(foundRegionIndex, 1);
+					    if(location.regionGeografica!= null &&
+						   location.regionGeografica.mapa.id == this.processedImageId){
+							const foundRegionIndex = this.regions.regionList.findIndex(region => region.coordenada == location.regionGeografica.coordenada);
+							if(foundRegionIndex > -1){
+								const foundRegion = this.regions.regionList[foundRegionIndex];
+								location.regionGeografica.rawId = location.regionGeografica.id;
+								location.regionGeografica.id = foundRegion.id;
+								dropList.push(location.regionGeografica);
+								this.regions.regionList.splice(foundRegionIndex, 1);
+							}
 						}
 						this.locations.push( {'id': location.id.toString(), 'name': location.tipoUbicacion.nombre + " " + location.nombre,'regionList':dropList});
 						this.regionsConnectedTo.push(location.id.toString());
@@ -169,7 +172,7 @@ export class MapComponent implements OnInit {
 			this.disableLocationSelection = false;
 		}
 	}else{
-		this.mapImageUrl = '';//'../static/media/images/location6.jpg';
+		this.mapImageUrl = '';
 	}
   }
 
