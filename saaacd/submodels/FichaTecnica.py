@@ -13,5 +13,9 @@ class FichaTecnica(Model):
                          decimal_places = 3, null=True) 
 	#Foreign Keys
 	modelo=models.ForeignKey(Modelo, on_delete=models.CASCADE)
+	
+	def __str__(self):
+		return str(self.modelo)
+
 
 	

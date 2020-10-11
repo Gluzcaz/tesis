@@ -11,6 +11,6 @@ class Categoria(Model):
 		esCategoriaSuperior = ""
 		if self.categoriaSuperior == None:
 			esCategoriaSuperior = " - SUPERIOR" 
-		return str(self.id) + " " + self.nombre + esCategoriaSuperior
+		return self.nombre + esCategoriaSuperior
 	
 	

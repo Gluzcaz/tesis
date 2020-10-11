@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-
+from django.utils.translation import gettext_lazy as _
+ 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -62,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'django.middleware.locale.LocaleMiddleware'
 ]
 
 ROOT_URLCONF = 'my_django_project.urls'
@@ -126,7 +128,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+#Generate into locale directories for each app with strings marked for translation.
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
+
+LANGUAGE_CODE = 'es-MX'
 
 TIME_ZONE = 'UTC'
 
@@ -136,6 +141,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+LANGUAGES = [
+    ('es', _('Spanish')),
+	('en', _('English'))
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/

@@ -37,6 +37,6 @@ class Actividad(models.Model):
     semestre = models.ForeignKey(Semestre, on_delete=models.CASCADE)
 
     def __str__(self):
-        return ""
+        return str(self.id)
 	
 	

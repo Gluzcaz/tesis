@@ -8,6 +8,9 @@ class Modelo(Model):
 	
 	#Foreign Keys
 	marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
+	
+	def __str__(self):
+		return str(self.marca) + " " + self.nombre
 
 
 

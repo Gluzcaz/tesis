@@ -17,6 +17,9 @@ class Dispositivo(models.Model):
 	fichaTecnica=models.ForeignKey(FichaTecnica, on_delete=models.CASCADE)
 	tipoDispositivo=models.ForeignKey(TipoDispositivo, on_delete=models.CASCADE)
 
+	def __str__(self):
+		return self.inventarioUNAM + " " + str(self.tipoDispositivo) + " " + str(self.fichaTecnica)
+
 
 	
 	
