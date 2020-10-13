@@ -8,49 +8,54 @@
 		<img id="logo_fi" src="\.\./static/media/images/escudoFiBlanco.png"/>
 	</div>
 	<span class="long-border"></span>
-	<nav>
-		<ul><!--
-			--><li><a routerLink="/allActivities">
-				<img src="\.\./static/media/images/bitacora.png"/>
-				<span class="borde"></span>
-				<span class="texto">BITÁCORA</span>
-				</a>
-			  </li><!--
-			--><li>
-				<div [matMenuTriggerFor]="estadistico_menu">
-					<img src="\.\./static/media/images/statistics.png"/>
+	<div>
+		<nav>
+			<ul><!--
+				--><li><a routerLink="/allActivities">
+					<img src="\.\./static/media/images/bitacora.png"/>
 					<span class="borde"></span>
-					<span class="texto">ESTADÍSTICAS</span>
-				</div>
-				<div style="margin-top:0px;">
-			    <mat-menu  #estadistico_menu="matMenu">
-				   <span  mat-menu-item routerLink="/activityStatistic" class="texto">Actividades</span>
-				   <span  mat-menu-item routerLink="/materialStatistic" class="texto">Material</span>
-				</mat-menu>
-				</div>
-			</li><!--
-			--><li>
-				<div [matMenuTriggerFor]="monitoreo_menu">
-					<img src="\.\./static/media/images/monitor.png"/>
-					<span class="borde"></span>
-					<span class="texto">MONITOREO</span>
-				</div>
-				<div style="background-color:#D4AC0D;" >
-				<mat-menu #monitoreo_menu="matMenu">
-				   <span class="texto" mat-menu-item routerLink="/activityMonitoring">Actividades</span>
-				   <span class="texto" mat-menu-item routerLink="/materialMonitoring">Material</span>
-				</mat-menu>
-			    </div>
-			   
-			   </li><!--
-			--><li><a  routerLink="/map">
-					<img src="\.\./static/media/images/map.png"/>
-					<span class="borde"></span>
-					<span class="texto">MAPA</span>
-				</a>
-			</li><!--
-		--></ul>
-	</nav>
+					<span class="texto">BITÁCORA</span>
+					</a>
+				  </li><!--
+				--><li>
+					<div [matMenuTriggerFor]="estadistico_menu">
+						<img src="\.\./static/media/images/statistics.png"/>
+						<span class="borde"></span>
+						<span class="texto">ESTADÍSTICAS</span>
+					</div>
+					<div style="margin-top:0px;">
+					<mat-menu  #estadistico_menu="matMenu">
+					   <span  mat-menu-item routerLink="/activityStatistic" class="texto">Actividades</span>
+					   <span  mat-menu-item routerLink="/materialStatistic" class="texto">Material</span>
+					</mat-menu>
+					</div>
+				</li><!--
+				--><li>
+					<div [matMenuTriggerFor]="monitoreo_menu">
+						<img src="\.\./static/media/images/monitor.png"/>
+						<span class="borde"></span>
+						<span class="texto">MONITOREO</span>
+					</div>
+					<div style="background-color:#D4AC0D;" >
+					<mat-menu #monitoreo_menu="matMenu">
+					   <span class="texto" mat-menu-item routerLink="/activityMonitoring">Actividades</span>
+					   <span class="texto" mat-menu-item routerLink="/materialMonitoring">Material</span>
+					</mat-menu>
+					</div>
+				   
+				   </li><!--
+				--><li><a  routerLink="/map">
+						<img src="\.\./static/media/images/map.png"/>
+						<span class="borde"></span>
+						<span class="texto">MAPA</span>
+					</a>
+				</li><!--
+			--></ul>
+		</nav>
+		<div>
+			<button mat-button (click)="logout()" >Cerrar Sesión</button>
+		</div>
+	</div>
 </header>
 <router-outlet></router-outlet>
 <!--<app-messages></app-messages>-->

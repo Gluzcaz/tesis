@@ -42,8 +42,8 @@ REST_FRAMEWORK={
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
+    'django.contrib.auth',#Core authentication framework and its default models.
+    'django.contrib.contenttypes',#Django content type system (allows permissions to be associated with models).
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -169,4 +169,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 #PROVISONAL---CHANGE IT !!!!!!!!!!!!!!!!
 #CORS_ORIGIN_ALLOW_ALL= True
 
-
+# Redirect to home URL after login (Default redirects to /accounts/profile/)
+LOGIN_REDIRECT_URL = '/allActivities/'
+LOGOUT_REDIRECT_URL= '/login/'

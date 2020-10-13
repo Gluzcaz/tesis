@@ -25,8 +25,6 @@ from rest_framework import viewsets
 from rest_framework.parsers import JSONParser
 
  
-#from data.models import Customer
-  
 class ActivityView(TemplateView):
     def get(self, request, **kwargs):
         return render(request, 'index.html', context=None)

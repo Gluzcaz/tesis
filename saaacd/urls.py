@@ -13,12 +13,33 @@ from rest_framework import routers
 from django.urls import re_path
 from django.conf import settings 
 from django.conf.urls.static import static 
- 
+from django.contrib.auth.views import LoginView,LogoutView
  
 router = routers.DefaultRouter()
  
 urlpatterns = [
-    url(r'^$', views.ActivityView.as_view()),
+	#url(r'^$', views.ActivityView.as_view()),
+	url(r'^$', 
+        LoginView.as_view(
+            template_name='admin/login.html',
+            extra_context={         
+              'title': 'Autenticación',
+              'site_title': 'SAAACD',
+              'site_header': 'SAAACD Autenticación'})),
+	url(r'^login/', 
+        LoginView.as_view(
+            template_name='admin/login.html',
+            extra_context={         
+              'title': 'Autenticación',
+              'site_title': 'SAAACD',
+              'site_header': 'SAAACD Autenticación'})),
+	url(r'^logout/',
+		LogoutView.as_view(
+			extra_context={         
+			  'title': 'Autenticación',
+			  'site_title': 'SAAACD',
+			  'site_header': 'SAAACD Autenticación'}),
+			  {'next_page': settings.LOGOUT_REDIRECT_URL}),
 	url(r'^allActivities/', views.ActivityView.as_view()),
 	re_path(r'^detail/(?P<id>[0-9]+)/$',views.ActivityView.getDetailUrl),
 	url(r'^create/', views.ActivityView.keepUrl),

@@ -48,6 +48,7 @@ padding:0;
 	width:70%;
 	/*max-width:1000px; */
 	margin:0 auto;
+	display: inline-block;
 }
 
 .super-cabecera nav ul{
@@ -131,4 +132,21 @@ transition:400ms;
 	color:#FFF;
 	font-weight: bold;
 	background-color:#D4AC0D;
+}
+
+button {
+  background-color: #D4AC0D;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  cursor: hand;
+  font-family: Arial;
+  font-weight: bold;
+  color: #FFF;
+  display: inline-block;
+}
+
+button:hover {
+  background-color:#B7950B;
 }
