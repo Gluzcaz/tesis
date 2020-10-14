@@ -53,7 +53,7 @@ class ActivityView( TemplateView):
         try:
             locationId=request.GET['locationId']
             semesterId = Semestre.objects.get(esActivo=1)
-            data = Actividad.objects.filter(ubicacion_id=locationId).filter(semestre_id=semesterId).exclude(estado=Actividad.ESTADO.r).filter(esSiniestro=0)
+            data = Actividad.objects.filter(ubicacion_id=locationId).filter(semestre_id=semesterId).exclude(estado=Actividad.ESTADO.r).filter(esSiniestro=0).order_by('prioridad')
             serializer = ActividadSerializador(data, many=True, fields=('id','categoria','usuario','estado','prioridad', 'fechaAlta','fechaRequerido','dispositivo'))
             return JsonResponse(serializer.data, safe=False)
         except Exception as e:

@@ -224,7 +224,8 @@ class LocationView(TemplateView):
 					GROUP BY ubicacion_id, prioridad ORDER BY prioridad) a
 			INNER JOIN saaacd_ubicacion u ON u.id = a.ubicacion_id
 			INNER JOIN saaacd_regiongeografica rg ON rg.id = u.regionGeografica_id
-			WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)''',[Actividad.ESTADO.r])
+			WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
+			GROUP BY a.ubicacion_id ''',[Actividad.ESTADO.r])
             data = LocationView.__dictFetchAll(cursor)
             return JsonResponse(data, safe=False) 
 			
@@ -306,7 +307,8 @@ class LocationView(TemplateView):
 			) a
 			INNER JOIN saaacd_ubicacion u ON u.id = a.ubicacion_id
 			INNER JOIN saaacd_regiongeografica rg ON rg.id = u.regionGeografica_id
-			WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)''',[MAXIMUM_DELTA_TIME])
+			WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1
+			GROUP BY a.ubicacion_id)''',[MAXIMUM_DELTA_TIME])
             data = LocationView.__dictFetchAll(cursor)
             return JsonResponse(data, safe=False)       
 	
