@@ -82,6 +82,7 @@ export class ActivityDetailComponent implements OnInit {
   lifeTimeControl = new FormControl();
   locationControl = new FormControl();
   deviceControl = new FormControl();
+  replicationControl = new FormControl();
   
   validationGroup : FormGroup = new FormGroup({
 	  userControl : this.userControl,
@@ -98,7 +99,8 @@ export class ActivityDetailComponent implements OnInit {
 	  commentControl: this.commentControl,
 	  locationControl: this.locationControl,
 	  deviceControl: this.deviceControl,
-	  lifeTimeControl: this.lifeTimeControl
+	  lifeTimeControl: this.lifeTimeControl,
+	  replicationControl : this.replicationControl
     });
       
   //Required Messages
@@ -189,6 +191,7 @@ export class ActivityDetailComponent implements OnInit {
 	if(this.activity.ubicacion == null || (this.activity.ubicacion != null && this.activity.ubicacion.id <= 0)){
 		this.deviceControl.disable();
 		this.lifeTimeControl.disable();
+		this.replicationControl.disable();
 	}
 	
 	if(this.isEdition){
@@ -424,7 +427,6 @@ export class ActivityDetailComponent implements OnInit {
     this.locationService.getLocations()
     .subscribe(locations =>{ 
 				this.locations = locations;
-				this.locations.push({"id": 0, "nombre": "", "regionGeografica": null, "ubicacionSuperior": null, "tipoUbicacion": { "id": 0, "nombre": "Ninguno"}});
 				this.createLocationCatalogue();
 				if(this.activity.ubicacion != null){
 					this.locationControl.setValue(this.activity.ubicacion.id);
@@ -432,11 +434,16 @@ export class ActivityDetailComponent implements OnInit {
 					this.assignDeviceList(this.activity.ubicacion.id);
 					if(this.activity.dispositivo != null){
 						this.deviceControl.setValue(this.activity.dispositivo.id);
+						this.deviceControl.enable();
 						this.lifeTimeControl.setValue(0);
+						this.lifeTimeControl.enable();
+					}else{
+						this.lifeTimeControl.disable();
 					}
 				} 
 				else {
 				    this.locationControl.setValue(0);
+					this.replicationControl.disable();
 				}
 	           },
 			   error => {
@@ -447,9 +454,14 @@ export class ActivityDetailComponent implements OnInit {
   } 
   
   createLocationCatalogue(){
+    var superiorLocations = [];
+	var element = {"id": 0, "nombre": "", "regionGeografica": null, "ubicacionSuperior": null, "tipoUbicacion": { "id": 0, "nombre": "Ninguno"}};
+	this.locationTree.push({ element, children : [] });
+	
 	this.locations.forEach(element => {
 		if(element.ubicacionSuperior == null){
 			this.locationHashTable[element.id] = { element, children : [] } ;
+			superiorLocations.push({ element, children : [] });
 		}
 	});
 	
@@ -460,26 +472,43 @@ export class ActivityDetailComponent implements OnInit {
 			this.locationTree.push(this.locationHashTable[element.id]);
 		}
 	  });
+	  
+	superiorLocations.forEach( element => {
+		this.locationTree.push(element);
+	}); 
   }
   
   assignDeviceList(selectedLocation: number){
 	this.devicesByLocation = [];
     if(selectedLocation > 0){
-		this.deviceService.getDevicesByLocation(selectedLocation)
-        .subscribe(devices =>{ 
+		const foundLocation= this.locations.find(location => location.id == selectedLocation);
+		if(foundLocation.ubicacionSuperior == null){
+			this.replicationControl.enable();
+			this.deviceControl.setValue(0);
+			this.deviceControl.disable();
+			this.lifeTimeControl.disable();
+		} 
+		else {
+		    this.replicationControl.disable();
+			this.deviceService.getDevicesByLocation(selectedLocation)
+			.subscribe(devices =>{ 
 				this.devicesByLocation = devices
 				this.devicesByLocation.push({"id": 0, "inventarioUNAM": "", "tipoDispositivo": { "id": 0, "nombre": "Ninguno"}});
-	            this.deviceControl.enable();
-				this.lifeTimeControl.enable();
+	            this.deviceControl.setValue(0);
+         	    this.deviceControl.enable();
+				this.lifeTimeControl.disable();
 			   },
 			   error => {
 				  catchError(this.notifyService.handleError<Dispositivo>('getDevice'));
 				  this.notifyService.showErrorTimeout(this.deviceErrorMessage, this.title);
 				  });
+		
+		}
 	} 
 	else{
 		this.deviceControl.disable();
 		this.lifeTimeControl.disable();
+		this.replicationControl.disable();
 	}
 	this.deviceControl.setValue(0);
  }
@@ -509,7 +538,8 @@ export class ActivityDetailComponent implements OnInit {
 			  'ubicacion': null,
 			  'usuario': this.validationGroup.get('userControl').value,
 			  'dispositivo': null,
-			  'tiempoVida': 0
+			  'tiempoVida': 0,
+			  'replication': this.validationGroup.get('replicationControl').value,
 			};
 			
 	if(this.isEdition)
@@ -524,7 +554,7 @@ export class ActivityDetailComponent implements OnInit {
 	
 	if(	this.validationGroup.get('locationControl').value != null &&
 		this.validationGroup.get('locationControl').value > 0)
-		newActivity['ubicacion'] = this.validationGroup.get('locationControl').value;
+		newActivity['ubicacion'] = this.validationGroup.get('locationControl').value;		
 	
 	if(	this.validationGroup.get('deviceControl').value!=null &&
 		this.validationGroup.get('deviceControl').value > 0){

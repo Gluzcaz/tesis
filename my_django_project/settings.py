@@ -32,9 +32,11 @@ REST_FRAMEWORK={
 	'DEFAULT_ATHENTICATION_CLASSES':(
 		'rest_framework.authentication.BasicAuthentication',
 		'rest_framework.authentication.SessionAuthentication',
+		#'rest_framework.authentication.TokenAuthentication',
 	),
 	'DEFAULT_PERMISSION_CLASSES':(
-		'rest_framework.permissions.AllowAny',
+		#'rest_framework.permissions.AllowAny', #For Developing
+		'rest_framework.permissions.IsAuthenticated',
 	)
 }
 

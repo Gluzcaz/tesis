@@ -12,3 +12,6 @@ class Mapa(Model):
 
 	def __str__(self):
 		return self.nombre
+		
+	class Meta:
+		default_permissions = ('add', 'delete', 'change', 'view')

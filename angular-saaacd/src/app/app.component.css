@@ -22,6 +22,19 @@
 	margin-left: 3%;
 	color:#FFF;
 }
+
+#logout{
+	float: right !important;
+}
+
+.grid-two-spaces{
+  display: grid;
+  grid-template-columns: 80% 20%;
+ 
+  /*margin: 15px;
+  grid-gap: 50px;*/
+}
+
 .topnav {
   background-color: #1B4B63;
   overflow: hidden;
@@ -45,10 +58,10 @@ padding:0;
 
 .super-cabecera nav{
 	position:relative;
-	width:70%;
-	/*max-width:1000px; */
-	margin:0 auto;
-	display: inline-block;
+	width:100%;
+	margin-left: 20%;
+	/*max-width:1000px; 
+	margin:0 auto;*/
 }
 
 .super-cabecera nav ul{
@@ -144,7 +157,6 @@ button {
   font-family: Arial;
   font-weight: bold;
   color: #FFF;
-  display: inline-block;
 }
 
 button:hover {

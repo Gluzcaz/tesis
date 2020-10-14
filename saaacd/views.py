@@ -17,15 +17,21 @@ import json
 
 
 from rest_framework import status
-
+from django.conf import settings 
 from rest_framework.response import Response
 from rest_framework.utils import json
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.parsers import JSONParser
+from django.db import transaction
+from django.db import IntegrityError
+from django.utils.decorators import method_decorator
+from rest_framework import permissions
 
- 
-class ActivityView(TemplateView):
+@method_decorator(login_required(login_url='/login/'),name="dispatch")
+class ActivityView( TemplateView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request, **kwargs):
         return render(request, 'index.html', context=None)
 	
@@ -34,9 +40,8 @@ class ActivityView(TemplateView):
 		
     def keepUrl(request):
         return render(request, 'index.html', context=None)
-		
-#   @login_required
-    @csrf_exempt	
+	
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)
     def getActivities(request):
         if request.method == 'GET':
             data = Actividad.objects.all()
@@ -84,10 +89,11 @@ class ActivityView(TemplateView):
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
 
     @csrf_exempt
-    @api_view(['POST', 'PUT'])
+    #@api_view(['POST', 'PUT']) #Shows Bad Request error with POST request
     def saveActivity(request, format=None):
         try:
             activityData = JSONParser().parse(request)
+            print(request.method)
             if(request.method == 'PUT'):
                 id=activityData['id']
                 activity = Actividad.objects.get(id=id)
@@ -98,28 +104,44 @@ class ActivityView(TemplateView):
                 serializer =  ActividadSerializador(data=activityData, many=False,  
 				                fields=( 'id', 'esSiniestro','comentario', 'estado', 'prioridad', 'fechaAlta', 'fechaResolucion', 'fechaRequerido', 'semestre', 'usuario', 'actividadSuperior', 'categoria', 'ubicacion', 'dispositivo')) 
                 if serializer.is_valid():
-                  newActivity = Actividad(
-					  id=activityData['id'],
-					  esSiniestro=activityData['esSiniestro'],
-					  comentario = activityData['comentario'],
-					  estado = activityData['estado'],
-					  prioridad = activityData['prioridad'],
-					  fechaAlta = activityData['fechaAlta'],
-					  fechaResolucion = activityData['fechaResolucion'],
-					  fechaRequerido = activityData['fechaRequerido'],
-					  semestre_id=activityData['semestre'],
-					  usuario_id = activityData['usuario'],
-					  ubicacion_id = activityData['ubicacion'],
-					  actividadSuperior_id = activityData['actividadSuperior'],
-					  categoria_id = activityData['categoria'],
-					  dispositivo_id = activityData['dispositivo']
-				  )
-                  newActivity.save() 
-                  return JsonResponse({'id': newActivity.id }, safe=False, status=status.HTTP_201_CREATED)
+                    locations = []
+                    if(activityData['replication']):
+                      activityId = None
+                      locations = Ubicacion.objects.all()
+                      locations = locations.filter(ubicacionSuperior = activityData['ubicacion'])
+                    else:
+                      activityId= activityData['id']
+                      locations.append( Ubicacion(id=activityData['ubicacion']))
+					  
+                    with transaction.atomic():
+                      for location in locations:
+                        newActivity = Actividad(
+					    id= activityId,
+					    esSiniestro=activityData['esSiniestro'],
+					    comentario = activityData['comentario'],
+					    estado = activityData['estado'],
+					    prioridad = activityData['prioridad'],
+					    fechaAlta = activityData['fechaAlta'],
+					    fechaResolucion = activityData['fechaResolucion'],
+					    fechaRequerido = activityData['fechaRequerido'],
+					    semestre_id=activityData['semestre'],
+					    usuario_id = activityData['usuario'],
+					    ubicacion_id = location.id,
+					    actividadSuperior_id = activityData['actividadSuperior'],
+					    categoria_id = activityData['categoria'],
+					    dispositivo_id = activityData['dispositivo'])
+                        newActivity.save() 
                 else:
-                  print(serializer.errors)
+                  print(serializer.errors)#QUITAR
                   return JsonResponse({'error': 'Serializer is not valid'}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except IntegrityError as ie: 
+            return JsonResponse({'error': ie}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             print(activityData)				  
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if activityId is None:
+            activityId = ''
+        else:
+            activityId = str(newActivity.id)
+        return JsonResponse({'id': activityId }, safe=False, status=status.HTTP_201_CREATED)
 			

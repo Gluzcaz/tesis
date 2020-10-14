@@ -14,6 +14,7 @@ from django.urls import re_path
 from django.conf import settings 
 from django.conf.urls.static import static 
 from django.contrib.auth.views import LoginView,LogoutView
+from django.contrib.auth.decorators import login_required
  
 router = routers.DefaultRouter()
  
@@ -51,7 +52,7 @@ urlpatterns = [
 	url(r'^api/petitionActivities/', views.ActivityView.getPetitionActivities),
 	url(r'^api/activitiesByLocation/', views.ActivityView.getActivitiesByLocation),
 	url(r'^api/detailActivity/', views.ActivityView.detailActivity),
-	url(r'^api/saveActivity/', views.ActivityView.saveActivity),
+	url(r'^api/saveActivity/', login_required(views.ActivityView.saveActivity, login_url='/login/')),
 	url(r'^api/activities/', views.ActivityView.getActivities),
 	url(r'^api/semesters/', SemesterView.getSemesters),
 	url(r'^api/users/', UserView.getUsers),

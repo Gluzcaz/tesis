@@ -16,9 +16,12 @@ class Dispositivo(models.Model):
 	ubicacion=models.ForeignKey(Ubicacion, on_delete=models.CASCADE, null=True)
 	fichaTecnica=models.ForeignKey(FichaTecnica, on_delete=models.CASCADE)
 	tipoDispositivo=models.ForeignKey(TipoDispositivo, on_delete=models.CASCADE)
-
+	
 	def __str__(self):
 		return self.inventarioUNAM + " " + str(self.tipoDispositivo) + " " + str(self.fichaTecnica)
+		
+	class Meta:
+		default_permissions = ('add', 'delete', 'change', 'view')
 
 
 	

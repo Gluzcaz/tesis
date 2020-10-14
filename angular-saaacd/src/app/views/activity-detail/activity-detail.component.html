@@ -122,6 +122,13 @@
 					  </div>
 					</mat-select>
 				</mat-form-field>
+				
+				<mat-checkbox name="replication" formControlName="replicationControl" >
+					<mat-label>¿Replicar en ubicaciones inferiores?</mat-label>	
+				</mat-checkbox>
+				
+				<div></div>
+			
 				<mat-form-field>
 					<mat-label> Relacionado a dispositivo: </mat-label>
 					<mat-select (selectionChange)="assignLifeTimeDevice($event.value)" formControlName="deviceControl">
@@ -135,6 +142,8 @@
 					<input matInput placeholder="Ex. 105" formControlName="lifeTimeControl">
 					<mat-hint align="end">horas</mat-hint>
 				</mat-form-field>
+				
+				<div></div>
 
 				<mat-form-field>
 						<mat-label>Resuelve la siguiente petición:</mat-label>
