@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Model 
-from saaacd.submodels.Mapa import Mapa
+from saaacd.models.Mapa import Mapa
 
 class RegionGeografica(Model):
 	coordenada = models.CharField(max_length=2000)

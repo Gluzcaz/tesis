@@ -103,7 +103,6 @@ export class MaterialMonitoringComponent implements OnInit {
   getMaterialMonitoringData(){
 	this.locationService.getMaterialMonitoringByLocation()
     .subscribe(locations =>{ 
-				
 			    for (var i = 0; i < locations.length; i++) { 
 					var feature = new Feature({
 					    type: 'click',
@@ -133,7 +132,8 @@ export class MaterialMonitoringComponent implements OnInit {
 					this.vectorSource.addFeature(feature);
 					this.assignTitleToLocation(locations[i]);
 				}
-				this.assignFeaturesToMap()
+				if(locations.length >0)
+					this.assignFeaturesToMap()
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Reporte>('getActivityStadisticByLocation'));
@@ -146,10 +146,12 @@ export class MaterialMonitoringComponent implements OnInit {
 	this.deviceService.getExpiredDevices()
     .subscribe(devices =>{ 
 			   this.devices = devices;
-			   for (var i = 0; i < devices.length; i++) { 
-					this.deviceTotalPrice += devices[i].precio*devices[i].cantidad
+			   if(devices.length > 0){
+				   for (var i = 0; i < devices.length; i++) { 
+						this.deviceTotalPrice += devices[i].precio*devices[i].cantidad
+				   }
+				   this.setDataSource();
 			   }
-			   this.setDataSource();
 	          },
 			   error => {
 				  catchError(this.notifyService.handleError<ExpiredDevice>('getExpiredDevices'));
@@ -188,7 +190,7 @@ export class MaterialMonitoringComponent implements OnInit {
   getActiveMap(){
     this.mapService.getActiveMap()
     .subscribe(map =>{ 
-				this.mapImageUrl = '../static/media/'+map.imagen;
+				this.mapImageUrl = '../' + (map.imagen).split("saaacd/" , 2)[1];
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Mapa>('getActiveMap'));
@@ -207,7 +209,9 @@ export class MaterialMonitoringComponent implements OnInit {
   onLoad(){
    this.loadedImageWidth = (this.img.nativeElement as HTMLImageElement).naturalWidth;
    this.loadedImageHeight = (this.img.nativeElement as HTMLImageElement).naturalHeight;
-   this.createMap();
+   if(this.mapImageUrl != ''){
+	   this.createMap();
+   }
    this.getMaterialMonitoringData();
   }
   

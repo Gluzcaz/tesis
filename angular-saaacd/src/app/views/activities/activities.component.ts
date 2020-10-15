@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { ConfirmDialogModel, ConfirmDialogComponent } from '../confirmDialog/confirm-dialog.component';
+import { ConfirmDialogModel, ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 
 import { Actividad } from '../../models/Actividad';
 import { Ubicacion } from '../../models/Ubicacion';
 import { Semestre } from '../../models/Semestre';
-import { ActivityService } from '../../services/Activity.service';
+import { ActivityService } from '../../services/activity.service';
 import { SemesterService } from '../../services/semester.service';
 
 import { Observable, of } from 'rxjs';
@@ -168,7 +168,7 @@ export class ActivitiesComponent implements OnInit {
 	return '/detail/';
   }
   
-  getPriorityImageUrl(priority: string): string{
+  getPriorityImageUrl(priority: number): string{
 	var url='';
 	switch(priority){
 		case Actividad.PRIORITIES[0].id:
@@ -184,17 +184,17 @@ export class ActivitiesComponent implements OnInit {
 	return url;
   }
   
-  getStatusImageUrl(status: string): string{
+  getStatusImageUrl(status: number): string{
 	var url='';
 	switch(status){
 		case Actividad.STATUSES[0].id:
-			url='../static/media/icons/estadoRealizado.jpg';
-			break;
-		case Actividad.STATUSES[1].id:
 			url='../static/media/icons/estadoPendiente.jpg';
 			break;
-		case Actividad.STATUSES[2].id:
+		case Actividad.STATUSES[1].id:
 			url='../static/media/icons/estadoProgreso.jpg';
+			break;
+		case Actividad.STATUSES[2].id:
+			url='../static/media/icons/estadoRealizado.jpg';
 			break;
 	}
 	return url;

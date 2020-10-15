@@ -1,9 +1,9 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, HttpResponseRedirect
 
-from saaacd.models import Dispositivo
-from saaacd.models import Ubicacion
-from saaacd.serializers import DispositivoSerializador
+from saaacd.models.Dispositivo import Dispositivo
+from saaacd.models.Ubicacion import Ubicacion
+from saaacd.serializers import DeviceSerializer
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
@@ -21,8 +21,8 @@ class DeviceView(generics.ListAPIView):
         try:
             data = Dispositivo.objects.all()
             if location is not None:
-                data = data.filter(ubicacion=location)
-                serializer = DispositivoSerializador(data, many=True)
+                data = data.filter(ubicacion=location).filter(fechaBaja=None)
+                serializer = DeviceSerializer(data, many=True)
                 return JsonResponse(serializer.data, safe=False)
         except Exception as e:
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
@@ -48,7 +48,7 @@ class DeviceView(generics.ListAPIView):
 				INNER JOIN saacd.saaacd_modelo mo ON mo.id = ft.modelo_id
 				INNER JOIN saacd.saaacd_marca ma ON ma.id = mo.marca_id
 				WHERE d.fechaBaja IS NULL 
-				AND ft.garantiaFabricante IS NOT NULL ''')
+				AND ft.prediccionVidaUtil IS NOT NULL ''') #QUERY PENDIENTE EN CANTIDAD 
             data = DeviceView.__dictFetchAll(cursor)
             return JsonResponse(data, safe=False)  	 
 

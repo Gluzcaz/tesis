@@ -1,16 +1,17 @@
 from django.contrib import admin
-from .models import Actividad
-from .submodels.Categoria import Categoria
-from .submodels.Ubicacion import Ubicacion
-from .submodels.Mapa import Mapa
-from .submodels.Marca import Marca
-from .submodels.Modelo import Modelo
-from .submodels.Dispositivo import Dispositivo
-from .submodels.FichaTecnica import FichaTecnica
-from .submodels.Semestre import Semestre
-from .submodels.RegionGeografica import RegionGeografica
-from .submodels.TipoDispositivo import TipoDispositivo
-from .submodels.TipoUbicacion import TipoUbicacion
+from .models.Actividad import Actividad
+from .models.Categoria import Categoria
+from .models.Ubicacion import Ubicacion
+from .models.Mapa import Mapa
+from .models.Marca import Marca
+from .models.Modelo import Modelo
+from .models.Dispositivo import Dispositivo
+from .models.FichaTecnica import FichaTecnica
+from .models.Semestre import Semestre
+from .models.RegionGeografica import RegionGeografica
+from .models.TipoDispositivo import TipoDispositivo
+from .models.TipoUbicacion import TipoUbicacion
+from .models.HorarioClase import HorarioClase
 
 # Header Admin Site
 admin.site.site_header = 'SAAACD' # default: "Django Administration"
@@ -22,9 +23,9 @@ admin.site.site_title = 'SAAACD' # default: "Django site admin"
 # Register your models here.
 @admin.register(Actividad)
 class Actividad(admin.ModelAdmin):
- list_display = ('id', 'usuario', 'categoria', 'ubicacion', 'dispositivo',  'estado', 'prioridad', 'semestre', 'fechaAlta', 'fechaRequerido', 'fechaResolucion', 'esSiniestro','actividadSuperior')
+ list_display = ('id', 'usuario', 'categoria', 'ubicacion', 'dispositivo',  'estado', 'prioridad', 'semestre', 'fechaAlta', 'fechaRequerido', 'fechaResolucion', 'esPeticion','actividadSuperior')
  list_filter = ('estado', 'prioridad')
- fields = ['usuario',('categoria', 'esSiniestro', 'actividadSuperior'), 'ubicacion','dispositivo', ( 'fechaAlta', 'fechaRequerido'), ('estado', 'fechaResolucion'),  'prioridad', 'semestre']
+ fields = ['usuario',('categoria', 'esPeticion', 'actividadSuperior'), 'ubicacion','dispositivo', ( 'fechaAlta', 'fechaRequerido'), ('estado', 'fechaResolucion'),  'prioridad', 'semestre']
  ordering = ['fechaAlta']
  search_fields = ['categoria__nombre']
  #autocomplete_fields = ['categoria']
@@ -35,14 +36,14 @@ class Categoria(admin.ModelAdmin):
  
 @admin.register(Dispositivo)
 class Dispositivo(admin.ModelAdmin):
- list_display = ('id', 'inventarioUNAM', 'tipoDispositivo', 'fichaTecnica', 'ubicacion' , 'fechaAlta', 'fechaBaja', 'motivoBaja')
+ list_display = ('id', 'inventarioUNAM', 'tipoDispositivo', 'fichaTecnica', 'tiempoVida', 'ubicacion' , 'fechaAlta', 'fechaBaja', 'motivoBaja')
  list_filter = ['ubicacion__nombre']
  fields = ['inventarioUNAM', 'tipoDispositivo','fichaTecnica', 'ubicacion' , 'fechaAlta','fechaBaja', 'motivoBaja']
  ordering = ['fechaAlta']
  
 @admin.register(FichaTecnica)
 class FichaTecnica(admin.ModelAdmin):
- list_display = ('id', 'garantiaFabricante', 'tiempoVida', 'detalles', 'existenciaInventario', 'precio', 'modelo')
+ list_display = ('id', 'garantiaFabricante', 'detalles', 'existenciaInventario', 'precio', 'modelo', 'prediccionVidaUtil')
 
 @admin.register(Mapa)
 class Mapa(admin.ModelAdmin):
@@ -80,6 +81,11 @@ class TipoUbicacion(admin.ModelAdmin):
 class Ubicacion(admin.ModelAdmin):
  list_display = ('id', 'nombre', 'tipoUbicacion', 'ubicacionSuperior', 'regionGeografica')
  fields = ['nombre', 'tipoUbicacion', 'ubicacionSuperior', 'regionGeografica']
+ 
+@admin.register(HorarioClase)
+class HorarioClase(admin.ModelAdmin):
+ list_display = ('id', 'ubicacion', 'semestre', 'tiempoSemestral', 'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo')
+ fields = ['ubicacion', 'semestre', 'tiempoSemestral', 'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo']
 
 
 

@@ -1,28 +1,25 @@
 from rest_framework import serializers
-from saaacd.subserializers.CategoriaSerializador import CategoriaSerializador
-from saaacd.subserializers.SemestreSerializador import SemestreSerializador
-from saaacd.subserializers.UbicacionSerializador import UbicacionSerializador
-from saaacd.subserializers.UsuarioSerializador import UsuarioSerializador
-from saaacd.subserializers.DispositivoSerializador import DispositivoSerializador
-from saaacd.subserializers.ActividadSuperiorSerializador import ActividadSuperiorSerializador
-from saaacd.models import Actividad
-from saaacd.subserializers.DynamicFieldsModelSerializer import DynamicFieldsModelSerializer
+from saaacd.serializers.CategorySerializer import CategorySerializer
+from saaacd.serializers.SemesterSerializer import SemesterSerializer
+from saaacd.serializers.LocationSerializer import LocationSerializer
+from saaacd.serializers.UserSerializer import UserSerializer
+from saaacd.serializers.DeviceSerializer import DeviceSerializer
+from saaacd.serializers.SuperiorActivitySerializer import SuperiorActivitySerializer
+from saaacd.models.Actividad import Actividad
+from saaacd.serializers.DynamicFieldsModelSerializer import DynamicFieldsModelSerializer
 
-class ActividadSerializador(DynamicFieldsModelSerializer):
-    categoria = CategoriaSerializador(read_only=True, fields=('id', 'nombre', 'categoriaSuperior')) 
-    semestre = SemestreSerializador(read_only=True) 
-    ubicacion = UbicacionSerializador(read_only=True, fields=('id', 'nombre', 'tipoUbicacion', 'ubicacionSuperior')) 
-    usuario = UsuarioSerializador(read_only=True) 
-    dispositivo = DispositivoSerializador(read_only=True)
-    actividadSuperior= ActividadSuperiorSerializador(read_only=True)
+class ActivitySerializer(DynamicFieldsModelSerializer):
+    categoria = CategorySerializer(read_only=True, fields=('id', 'nombre', 'categoriaSuperior')) 
+    semestre = SemesterSerializer(read_only=True) 
+    ubicacion = LocationSerializer(read_only=True, fields=('id', 'nombre', 'tipoUbicacion', 'ubicacionSuperior')) 
+    usuario = UserSerializer(read_only=True) 
+    dispositivo = DeviceSerializer(read_only=True)
+    actividadSuperior= SuperiorActivitySerializer(read_only=True)
     class Meta:
         model = Actividad
-        fields = 'id', 'estado','prioridad', 'comentario', 'fechaResolucion', 'fechaAlta', 'fechaRequerido', 'esSiniestro', 'actividadSuperior', 'categoria', 'semestre', 'ubicacion', 'usuario', 'dispositivo'
+        fields = 'id', 'estado','prioridad', 'comentario', 'fechaResolucion', 'fechaAlta', 'fechaRequerido', 'esPeticion', 'actividadSuperior', 'categoria', 'semestre', 'ubicacion', 'usuario', 'dispositivo'
 		
     def validate(self, attrs):
-        """
-        Check that the start is before the stop.
-        """
         if(attrs['fechaAlta'] is None):
             raise serializers.ValidationError("Start date is required.")
         if(attrs['estado'] is None):

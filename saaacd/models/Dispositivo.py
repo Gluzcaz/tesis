@@ -1,15 +1,15 @@
 from django.db import models
 from django.db.models import Model 
-from saaacd.submodels.Ubicacion import Ubicacion
-from saaacd.submodels.FichaTecnica import FichaTecnica
-from saaacd.submodels.TipoDispositivo import TipoDispositivo
+from saaacd.models.Ubicacion import Ubicacion
+from saaacd.models.FichaTecnica import FichaTecnica
+from saaacd.models.TipoDispositivo import TipoDispositivo
+import datetime
 
 class Dispositivo(models.Model):
-
+	tiempoVida = models.IntegerField(blank=False, null=False, default=0, help_text='Tiempo de vida en horas.')	#Horas
 	inventarioUNAM = models.CharField(max_length=50)
-	fechaIngresoUbicacion = models.DateField(null=True)
 	fechaBaja = models.DateField(null=True)
-	fechaAlta = models.DateField(null=True)
+	fechaAlta = models.DateField(null=True, default=datetime.date.today)
 	motivoBaja = models.TextField(help_text='Redacta algún Comentario', null=True)
 			
 	#Foreign Keys

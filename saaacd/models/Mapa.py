@@ -1,10 +1,10 @@
 from django.db import models
 from django.db.models import Model 
-from saaacd.submodels.TipoUbicacion import TipoUbicacion
+from saaacd.models.TipoUbicacion import TipoUbicacion
 
 class Mapa(Model):
 	#Dato imagen, se almacenarán en la carpeta mapas, titulo: Imagen
-	imagen = models.ImageField(upload_to='mapas', verbose_name='Imagen')
+	imagen = models.ImageField(upload_to='saaacd/static/media/maps', verbose_name='Imagen')
 	nombre = models.CharField(max_length=50)
 	esActivo = models.BooleanField(default=False)
 	#Foreign Keys

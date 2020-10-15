@@ -10,7 +10,7 @@ import { Categoria } from '../../models/Categoria';
 import { Ubicacion } from '../../models/Ubicacion';
 import { Dispositivo } from '../../models/Dispositivo';
 import { CategoriaSuperior } from '../../models/CategoriaSuperior';
-import { ActivityService } from '../../services/Activity.service';
+import { ActivityService } from '../../services/activity.service';
 import { NotificationService } from '../../services/notification.service';
 import { SemesterService } from '../../services/semester.service';
 import { CategoryService } from '../../services/category.service';
@@ -36,7 +36,7 @@ export class ActivityDetailComponent implements OnInit {
   petitionActivities: Actividad[];
   users: Usuario[];
   isPetition: boolean = false;
-  DONE : string = Actividad.STATUSES[0].id;
+  DONE : number = Actividad.STATUSES[2].id;
   MAX_LENGTH_COMMENT: number = Actividad.MAX_LENGTH_COMMENT;
   pageTitle : string = "Nueva actividad"; 
   
@@ -148,7 +148,7 @@ export class ActivityDetailComponent implements OnInit {
 		  'fechaResolucion': null,
 		  'fechaAlta': null,
 		  'fechaRequerido': null,
-		  'esSiniestro': false,
+		  'esPeticion': false,
 		  'actividadSuperior': null,
 		  'categoria': null,
 		  'semestre': null,
@@ -187,7 +187,7 @@ export class ActivityDetailComponent implements OnInit {
 	if(this.statusControl.value != this.DONE)
 		this.resolutionDateControl.disable();
 	this.priorityControl.setValue(this.activity.prioridad);
-	this.petitionControl.setValue(this.activity.esSiniestro);
+	this.petitionControl.setValue(this.activity.esPeticion);
 	if(this.activity.ubicacion == null || (this.activity.ubicacion != null && this.activity.ubicacion.id <= 0)){
 		this.deviceControl.disable();
 		this.lifeTimeControl.disable();
@@ -562,15 +562,15 @@ export class ActivityDetailComponent implements OnInit {
 		
 		if(this.validationGroup.get('lifeTimeControl').value!=null &&
 			this.validationGroup.get('lifeTimeControl').value >=0){
-			//newActivity['lifeTimeControl']=this.validationGroup.get('lifeTimeControl').value;
+			newActivity['tiempoVida']=this.validationGroup.get('lifeTimeControl').value;
 		}
 	}
 	
 	if(this.validationGroup.get('resolutionDateControl').value!=null)
-		newActivity['fechaResolucion']=formatDate(new Date(this.validationGroup.get('resolutionDateControl').value), 'yyyy-MM-dd', 'en-US').toString();
+		newActivity['fechaResolucion']= formatDate(new Date(this.validationGroup.get('resolutionDateControl').value), 'yyyy-MM-dd', 'en-US').toString();
 
 	if(this.validationGroup.get('requiredDateControl').value!=null)
-		newActivity['fechaRequerido']=formatDate(new Date(this.validationGroup.get('requiredDateControl').value), 'yyyy-MM-dd', 'en-US').toString();
+		newActivity['fechaRequerido']= formatDate(new Date(this.validationGroup.get('requiredDateControl').value), 'yyyy-MM-dd', 'en-US').toString();
 	console.log(newActivity);
 	return newActivity;
   }

@@ -2,13 +2,13 @@ from django.http import HttpResponse, JsonResponse, QueryDict
 from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import TemplateView
 
-from saaacd.models import Actividad
-from saaacd.submodels.Semestre import Semestre
-from saaacd.submodels.Categoria import Categoria
-from saaacd.submodels.Ubicacion import Ubicacion
-from saaacd.submodels.Dispositivo import Dispositivo
+from saaacd.models.Actividad import Actividad
+from saaacd.models.Semestre import Semestre
+from saaacd.models.Categoria import Categoria
+from saaacd.models.Ubicacion import Ubicacion
+from saaacd.models.Dispositivo import Dispositivo
 from django.contrib.auth.models import User
-from saaacd.serializers import ActividadSerializador
+from saaacd.serializers.ActivitySerializer import ActivitySerializer
  
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
@@ -45,7 +45,7 @@ class ActivityView( TemplateView):
     def getActivities(request):
         if request.method == 'GET':
             data = Actividad.objects.all()
-            serializer =  ActividadSerializador(data, many=True, fields=('id', 'estado','prioridad', 'comentario', 'fechaResolucion', 'fechaAlta', 'fechaRequerido', 'esSiniestro', 'actividadSuperior', 'categoria', 'semestre', 'ubicacion', 'usuario', 'dispositivo'))
+            serializer =  ActivitySerializer(data, many=True, fields=('id', 'estado','prioridad', 'comentario', 'fechaResolucion', 'fechaAlta', 'fechaRequerido', 'esPeticion', 'actividadSuperior', 'categoria', 'semestre', 'ubicacion', 'usuario', 'dispositivo'))
             return JsonResponse(serializer.data, safe=False)
 			
     @api_view(['GET'])
@@ -53,8 +53,8 @@ class ActivityView( TemplateView):
         try:
             locationId=request.GET['locationId']
             semesterId = Semestre.objects.get(esActivo=1)
-            data = Actividad.objects.filter(ubicacion_id=locationId).filter(semestre_id=semesterId).exclude(estado=Actividad.ESTADO.r).filter(esSiniestro=0).order_by('prioridad')
-            serializer = ActividadSerializador(data, many=True, fields=('id','categoria','usuario','estado','prioridad', 'fechaAlta','fechaRequerido','dispositivo'))
+            data = Actividad.objects.filter(ubicacion_id=locationId).filter(semestre_id=semesterId).exclude(estado=Actividad.REALIZADA).filter(esPeticion=0).order_by('prioridad')
+            serializer = ActivitySerializer(data, many=True, fields=('id','categoria','usuario','estado','prioridad', 'fechaAlta','fechaRequerido','dispositivo'))
             return JsonResponse(serializer.data, safe=False)
         except Exception as e:
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
@@ -63,8 +63,9 @@ class ActivityView( TemplateView):
     @api_view(['GET'])
     def getPetitionActivities(request):
         try:
-            data = Actividad.objects.filter(esSiniestro=1).exclude(estado=Actividad.ESTADO.r)
-            serializer = ActividadSerializador(data, many=True, fields=('id','categoria','usuario'))
+            print(Actividad.REALIZADA)
+            data = Actividad.objects.filter(esPeticion=1).exclude(estado=Actividad.REALIZADA)
+            serializer = ActivitySerializer(data, many=True, fields=('id','categoria','usuario'))
             return JsonResponse(serializer.data, safe=False)
         except Exception as e:
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
@@ -83,7 +84,7 @@ class ActivityView( TemplateView):
                 activity.delete() 
                 return JsonResponse({'message': 'La actividad fue eliminada satisfactoriamente.'},safe=False, status=status.HTTP_204_NO_CONTENT)
             elif request.method == 'GET':
-                serializer =  ActividadSerializador(activity)               
+                serializer =  ActivitySerializer(activity)               
                 return JsonResponse(serializer.data, safe=False, status=status.HTTP_201_CREATED)
         except Exception as e:
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
@@ -101,8 +102,8 @@ class ActivityView( TemplateView):
             return JsonResponse({'message': "Activity doesn't exist."}, status=status.HTTP_404_NOT_FOUND) 
         try:
             if request.method == 'POST' or request.method == 'PUT': 
-                serializer =  ActividadSerializador(data=activityData, many=False,  
-				                fields=( 'id', 'esSiniestro','comentario', 'estado', 'prioridad', 'fechaAlta', 'fechaResolucion', 'fechaRequerido', 'semestre', 'usuario', 'actividadSuperior', 'categoria', 'ubicacion', 'dispositivo')) 
+                serializer =  ActivitySerializer(data=activityData, many=False,  
+				                fields=( 'id', 'esPeticion','comentario', 'estado', 'prioridad', 'fechaAlta', 'fechaResolucion', 'fechaRequerido', 'semestre', 'usuario', 'actividadSuperior', 'categoria', 'ubicacion', 'dispositivo')) 
                 if serializer.is_valid():
                     locations = []
                     if(activityData['replication']):
@@ -112,12 +113,15 @@ class ActivityView( TemplateView):
                     else:
                       activityId= activityData['id']
                       locations.append( Ubicacion(id=activityData['ubicacion']))
-					  
+					
                     with transaction.atomic():
+                      device = Dispositivo.objects.get(id=activityData['dispositivo'])
+                      device__tiempoVida = activityData['tiempoVida']
+                      device.save() 
                       for location in locations:
                         newActivity = Actividad(
 					    id= activityId,
-					    esSiniestro=activityData['esSiniestro'],
+					    esPeticion=activityData['esPeticion'],
 					    comentario = activityData['comentario'],
 					    estado = activityData['estado'],
 					    prioridad = activityData['prioridad'],

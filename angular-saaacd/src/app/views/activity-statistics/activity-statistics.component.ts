@@ -36,7 +36,7 @@ import { DOCUMENT, Location} from '@angular/common';
 })
 export class ActivityStatisticsComponent implements OnInit {
 
-  mapImageUrl: string =''; 
+  mapImageUrl: string = '';
   loadedImageWidth: number = 0;
   loadedImageHeight: number = 0;
   view: OlView = new OlView();
@@ -129,7 +129,6 @@ export class ActivityStatisticsComponent implements OnInit {
   getStatisticData(){
 	this.locationService.getActivityStatisticByLocation(this.selectedSemester, this.selectedLocationType)
     .subscribe(locations =>{ 
-				console.log(locations)
 			    for (var i = 0; i < locations.length; i++) { 
 					var statistics = JSON.parse(locations[i].data);
 					var sum = 0
@@ -152,8 +151,9 @@ export class ActivityStatisticsComponent implements OnInit {
 					feature.styleText=this.getFeatureStyle(feature, true);
 					this.vectorSource.addFeature(feature);
 					this.assignTitleToLocation(locations[i]);
-				}
-				this.assignFeaturesToMap()
+				} 
+				if(locations.length >0)
+					this.assignFeaturesToMap()
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Reporte>('getActivityStatisticsByLocation'));
@@ -205,8 +205,7 @@ export class ActivityStatisticsComponent implements OnInit {
   getActiveMap(){
     this.mapService.getActiveMap()
     .subscribe(map =>{ 
-				this.mapImageUrl = '../static/media/'+map.imagen;
-				console.log(this.mapImageUrl)
+				this.mapImageUrl = '../' + (map.imagen).split("saaacd/" , 2)[1];
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Mapa>('getActiveMap'));
@@ -219,8 +218,10 @@ export class ActivityStatisticsComponent implements OnInit {
     this.semesterService.getSemesters()
     .subscribe(semesters =>{ 
 				this.semesters = semesters;
-				this.selectedSemester = this.semesterService.getDefaultSemester(this.semesters);
-				this.getStatisticData();
+				if(semesters.length > 0){
+					this.selectedSemester = this.semesterService.getDefaultSemester(this.semesters);
+					this.getStatisticData();
+				}
 			   },
 			   error => {
 				  catchError(this.notifyService.handleError<Semestre>('getSemester'));
@@ -250,8 +251,10 @@ export class ActivityStatisticsComponent implements OnInit {
   }
   
   filterStatistics(){
-	this.clearMap()
-	this.getStatisticData()
+	if(this.selectedSemester != undefined){
+		this.clearMap();
+		this.getStatisticData();
+	}
   }
     
   /*************** MAP VISUALIZATION ******************* ***/
@@ -260,7 +263,9 @@ export class ActivityStatisticsComponent implements OnInit {
   onLoad(){
    this.loadedImageWidth = (this.img.nativeElement as HTMLImageElement).naturalWidth;
    this.loadedImageHeight = (this.img.nativeElement as HTMLImageElement).naturalHeight;
-   this.createMap();
+   if(this.mapImageUrl != ''){
+	   this.createMap();
+   }
    this.getSemesters();
   }
   
@@ -296,14 +301,16 @@ export class ActivityStatisticsComponent implements OnInit {
 //-------------------------DRAW ELEMENTS ON MAP
 // Style function
 changeChartType(selectedChartType: string){
-	var features = this.vectorSource.getFeatures();
-	for (var i = 0; i < features.length; i++) { 
-		features[i].style=this.getFeatureStyle(features[i], false);
-		features[i].styleText=this.getFeatureStyle(features[i], true);
-	}
-
-	this.vectorSource.changed();
 	
+	var features = this.vectorSource.getFeatures();
+	if(features.length > 0){
+		for (var i = 0; i < features.length; i++) { 
+			features[i].style=this.getFeatureStyle(features[i], false);
+			features[i].styleText=this.getFeatureStyle(features[i], true);
+		}
+
+		this.vectorSource.changed();
+	}
 }
 
 //---------------------------PDF

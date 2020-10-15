@@ -1,8 +1,8 @@
 from django.db import models
 from django.db.models import Model 
 from model_utils import Choices
-from saaacd.submodels.RegionGeografica import RegionGeografica
-from saaacd.submodels.TipoUbicacion import TipoUbicacion
+from saaacd.models.RegionGeografica import RegionGeografica
+from saaacd.models.TipoUbicacion import TipoUbicacion
 
 class Ubicacion(Model):
 	nombre = models.CharField(max_length=45)

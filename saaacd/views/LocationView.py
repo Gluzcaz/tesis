@@ -2,12 +2,12 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import TemplateView
 
-from saaacd.submodels.Ubicacion import Ubicacion
-from saaacd.submodels.Categoria import Categoria
-from saaacd.models import Actividad
-from saaacd.submodels.Mapa import Mapa
-from saaacd.submodels.RegionGeografica import RegionGeografica
-from saaacd.subserializers.UbicacionSerializador import UbicacionSerializador
+from saaacd.models.Ubicacion import Ubicacion
+from saaacd.models.Categoria import Categoria
+from saaacd.models.Actividad import Actividad
+from saaacd.models.Mapa import Mapa
+from saaacd.models.RegionGeografica import RegionGeografica
+from saaacd.serializers.LocationSerializer import LocationSerializer
  
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -28,14 +28,14 @@ class LocationView(TemplateView):
     def getLocations(request):
         if request.method == 'GET':
             data = Ubicacion.objects.all()
-            serializer = UbicacionSerializador(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'ubicacionSuperior'))
+            serializer = LocationSerializer(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'ubicacionSuperior'))
             return JsonResponse(serializer.data, safe=False)
 	
     def getSuperiorLocations(request):
         if request.method == 'GET':
             data = Ubicacion.objects.all()
             data = data.filter(ubicacionSuperior= None)
-            serializer = UbicacionSerializador(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'regionGeografica'))
+            serializer = LocationSerializer(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'regionGeografica'))
             return JsonResponse(serializer.data, safe=False)
 			
     def getInferiorLocations(request):
@@ -48,7 +48,7 @@ class LocationView(TemplateView):
             data = Ubicacion.objects.all()
             if location is not None:
                 data = data.filter(ubicacionSuperior=location)
-                serializer = UbicacionSerializador(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'regionGeografica'))
+                serializer = LocationSerializer(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'regionGeografica'))
                 return JsonResponse(serializer.data, safe=False)
         except Exception as e:
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
@@ -144,20 +144,20 @@ class LocationView(TemplateView):
 				SELECT '0' as categoryName, u.regionGeografica_id as regionId, a.ubicacion_id, u.nombre as locationName, count(*) frequencies FROM saacd.saaacd_actividad a 
 				INNER JOIN saacd.saaacd_categoria c ON a.categoria_id=c.id 
 				INNER JOIN saacd.saaacd_ubicacion u ON a.ubicacion_id=u.id 
-				WHERE a.esSiniestro = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "EXTRAVÍO") > 0
+				WHERE a.esPeticion = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "EXTRAVÍO") > 0
 				GROUP BY a.ubicacion_id
 				UNION
 				(SELECT '1' as categoryName, u.regionGeografica_id as regionId,  a.ubicacion_id, u.nombre as locationName, count(*) frequencies FROM saacd.saaacd_actividad a 
 				INNER JOIN saacd.saaacd_categoria c ON a.categoria_id=c.id 
 				INNER JOIN saacd.saaacd_ubicacion u ON a.ubicacion_id=u.id 
-				WHERE a.esSiniestro = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "FALLA") > 0
+				WHERE a.esPeticion = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "FALLA") > 0
 				GROUP BY a.ubicacion_id)
 				UNION
 				(SELECT '2' as categoryName, u.regionGeografica_id as regionId,  a.ubicacion_id, u.nombre as locationName, count(*) frequencies
 				 FROM saacd.saaacd_actividad a 
 				 INNER JOIN saacd.saaacd_categoria c ON a.categoria_id=c.id 
 				 INNER JOIN saacd.saaacd_ubicacion u ON a.ubicacion_id=u.id 
-				 WHERE a.esSiniestro = 1 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s 
+				 WHERE a.esPeticion = 1 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s 
 				 GROUP BY a.ubicacion_id)
 			 ) b
 			 INNER JOIN saacd.saaacd_regiongeografica rg ON rg.id = b.regionId
@@ -182,7 +182,7 @@ class LocationView(TemplateView):
 				INNER JOIN saacd.saaacd_categoria c ON a.categoria_id=c.id 
 				INNER JOIN saacd.saaacd_ubicacion u ON a.ubicacion_id=u.id 
 				INNER JOIN saacd.saaacd_ubicacion su ON u.ubicacionSuperior_id=su.id 
-				WHERE a.esSiniestro = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "EXTRAVÍO") > 0
+				WHERE a.esPeticion = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "EXTRAVÍO") > 0
 				GROUP BY a.ubicacion_id
 				UNION
 				(SELECT '1' as categoryName, su.regionGeografica_id as regionId, count(*) frequencies,
@@ -192,7 +192,7 @@ class LocationView(TemplateView):
 				INNER JOIN saacd.saaacd_categoria c ON a.categoria_id=c.id 
 				INNER JOIN saacd.saaacd_ubicacion u ON a.ubicacion_id=u.id 
 				INNER JOIN saacd.saaacd_ubicacion su ON u.ubicacionSuperior_id=su.id 
-				WHERE a.esSiniestro = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "FALLA") > 0
+				WHERE a.esPeticion = 0 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s AND INSTR(UPPER(c.nombre), "FALLA") > 0
 				GROUP BY a.ubicacion_id)
 				UNION
 				(SELECT '2' as categoryName, su.regionGeografica_id as regionId, count(*) frequencies,
@@ -202,7 +202,7 @@ class LocationView(TemplateView):
 				 INNER JOIN saacd.saaacd_categoria c ON a.categoria_id=c.id 
 				 INNER JOIN saacd.saaacd_ubicacion u ON a.ubicacion_id=u.id 
 				 INNER JOIN saacd.saaacd_ubicacion su ON u.ubicacionSuperior_id=su.id 
-				 WHERE a.esSiniestro = 1 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s 
+				 WHERE a.esPeticion = 1 AND a.dispositivo_id IS NOT NULL AND a.semestre_id=%s 
 				 GROUP BY a.ubicacion_id)
 			 ) b
 			 INNER JOIN saacd.saaacd_regiongeografica rg ON rg.id = b.regionId
@@ -219,13 +219,13 @@ class LocationView(TemplateView):
 			FROM (SELECT count(*) frequencies, ubicacion_id, prioridad FROM saacd.saaacd_actividad 
 					WHERE semestre_id=(SELECT id FROM saacd.saaacd_semestre WHERE esActivo=1) 
 					      AND ubicacion_id IS NOT NULL 
-						  AND esSiniestro = 0
+						  AND esPeticion = 0
 						  AND estado != %s
 					GROUP BY ubicacion_id, prioridad ORDER BY prioridad) a
 			INNER JOIN saaacd_ubicacion u ON u.id = a.ubicacion_id
 			INNER JOIN saaacd_regiongeografica rg ON rg.id = u.regionGeografica_id
 			WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
-			GROUP BY a.ubicacion_id ''',[Actividad.ESTADO.r])
+			GROUP BY a.ubicacion_id ''',[Actividad.REALIZADA])#PENDIENTE Agregar INTERRUMPIDA
             data = LocationView.__dictFetchAll(cursor)
             return JsonResponse(data, safe=False) 
 			
@@ -234,16 +234,16 @@ class LocationView(TemplateView):
             locationId = request.GET['locationId']
             cursor = connection.cursor()
             cursor.execute('''SELECT d.id, CONCAT(tp.nombre, " ", ma.nombre," ", mo.nombre ) AS nombre ,
-					IF( (ft.tiempoVida * 100/ ft.garantiaFabricante) >= 100, 100, (ft.tiempoVida * 100)/ ft.garantiaFabricante)  AS data
+					IF( (d.tiempoVida * 100/ ft.prediccionVidaUtil) >= 100, 100, (d.tiempoVida * 100)/ ft.prediccionVidaUtil)  AS data
 					FROM saacd.saaacd_dispositivo d 
 					INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
                     INNER JOIN saacd.saaacd_tipodispositivo tp ON tp.id = d.tipoDispositivo_id
 					INNER JOIN saacd.saaacd_modelo mo ON mo.id = ft.modelo_id
                     INNER JOIN saacd.saaacd_marca ma ON ma.id = mo.marca_id
 					WHERE d.fechaBaja IS NULL 
-					AND ft.garantiaFabricante IS NOT NULL 
+					AND ft.prediccionVidaUtil IS NOT NULL 
                     AND  d.ubicacion_id = %s
-                    ORDER BY tiempoVida DESC''',[locationId])
+                    ORDER BY d.tiempoVida DESC''',[locationId])
             data = LocationView.__dictFetchAll(cursor)
             return JsonResponse(data, safe=False) 
 
@@ -293,17 +293,17 @@ class LocationView(TemplateView):
     def getMaterialMonitoringByLocation(request):
         if request.method == 'GET':
             futureDate = '2020-10-14'#request.GET['date']
-            MAXIMUM_DELTA_TIME = 240 #hours = 10 days
+            MAXIMUM_DELTA_TIME = 240 #hours = 30 days * 8 horas de uso PENDIENTE select semester activo por cada ubicacion en una funcion
             cursor = connection.cursor()
             cursor.execute('''SELECT DISTINCT (a.ubicacion_id) AS id, a.prioridad AS data, u.nombre, rg.coordenada, rg.centroide
 			FROM (
 				SELECT d.id, d.ubicacion_id, 
-					IF(ft.tiempoVida >=  ft.garantiaFabricante, 1, 
-					IF(ft.tiempoVida + %s >= ft.garantiaFabricante, 2, 0)) as prioridad 
+					IF(d.tiempoVida >=  ft.prediccionVidaUtil, 1, 
+					IF(d.tiempoVida + %s >= ft.prediccionVidaUtil, 2, 0)) as prioridad 
 					FROM saacd.saaacd_dispositivo d 
 					INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
 					WHERE fechaBaja IS NULL AND 
-					ft.garantiaFabricante IS NOT NULL ORDER BY prioridad
+					ft.prediccionVidaUtil IS NOT NULL ORDER BY prioridad
 			) a
 			INNER JOIN saaacd_ubicacion u ON u.id = a.ubicacion_id
 			INNER JOIN saaacd_regiongeografica rg ON rg.id = u.regionGeografica_id

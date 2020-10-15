@@ -39,7 +39,7 @@
 		<ng-container matColumnDef="id">
 		  <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
 		  <td mat-cell *matCellDef="let row">
-		    <mark *ngIf="row.esSiniestro; else hideId">{{row.id}}</mark>
+		    <mark *ngIf="row.esPeticion; else hideId">{{row.id}}</mark>
 			<ng-template #hideId>{{row.id}}</ng-template>
 			</td>
 		</ng-container>
@@ -55,7 +55,7 @@
 		<ng-container matColumnDef="semestre">
 		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Semestre </th>
 		  <td mat-cell *matCellDef="let row"> 
-			<mark *ngIf="row.esSiniestro; else hideSemestre">{{row.semestre.nombre}}</mark>
+			<mark *ngIf="row.esPeticion; else hideSemestre">{{row.semestre.nombre}}</mark>
 			<ng-template #hideSemestre>{{row.semestre.nombre}}</ng-template>
 		  </td>
 		</ng-container>
@@ -64,7 +64,7 @@
 		<ng-container matColumnDef="fechaAlta">
 		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Periodo </th>
 		  <td mat-cell *matCellDef="let row" >
-			<mark  *ngIf="row.esSiniestro; else hidePeriodo">
+			<mark  *ngIf="row.esPeticion; else hidePeriodo">
 				{{ row.fechaAlta + getFechaPeriodoText(row) }}
      			<b>{{ getFechaRequeridoText(row) }}</b>
 			</mark>
@@ -79,7 +79,7 @@
 		<ng-container matColumnDef="usuario">
 		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Usuario </th>
 		  <td mat-cell *matCellDef="let row" > 
-			<mark *ngIf="row.esSiniestro; else hideUsuario">{{row.usuario.first_name}}</mark>
+			<mark *ngIf="row.esPeticion; else hideUsuario">{{row.usuario.first_name}}</mark>
 			<ng-template #hideUsuario>{{row.usuario.first_name}}</ng-template>
 		  </td>
 		</ng-container>
@@ -88,7 +88,7 @@
 		<ng-container matColumnDef="categoria">
 		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Actividad </th>
 		  <td mat-cell *matCellDef="let row" >
-			<mark *ngIf="row.esSiniestro; else hideCategoria"> {{row.categoria.nombre}} </mark>
+			<mark *ngIf="row.esPeticion; else hideCategoria"> {{row.categoria.nombre}} </mark>
 			<ng-template #hideCategoria>{{row.categoria.nombre}}</ng-template>
 		  </td>
 		</ng-container>
@@ -97,7 +97,7 @@
 		<ng-container matColumnDef="ubicacion">
 		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Ubicación </th>
 		  <td mat-cell *matCellDef="let row" > 
-			<mark *ngIf="row.esSiniestro; else hideUbicacion">{{getUbicacionText(row)}}</mark>
+			<mark *ngIf="row.esPeticion; else hideUbicacion">{{getUbicacionText(row)}}</mark>
 			<ng-template #hideUbicacion>{{getUbicacionText(row)}}</ng-template>
 		  </td>
 		</ng-container>
@@ -106,7 +106,7 @@
 		<ng-container matColumnDef="dispositivo">
 		  <th mat-header-cell *matHeaderCellDef mat-sort-header> Dispositivo </th>
 		  <td mat-cell *matCellDef="let row" >
-			<mark *ngIf="row.esSiniestro; else hideDispositivo">{{getDispositivoText(row)}} </mark>
+			<mark *ngIf="row.esPeticion; else hideDispositivo">{{getDispositivoText(row)}} </mark>
 			<ng-template #hideDispositivo>{{getDispositivoText(row)}} </ng-template>
 		  </td>
 		</ng-container>

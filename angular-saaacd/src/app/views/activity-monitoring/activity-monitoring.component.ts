@@ -32,7 +32,7 @@ import { Observable, of } from 'rxjs';
 })
 export class ActivityMonitoringComponent implements OnInit {
 
-  mapImageUrl: string =''; 
+  mapImageUrl: string = '';
   loadedImageWidth: number = 0;
   loadedImageHeight: number = 0;
   view: OlView = new OlView();
@@ -85,7 +85,7 @@ export class ActivityMonitoringComponent implements OnInit {
 						dialog: this.dialog
 					});
 					
-					var priority= locations[i].data;
+					var priority= parseInt(locations[i].data,10);
 					switch(priority) { 
 					   case Actividad.PRIORITIES[0].id:{
 						  feature.setStyle(this.dangerousStyle)
@@ -107,7 +107,8 @@ export class ActivityMonitoringComponent implements OnInit {
 					this.vectorSource.addFeature(feature);
 					this.assignTitleToLocation(locations[i]);
 				}
-				this.assignFeaturesToMap()
+				if(locations.length >0)
+					this.assignFeaturesToMap()
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Reporte>('getActivityStadisticByLocation'));
@@ -119,7 +120,7 @@ export class ActivityMonitoringComponent implements OnInit {
   getActiveMap(){
     this.mapService.getActiveMap()
     .subscribe(map =>{ 
-				this.mapImageUrl = '../static/media/'+map.imagen;
+				this.mapImageUrl = '../' + (map.imagen).split("saaacd/" , 2)[1];
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Mapa>('getActiveMap'));
@@ -134,7 +135,9 @@ export class ActivityMonitoringComponent implements OnInit {
   onLoad(){
    this.loadedImageWidth = (this.img.nativeElement as HTMLImageElement).naturalWidth;
    this.loadedImageHeight = (this.img.nativeElement as HTMLImageElement).naturalHeight;
-   this.createMap();
+   if(this.mapImageUrl != ''){
+	   this.createMap();
+   }
    this.getStatisticData();
   }
   

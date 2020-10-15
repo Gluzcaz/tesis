@@ -12,14 +12,14 @@ export class Actividad {
   fechaResolucion: string;
   fechaAlta: string;
   fechaRequerido: string;
-  esSiniestro: boolean;
+  esPeticion: boolean;
   actividadSuperior: ActividadSuperior;
   categoria: Categoria;
   semestre: Semestre;
   ubicacion: Ubicacion;
   usuario: Usuario;
   dispositivo: Dispositivo;
-  public static PRIORITIES  = [ {id :'a', name:'Alta'}, {id:'m', name:'Media'}, {id:'b', name:'Baja'}];
-  public static STATUSES = [ {id :'r', name:'Realizada'}, {id:'p', name:'Pendiente'}, {id:'e', name:'En Progreso'}];
+  public static PRIORITIES  = [ {id :1, name:'Alta'}, {id:2, name:'Media'}, {id:3, name:'Baja'}];
+  public static STATUSES = [ {id :1, name:'Pendiente'}, {id:2, name:'En Progreso'}, {id:3, name:'Realizada'}];
   public static MAX_LENGTH_COMMENT : number = 250;
 }

@@ -2,8 +2,8 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import TemplateView
 
-from saaacd.submodels.Mapa import Mapa
-from saaacd.subserializers.MapaSerializador import MapaSerializador
+from saaacd.models.Mapa import Mapa
+from saaacd.serializers.MapSerializer import MapSerializer
  
 from django.views.decorators.csrf import csrf_exempt
 
@@ -13,13 +13,16 @@ class MapView(TemplateView):
     def getMaps(request):
         if request.method == 'GET':
             data = Mapa.objects.all()
-            serializer =  MapaSerializador(data, many=True)
+            serializer =  MapSerializer(data, many=True)
             return JsonResponse(serializer.data, safe=False)
 			
     def getActiveMap(request):
         if request.method == 'GET':
-            data= Mapa.objects.get(esActivo=True)
-            serializer =  MapaSerializador(data)
-            return JsonResponse(serializer.data, safe=False)
-	
+            data = Mapa.objects.all()
+            if(data):
+                data= data.filter(esActivo=True)
+                serializer =  MapSerializer(data)
+                return JsonResponse(serializer.data, safe=False)
+            else:
+                return JsonResponse({}, safe=False)			
 	

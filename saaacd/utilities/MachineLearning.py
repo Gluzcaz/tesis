@@ -1,6 +1,6 @@
 import numpy as np
 import cv2 as cv
-from saaacd.submodels.RegionGeografica import RegionGeografica
+from saaacd.models.RegionGeografica import RegionGeografica
 
 
 class MachineLearning():

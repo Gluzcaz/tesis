@@ -7,7 +7,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { Actividad } from '../models/Actividad';
 import { URLutility } from '../utilities/URLutility';
 
-import { ConfirmDialogModel, ConfirmDialogComponent } from '../views/confirmDialog/confirm-dialog.component';
+import { ConfirmDialogModel, ConfirmDialogComponent } from '../views/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 
 @Injectable({ providedIn: 'root' })

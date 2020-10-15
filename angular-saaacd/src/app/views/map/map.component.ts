@@ -36,7 +36,7 @@ import * as olEasing from 'ol/easing';
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-  mapImageUrl: string = '../static/media/images/location6.jpg';
+  mapImageUrl: string = '../static/media/images/location.jpg';
   maps: Mapa[];
   regions ={'id':'0', 'name': 'Regiones', 'regionList':[]};
   locations = [];
@@ -163,7 +163,7 @@ export class MapComponent implements OnInit {
   changeMapImageUrl(selectedMap){
 	if(selectedMap){
 		const foundMap = this.maps.find(map => map.id == selectedMap);
-		this.mapImageUrl ='../static/media/' + foundMap.imagen;
+		this.mapImageUrl = '../' + (foundMap.imagen).split("saaacd/" , 2)[1];
 		this.disableButton = false;
 		this.isMainMap = foundMap.esActivo;
 		if(selectedMap!=this.processedImageId){

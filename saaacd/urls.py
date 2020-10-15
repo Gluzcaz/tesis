@@ -1,14 +1,14 @@
 from django.conf.urls import url
 from django.urls import path, include
- 
-from saaacd import views
-from saaacd.subviews.SemesterView import SemesterView
-from saaacd.subviews.UserView import UserView
-from saaacd.subviews.CategoryView import CategoryView
-from saaacd.subviews.LocationView import LocationView
-from saaacd.subviews.DeviceView import DeviceView
-from saaacd.subviews.MapView import MapView
-from saaacd.subviews.RegionView import RegionView
+
+from saaacd.views.ActivityView import ActivityView 
+from saaacd.views.SemesterView import SemesterView
+from saaacd.views.UserView import UserView
+from saaacd.views.CategoryView import CategoryView
+from saaacd.views.LocationView import LocationView
+from saaacd.views.DeviceView import DeviceView
+from saaacd.views.MapView import MapView
+from saaacd.views.RegionView import RegionView
 from rest_framework import routers
 from django.urls import re_path
 from django.conf import settings 
@@ -19,7 +19,7 @@ from django.contrib.auth.decorators import login_required
 router = routers.DefaultRouter()
  
 urlpatterns = [
-	#url(r'^$', views.ActivityView.as_view()),
+	#url(r'^$', ActivityView.as_view()),
 	url(r'^$', 
         LoginView.as_view(
             template_name='admin/login.html',
@@ -41,19 +41,19 @@ urlpatterns = [
 			  'site_title': 'SAAACD',
 			  'site_header': 'SAAACD Autenticación'}),
 			  {'next_page': settings.LOGOUT_REDIRECT_URL}),
-	url(r'^allActivities/', views.ActivityView.as_view()),
-	re_path(r'^detail/(?P<id>[0-9]+)/$',views.ActivityView.getDetailUrl),
-	url(r'^create/', views.ActivityView.keepUrl),
-	url(r'^activityStatistic/', views.ActivityView.keepUrl),
-	url(r'^materialStatistic/', views.ActivityView.keepUrl),
-	url(r'^activityMonitoring/', views.ActivityView.keepUrl),
-	url(r'^materialMonitoring/', views.ActivityView.keepUrl),
-	url(r'^map/', views.ActivityView.keepUrl),
-	url(r'^api/petitionActivities/', views.ActivityView.getPetitionActivities),
-	url(r'^api/activitiesByLocation/', views.ActivityView.getActivitiesByLocation),
-	url(r'^api/detailActivity/', views.ActivityView.detailActivity),
-	url(r'^api/saveActivity/', login_required(views.ActivityView.saveActivity, login_url='/login/')),
-	url(r'^api/activities/', views.ActivityView.getActivities),
+	url(r'^allActivities/', ActivityView.as_view()),
+	re_path(r'^detail/(?P<id>[0-9]+)/$',ActivityView.getDetailUrl),
+	url(r'^create/', ActivityView.keepUrl),
+	url(r'^activityStatistic/', ActivityView.keepUrl),
+	url(r'^materialStatistic/', ActivityView.keepUrl),
+	url(r'^activityMonitoring/', ActivityView.keepUrl),
+	url(r'^materialMonitoring/', ActivityView.keepUrl),
+	url(r'^map/', ActivityView.keepUrl),
+	url(r'^api/petitionActivities/', ActivityView.getPetitionActivities),
+	url(r'^api/activitiesByLocation/', ActivityView.getActivitiesByLocation),
+	url(r'^api/detailActivity/', ActivityView.detailActivity),
+	url(r'^api/saveActivity/', login_required(ActivityView.saveActivity, login_url='/login/')),
+	url(r'^api/activities/', ActivityView.getActivities),
 	url(r'^api/semesters/', SemesterView.getSemesters),
 	url(r'^api/users/', UserView.getUsers),
 	url(r'^api/categories/', CategoryView.getCategories),

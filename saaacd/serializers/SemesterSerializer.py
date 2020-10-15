@@ -1,7 +1,7 @@
-from saaacd.models import Semestre
+from saaacd.models.Semestre import Semestre
 from rest_framework import serializers
 
-class SemestreSerializador(serializers.ModelSerializer):
+class SemesterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Semestre
