@@ -37,6 +37,7 @@ export class ActivityDetailComponent implements OnInit {
   users: Usuario[];
   isPetition: boolean = false;
   DONE : number = Actividad.STATUSES[2].id;
+  CANCELED : number = Actividad.STATUSES[3].id;
   MAX_LENGTH_COMMENT: number = Actividad.MAX_LENGTH_COMMENT;
   pageTitle : string = "Nueva actividad"; 
   
@@ -115,7 +116,7 @@ export class ActivityDetailComponent implements OnInit {
   dateLessValidationMessage = 'Por favor ingrese una fecha posterior a la fecha de Alta.';
   dateLessThanRequiredMessage = 'Por favor ingrese una fecha anterior a la fecha requerida.';
   dateLessThanResolutionMessage = 'Por favor ingrese una fecha anterior a la fecha de resolución.';
-  requireDoneStatusMessage = 'Por favor elige el estado Realizada para registrar una fecha de resolución.';
+  requireDoneStatusMessage = 'Por favor elige el estado Realizada o Interrumpida para registrar una fecha de resolución.';
   requireResolutionDateMessage = 'Necesita una fecha de resolución para registrar una actividad Realizada.';
   
   constructor(
@@ -184,7 +185,7 @@ export class ActivityDetailComponent implements OnInit {
    
   setDefaultValuesToForms(): void {
 	this.statusControl.setValue(this.activity.estado);
-	if(this.statusControl.value != this.DONE)
+	if(this.statusControl.value != this.DONE && this.statusControl.value != this.CANCELED)
 		this.resolutionDateControl.disable();
 	this.priorityControl.setValue(this.activity.prioridad);
 	this.petitionControl.setValue(this.activity.esPeticion);
@@ -219,12 +220,15 @@ export class ActivityDetailComponent implements OnInit {
 		else {
 			//Done state is required to register resolution date.
 			if( resolutionDate != null &&
-				this.statusControl.value != this.DONE ){ 
+				this.statusControl.value != this.DONE &&  
+				this.statusControl.value != this.CANCELED){ 
 				this.statusControl.setErrors({ isInvalidDate: true });
 			} 
 			else{ 
 			    //Resolution date is required to register Done state.
-				if(resolutionDate == null && this.statusControl.value == this.DONE)
+				if(resolutionDate == null && 
+				(this.statusControl.value == this.DONE
+				  || this.statusControl.value == this.CANCELED))
 				   this.resolutionDateControl.setErrors({ requireResolutionDate: true });
 				else
 				   this.statusControl.setErrors(null);
@@ -264,7 +268,7 @@ export class ActivityDetailComponent implements OnInit {
    	  
   this.statusControl.valueChanges.subscribe(status => {
 	//Resolution date is required to register Done state
-	if(status != this.DONE){
+	if(status != this.DONE && status != this.CANCELED){
 	    this.resolutionDateControl.setValue(null);
 		this.resolutionDateControl.disable();
 	}
@@ -531,7 +535,7 @@ export class ActivityDetailComponent implements OnInit {
 			  'fechaResolucion': null,
 			  'fechaAlta': formatDate(new Date(this.validationGroup.get('currentDateControl').value.toString()), 'yyyy-MM-dd', 'en-US').toString(),
 			  'fechaRequerido': null,
-			  'esSiniestro': this.validationGroup.get('petitionControl').value ? 1 : 0,
+			  'esPeticion': this.validationGroup.get('petitionControl').value ? 1 : 0,
 			  'actividadSuperior': null,
 			  'categoria': this.validationGroup.get('categoryControl').value,
 			  'semestre': this.validationGroup.get('semesterControl').value,

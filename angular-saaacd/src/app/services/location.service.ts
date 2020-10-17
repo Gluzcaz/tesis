@@ -14,9 +14,7 @@ export class LocationService {
   private inferiorLocationsUrl = '/api/inferiorLocations'; 
   private superiorLocationsUrl = '/api/superiorLocations';
   private saveLocationsUrl = '/api/saveLocations/';
-  private activityMonitoringByLocationUrl = '/api/activityMonitoringByLocation/'
-  private materialMonitoringByLocationUrl = '/api/materialMonitoringByLocation/'
- 
+
   constructor(private http: HttpClient) {}
   
  /** GET locations */
@@ -33,30 +31,6 @@ export class LocationService {
   getLocationsBySuperiorLocation(id: number):  Observable<any> {
 	var options = URLutility.getHttpOptionsWithParam('location', id.toString());
     return this.http.get<Ubicacion[]>(this.inferiorLocationsUrl, options);
-  }
-  
-  getActivityStatisticByLocation(semesterId: number, locationType: boolean): Observable<any>{
-	 var options = URLutility.getHttpOptionsWithParam('semesterId', semesterId.toString());
-     var url = 'api/activityStatisticBySupLocation/';
-	 if(locationType)
-		url = 'api/activityStatisticByInfLocation/'
-	 return this.http.get<Reporte[]>(url, options);
-  }
- 
-  getMaterialStatisticByLocation(semesterId: number, locationType: boolean): Observable<any>{
-	 var options = URLutility.getHttpOptionsWithParam('semesterId', semesterId.toString());
-     var url = 'api/materialStatisticBySupLocation/';
-	 if(locationType)
-		url = 'api/materialStatisticByInfLocation/'
-	 return this.http.get<Reporte[]>(url, options);
-  }
-  
-  getActivityMonitoringByLocation(): Observable<Reporte[]> {
-    return this.http.get<Reporte[]>(this.activityMonitoringByLocationUrl);
-  }
-  
-  getMaterialMonitoringByLocation(): Observable<Reporte[]> {
-    return this.http.get<Reporte[]>(this.materialMonitoringByLocationUrl);
   }
   
   /** PUT: update the activity on the server */

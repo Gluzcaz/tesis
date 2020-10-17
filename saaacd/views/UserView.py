@@ -3,7 +3,7 @@ from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import TemplateView
 
 from django.contrib.auth.models import User
-from saaacd.serializers import UserSerializer
+from saaacd.serializers.UserSerializer import UserSerializer
  
 from django.views.decorators.csrf import csrf_exempt
 

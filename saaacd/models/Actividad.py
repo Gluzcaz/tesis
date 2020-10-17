@@ -10,10 +10,12 @@ class Actividad(models.Model):
     PENDIENTE = 1
     PROGRESO = 2
     REALIZADA = 3
+    CANCELADA = 4
     ESTADO = Choices(
 		(PENDIENTE, ('Pendiente')), 
 		(PROGRESO, ('En Progreso')), 
-		(REALIZADA, ('Realizada'))
+		(REALIZADA, ('Realizada')),
+		(CANCELADA, ('Cancelada'))
 	)
 	
     ALTA = 1
@@ -31,9 +33,9 @@ class Actividad(models.Model):
     prioridad =  models.IntegerField(choices=PRIORIDAD)
     comentario = models.CharField(max_length=250, null=True, blank = True)
     fechaResolucion = models.DateField(null=True, blank = True)
-    fechaAlta = models.DateField(null=False, default=datetime.date.today)
+    fechaAlta = models.DateField(null=False)
     fechaRequerido = models.DateField(null=True,blank = True)
-    esPeticion = models.BooleanField(default=False)
+    esPeticion = models.BooleanField(default=0)
 	#Foreign Keys
     usuario = models.ForeignKey('auth.User', related_name="usuario", on_delete=models.CASCADE, null=True)
     ubicacion=models.ForeignKey(Ubicacion, related_name="ubicacion", on_delete=models.CASCADE, null=True)

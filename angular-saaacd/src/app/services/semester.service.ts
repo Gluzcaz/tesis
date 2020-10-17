@@ -11,6 +11,8 @@ import { NotificationService } from './notification.service';
 @Injectable({ providedIn: 'root' })
 export class SemesterService {
   private semestersUrl = '/api/semesters';  // URL to web api
+  private predictiveSemestersUrl = '/api/predictiveSemesters';
+  
   constructor(
     private http: HttpClient,
 	private notifyService : NotificationService) {}
@@ -26,5 +28,9 @@ export class SemesterService {
 		return semesters[i].id;
 	  }
     }
+  }
+  
+  getPredictiveSemesters(): Observable<Semestre[]> {
+    return this.http.get<Semestre[]>(this.predictiveSemestersUrl);
   }
 }

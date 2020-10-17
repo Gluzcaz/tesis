@@ -11,8 +11,9 @@ import { URLutility } from '../utilities/URLutility';
 @Injectable({ providedIn: 'root' })
 export class DeviceService {
   private deviceUrl = '/api/devices/';  // URL to web api
-  private lifeTimeMonitoringUrl = 'api/lifeTimeDeviceByLocation/';
+  private lifeTimeMonitoringUrl = 'api/deviceLifeTimeByLocation/';
   private expiredDevicesUrl = 'api/expiredDevices/';
+  private deviceMonitoringByLocationUrl = '/api/deviceMonitoringByLocation/'
  
   constructor(
     private http: HttpClient) {}
@@ -23,12 +24,26 @@ export class DeviceService {
     return this.http.get<Reporte[]>(this.deviceUrl, options);
   }
   
- getLifeTimeDeviceByLocation(id: number): Observable<any>{
-	 var options = URLutility.getHttpOptionsWithParam('locationId', id.toString());
+ getDeviceLifeTimeByLocation(id: number, semesterId: number): Observable<any>{
+ 	 var options = URLutility.getHttpOptionsWithTwoParam('locationId', id.toString(), 'semesterId', semesterId.toString())
 	 return this.http.get<Reporte[]>(this.lifeTimeMonitoringUrl, options);
   }
   
-  getExpiredDevices(): Observable<any>{
-    return this.http.get<ExpiredDevice[]>(this.expiredDevicesUrl);
+ getExpiredDevices(semesterId): Observable<any>{
+	var options = URLutility.getHttpOptionsWithParam('semesterId', semesterId.toString());
+    return this.http.get<ExpiredDevice[]>(this.expiredDevicesUrl, options);
+  }
+    
+ getDeviceMonitoringByLocation(semesterId): Observable<any> {
+	var options = URLutility.getHttpOptionsWithParam('semesterId', semesterId.toString());
+    return this.http.get<Reporte[]>(this.deviceMonitoringByLocationUrl, options);
+  }
+  
+ getDeviceStatisticByLocation(semesterId: number, locationType: boolean): Observable<any>{
+	 var options = URLutility.getHttpOptionsWithParam('semesterId', semesterId.toString());
+     var url = 'api/deviceStatisticBySupLocation/';
+	 if(locationType)
+		url = 'api/deviceStatisticByInfLocation/'
+	 return this.http.get<Reporte[]>(url, options);
   }
 }

@@ -20,6 +20,6 @@ export class Actividad {
   usuario: Usuario;
   dispositivo: Dispositivo;
   public static PRIORITIES  = [ {id :1, name:'Alta'}, {id:2, name:'Media'}, {id:3, name:'Baja'}];
-  public static STATUSES = [ {id :1, name:'Pendiente'}, {id:2, name:'En Progreso'}, {id:3, name:'Realizada'}];
+  public static STATUSES = [ {id :1, name:'Pendiente'}, {id:2, name:'En Progreso'}, {id:3, name:'Realizada'}, {id:4, name:'Cancelada'}];
   public static MAX_LENGTH_COMMENT : number = 250;
 }

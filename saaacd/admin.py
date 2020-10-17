@@ -43,7 +43,7 @@ class Dispositivo(admin.ModelAdmin):
  
 @admin.register(FichaTecnica)
 class FichaTecnica(admin.ModelAdmin):
- list_display = ('id', 'garantiaFabricante', 'detalles', 'existenciaInventario', 'precio', 'modelo', 'prediccionVidaUtil')
+ list_display = ('id', 'garantiaFabricante', 'detalles', 'precio', 'modelo', 'prediccionVidaUtil')
 
 @admin.register(Mapa)
 class Mapa(admin.ModelAdmin):
@@ -67,7 +67,7 @@ class RegionGeografica(admin.ModelAdmin):
 
 @admin.register(Semestre)
 class Semestre(admin.ModelAdmin):
- list_display = ('id', 'nombre', 'esActivo')
+ list_display = ('id', 'nombre', 'esActivo', 'inicio', 'fin', 'diasAsueto')
  
 @admin.register(TipoDispositivo)
 class TipoDispositivo(admin.ModelAdmin):
@@ -84,8 +84,8 @@ class Ubicacion(admin.ModelAdmin):
  
 @admin.register(HorarioClase)
 class HorarioClase(admin.ModelAdmin):
- list_display = ('id', 'ubicacion', 'semestre', 'tiempoSemestral', 'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo')
- fields = ['ubicacion', 'semestre', 'tiempoSemestral', 'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo']
+ list_display = ('id', 'ubicacion', 'semestre', 'duracionSemestral', 'duracionMensual', 'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo')
+ fields = ['ubicacion', 'semestre',  'duracionSemestral', 'duracionMensual', 'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo']
 
 
 

@@ -1,11 +1,19 @@
 <h1 class="title">Monitoreo de material</h1>
 <div class="controlStyle">
-	<mat-form-field appearance="fill">
+	<!--<mat-form-field appearance="fill">
 	  <mat-label>Fecha de Pronóstico</mat-label>
 	  <input matInput (dateChange)="changeFutureDate($event)" [min]="minDate" [max]="maxDate" [matDatepicker]="picker">
 	  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
 	  <mat-datepicker #picker></mat-datepicker>
-	</mat-form-field>
+	</mat-form-field>-->
+	<mat-form-field>
+			<mat-label>Selecciona la predicción:</mat-label>
+			<mat-select [(ngModel)]="selectedSemester" name="semester" (selectionChange)="changePrediction($event)">
+			  <mat-option *ngFor="let semester of semesters" [value]="semester.id">
+				{{semester.nombre}}
+			  </mat-option>
+			</mat-select>
+    </mat-form-field>
 	
 	<button id="exportButton" (click)="downloadPDF()" [disabled]="false">Exportar PDF</button>
 </div>

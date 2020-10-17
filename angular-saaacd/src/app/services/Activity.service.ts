@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 import { Actividad } from '../models/Actividad';
+import { Reporte } from '../models/Reporte';
 import { URLutility } from '../utilities/URLutility';
 
 import { ConfirmDialogModel, ConfirmDialogComponent } from '../views/confirm-dialog/confirm-dialog.component';
@@ -18,7 +19,7 @@ export class ActivityService {
   private detailActivityUrl = '/api/detailActivity/';
   private createActivityUrl = '/api/createActivity/';
   private saveActivityUrl = '/api/saveActivity/'
- 
+  private activityMonitoringByLocationUrl = '/api/activityMonitoringByLocation/'
   
   constructor(
     private http: HttpClient,
@@ -63,6 +64,18 @@ export class ActivityService {
   /** PUT: update the activity on the server */
   updateActivity(activity: any): Observable<Actividad> {
     return this.http.put<any>(this.saveActivityUrl, activity, URLutility.httpOptions);
+  }
+  
+  getActivityStatisticByLocation(semesterId: number, locationType: boolean): Observable<any>{
+	 var options = URLutility.getHttpOptionsWithParam('semesterId', semesterId.toString());
+     var url = 'api/activityStatisticBySupLocation/';
+	 if(locationType)
+		url = 'api/activityStatisticByInfLocation/'
+	 return this.http.get<Reporte[]>(url, options);
+  }
+ 
+  getActivityMonitoringByLocation(): Observable<Reporte[]> {
+    return this.http.get<Reporte[]>(this.activityMonitoringByLocationUrl);
   }
 
   /**

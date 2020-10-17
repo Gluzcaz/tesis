@@ -15,3 +15,10 @@ class SemesterView(TemplateView):
             data = Semestre.objects.all()
             serializer =  SemesterSerializer(data, many=True)
             return JsonResponse(serializer.data, safe=False)
+			
+    def getPredictiveSemesters(request):
+        if request.method == 'GET':
+            activeSemester = Semestre.objects.get(esActivo=1)
+            data = Semestre.objects.all().filter(fin__gte= activeSemester.fin)
+            serializer =  SemesterSerializer(data, many=True)
+            return JsonResponse(serializer.data, safe=False)

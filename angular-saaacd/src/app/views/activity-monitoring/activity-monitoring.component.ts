@@ -14,7 +14,7 @@ import Vector from 'ol/source/Vector';
 import Polygon from 'ol/geom/Polygon';
 import Overlay from 'ol/Overlay';
 
-import { LocationService } from '../../services/location.service';
+import { ActivityService } from '../../services/activity.service';
 import { NotificationService } from '../../services/notification.service';
 import { catchError} from 'rxjs/operators';
 import { Reporte } from '../../models/Reporte';
@@ -59,7 +59,7 @@ export class ActivityMonitoringComponent implements OnInit {
   locationErrorMessage = 'No se ha podido mostrar los datos estadísticos.';
   mapErrorMessage = 'No se ha podido identificar el mapa.';
  
-  constructor( private locationService: LocationService,
+  constructor( private activityService: ActivityService,
 		   private notifyService : NotificationService,
 		   private mapService: MapService,
 		   public dialog: MatDialog,
@@ -71,7 +71,7 @@ export class ActivityMonitoringComponent implements OnInit {
   }
   
   getStatisticData(){
-	this.locationService.getActivityMonitoringByLocation()
+	this.activityService.getActivityMonitoringByLocation()
     .subscribe(locations =>{ 
 				
 			    for (var i = 0; i < locations.length; i++) { 

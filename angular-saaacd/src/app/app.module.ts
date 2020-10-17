@@ -11,7 +11,6 @@ import { AppRoutingModule }     from './app-routing.module';
  
 import { AppComponent } from './app.component';
 import { ActivitiesComponent }  from './views/activities/activities.component';
-import { MessagesComponent }    from './views/messages/messages.component';
 import { ConfirmDialogComponent } from './views/confirm-dialog/confirm-dialog.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -42,7 +41,6 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
   declarations: [
     AppComponent,
 	ActivitiesComponent,
-    MessagesComponent,
     ConfirmDialogComponent,
 	ActivityDetailComponent,
 	MapComponent,

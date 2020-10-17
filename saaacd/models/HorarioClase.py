@@ -4,7 +4,9 @@ from saaacd.models.Ubicacion import Ubicacion
 from saaacd.models.Semestre import Semestre
 
 class HorarioClase(Model):
-	tiempoSemestral = models.IntegerField(null=False, default=0)
+	duracionSemestral = models.IntegerField(null=False, default=0)
+	duracionMensual = models.IntegerField(null=False, default=0) #4Semanas
+	numClasesSemanal = models.IntegerField(null=False, default=0)
 	Lunes = models.IntegerField(null=False, default=0)
 	Martes = models.IntegerField(null=False, default=0)
 	Miercoles = models.IntegerField(null=False, default=0)

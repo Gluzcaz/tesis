@@ -20,7 +20,7 @@ class MapView(TemplateView):
         if request.method == 'GET':
             data = Mapa.objects.all()
             if(data):
-                data= data.filter(esActivo=True)
+                data= data.get(esActivo=True)
                 serializer =  MapSerializer(data)
                 return JsonResponse(serializer.data, safe=False)
             else:

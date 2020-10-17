@@ -14,7 +14,7 @@ import Vector from 'ol/source/Vector';
 import Point from 'ol/geom/Point';
 import Overlay from 'ol/Overlay';
 
-import { LocationService } from '../../services/location.service';
+import { ActivityService } from '../../services/activity.service';
 import { NotificationService } from '../../services/notification.service';
 import { catchError} from 'rxjs/operators';
 import { Reporte } from '../../models/Reporte';
@@ -64,7 +64,7 @@ export class ActivityStatisticsComponent implements OnInit {
   mapErrorMessage = 'No se ha podido mostrar el mapa activo.';
   categoryErrorMessage = 'No se ha podido mostrar las categorias de actividad.';
 
-  constructor( private locationService: LocationService,
+  constructor( private activityService: ActivityService,
     	       private notifyService : NotificationService,
 			   private semesterService: SemesterService,
 			   private mapService: MapService,
@@ -127,7 +127,7 @@ export class ActivityStatisticsComponent implements OnInit {
 }
  
   getStatisticData(){
-	this.locationService.getActivityStatisticByLocation(this.selectedSemester, this.selectedLocationType)
+	this.activityService.getActivityStatisticByLocation(this.selectedSemester, this.selectedLocationType)
     .subscribe(locations =>{ 
 			    for (var i = 0; i < locations.length; i++) { 
 					var statistics = JSON.parse(locations[i].data);

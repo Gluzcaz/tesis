@@ -196,6 +196,9 @@ export class ActivitiesComponent implements OnInit {
 		case Actividad.STATUSES[2].id:
 			url='../static/media/icons/estadoRealizado.jpg';
 			break;
+		case Actividad.STATUSES[3].id:
+			url='../static/media/icons/estadoCancelado.jpg';
+			break;
 	}
 	return url;
   }

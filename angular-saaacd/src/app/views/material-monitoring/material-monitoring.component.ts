@@ -15,10 +15,10 @@ import Polygon from 'ol/geom/Polygon';
 import Overlay from 'ol/Overlay';
 
 import { DeviceService } from '../../services/device.service';
-import { LocationService } from '../../services/location.service';
 import { NotificationService } from '../../services/notification.service';
 import { catchError} from 'rxjs/operators';
 import { Reporte } from '../../models/Reporte';
+import { Semestre } from '../../models/Semestre';
 import { Mapa } from '../../models/Mapa';
 import { MapService } from '../../services/map.service';
 import { Actividad } from '../../models/Actividad';
@@ -26,6 +26,7 @@ import { MonitorDialogModel, MonitorDialogComponent } from '../monitor-dialog/mo
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, of } from 'rxjs';
 
+import { SemesterService } from '../../services/semester.service';
 import { ExpiredDevice } from '../../models/ExpiredDevice';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
@@ -49,7 +50,8 @@ export class MaterialMonitoringComponent implements OnInit {
   view: OlView = new OlView();
   vectorSource = new Vector();
   map: OlMap;
-  selectedSemester: number;
+  selectedSemester: number = 2;
+  semesters: Semestre[];
   actionInProgress =false;
   minDate: Date;
   maxDate: Date;
@@ -65,8 +67,8 @@ export class MaterialMonitoringComponent implements OnInit {
 		{	stroke: new Stroke({ width:3, color:'red' }),
 			fill: new Fill({ color:'red' })
 		});
-  superiorCategories: string[] = ['Material expirado','Material por expirar en un mes'];
-  chartColors = ["red","yellow"]
+  superiorCategories: string[] = ['Material expirado','Material por expirar en las próximas 4 semanas'];
+  chartColors = ["red","orange"]
   //Table Elements
   displayedColumns: string[] =['id','nombre','cantidad', 'precio']
   dataSource: MatTableDataSource<any>;
@@ -77,11 +79,12 @@ export class MaterialMonitoringComponent implements OnInit {
   locationErrorMessage = 'No se ha podido mostrar los datos estadísticos.';
   mapErrorMessage = 'No se ha podido identificar el mapa.';
   deviceErrorMessage = 'No se ha podido mostrar los dispositivos expirados.';
+  semesterErrorMessage = 'No se ha podido mostrar los semestres';
  
   constructor( private deviceService: DeviceService,
-           private locationService: LocationService,
 		   private notifyService : NotificationService,
 		   private mapService: MapService,
+		   private semesterService: SemesterService, 
 		   public dialog: MatDialog,
 		   private renderer: Renderer2,
 		   @Inject(DOCUMENT) document
@@ -97,12 +100,13 @@ export class MaterialMonitoringComponent implements OnInit {
 
   ngOnInit(): void {
 	this.getActiveMap();
-	this.getExpiredDevices();
+    this.getSemesters();
   }
   
-  getMaterialMonitoringData(){
-	this.locationService.getMaterialMonitoringByLocation()
+  getDeviceMonitoringData(){
+	this.deviceService.getDeviceMonitoringByLocation(this.selectedSemester)
     .subscribe(locations =>{ 
+				console.log(locations)
 			    for (var i = 0; i < locations.length; i++) { 
 					var feature = new Feature({
 					    type: 'click',
@@ -111,7 +115,8 @@ export class MaterialMonitoringComponent implements OnInit {
 						geometry_name: locations[i].nombre,
 						centroid : JSON.parse(locations[i].centroide),
 					    callMonitorDialog: this.openDialog,
-						dialog: this.dialog
+						dialog: this.dialog,
+						semesterId: this.selectedSemester
 					});
 					
 					var priority= parseInt(locations[i].data, 10);
@@ -143,14 +148,20 @@ export class MaterialMonitoringComponent implements OnInit {
   }
   
   getExpiredDevices(){
-	this.deviceService.getExpiredDevices()
+	this.deviceService.getExpiredDevices(this.selectedSemester)
     .subscribe(devices =>{ 
-			   this.devices = devices;
+			   this.devices = [];
+			   this.deviceTotalPrice = 0;
 			   if(devices.length > 0){
 				   for (var i = 0; i < devices.length; i++) { 
 						this.deviceTotalPrice += devices[i].precio*devices[i].cantidad
+				        this.devices.push(devices[i]);
 				   }
 				   this.setDataSource();
+			   }
+			   else{
+				this.dataSource = new MatTableDataSource();
+	            this.dataSource.data = this.devices; 
 			   }
 	          },
 			   error => {
@@ -161,9 +172,24 @@ export class MaterialMonitoringComponent implements OnInit {
 	
   }
   
+  getSemesters(){
+    this.semesterService.getPredictiveSemesters()
+    .subscribe(semesters =>{ 
+				this.semesters = semesters;
+				this.selectedSemester = this.semesterService.getDefaultSemester( this.semesters );
+				this.getExpiredDevices();
+	           },
+			   error => {
+				  catchError(this.notifyService.handleError<Semestre>('getSemester'));
+				  this.notifyService.showErrorTimeout(this.semesterErrorMessage, this.title);
+				  }
+			   );
+  }  
+  
    setDataSource(){
     // Assign the data to the data source for the table to render
-    this.dataSource = new MatTableDataSource(this.devices);
+    this.dataSource = new MatTableDataSource();
+	this.dataSource.data = this.devices; // this step will refresh the table
 	this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
 	this.dataSource.sortingDataAccessor = (item, property) => {
@@ -199,8 +225,11 @@ export class MaterialMonitoringComponent implements OnInit {
 			   );
   } 
   
-  changeFutureDate(event) {
-    console.log(event.value);
+  changePrediction(event) {
+    console.log(this.selectedSemester);
+	this.clearMap();
+	this.getDeviceMonitoringData();
+	this.getExpiredDevices();	
   }
   
     /*************** MAP VISUALIZATION ******************* ***/
@@ -211,8 +240,8 @@ export class MaterialMonitoringComponent implements OnInit {
    this.loadedImageHeight = (this.img.nativeElement as HTMLImageElement).naturalHeight;
    if(this.mapImageUrl != ''){
 	   this.createMap();
+	   this.getDeviceMonitoringData();
    }
-   this.getMaterialMonitoringData();
   }
   
    createMap(): void{
@@ -251,13 +280,13 @@ export class MaterialMonitoringComponent implements OnInit {
     );
 	if (f && f.get('type') == 'click') {
 		var dialog = f.get('dialog');
-		f.get('callMonitorDialog')(f.values_.id, f.values_.geometry_name, dialog);
+		f.get('callMonitorDialog')(f.values_.id, f.values_.geometry_name, dialog, f.values_.semesterId);
 	}
   });
  }
  
-  openDialog(id, title, dialog): Observable<any>{
-    const dialogData = new MonitorDialogModel(id, title, false);
+  openDialog(id, title, dialog, semesterId): Observable<any>{
+    const dialogData = new MonitorDialogModel(id, title, false, semesterId);
     const dialogRef = dialog.open(MonitorDialogComponent, {
       maxWidth: "70%",
 	  maxHeight: "50%",
@@ -298,6 +327,18 @@ export class MaterialMonitoringComponent implements OnInit {
 	});
 	this.map.addLayer(vectorLayer);
   }
+  
+    
+  clearMap(){
+	 this.map.getInteractions().pop();
+	 this.map.getOverlays().clear();
+	 this.vectorSource.clear();
+  }
+  
+  clearTable() {
+    this.dataSource._updateChangeSubscription() 
+  }
+  
   
   //---------------------------PDF
 	public downloadPDF(): void {

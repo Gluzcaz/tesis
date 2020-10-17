@@ -18,6 +18,7 @@ import { NotificationService } from '../../services/notification.service';
 export class MonitorDialogComponent{
   locationName: string;
   locationId: number;
+  semesterId: number;
   isActivityMonitoring : boolean;
   activities: Actividad[];
   devices: Reporte[];
@@ -40,13 +41,14 @@ export class MonitorDialogComponent{
 	this.locationName = data.locationName;
     this.locationId = data.locationId;
     this.isActivityMonitoring = data.isActivityMonitoring;
+	this.semesterId = data.semesterId;
 	
 	if(this.isActivityMonitoring){
 		this.getActivitiesByLocation(this.locationId);
 		this.displayedColumns=[ 'id', 'prioridad', 'fechaAlta', 'usuario', 'categoria', 'dispositivo', 'estado', 'edit'];
 
 	} else {
-		this.getMaterialByLocation(this.locationId)
+		this.getMaterialByLocation(this.locationId, this.semesterId)
 		this.displayedColumns=[ 'id', 'nombre', 'tiempoVida'];
 	}
 	
@@ -75,8 +77,8 @@ export class MonitorDialogComponent{
 	);
   }
   
-  getMaterialByLocation(locationId){
-	this.deviceService.getLifeTimeDeviceByLocation(locationId)
+  getMaterialByLocation(locationId, semesterId){
+	this.deviceService.getDeviceLifeTimeByLocation(locationId, semesterId)
 	.subscribe(devices =>{ 
 			this.devices = devices;
 		    this.setDataSource(this.devices);
@@ -142,6 +144,12 @@ export class MonitorDialogComponent{
 			activityText = activityText + "\n" + activity.ubicacion.ubicacionSuperior.tipoUbicacion.nombre + " " + activity.ubicacion.ubicacionSuperior.nombre;
     }
 	return activityText;
+  }
+  
+  getLifeTime(lifeTime){
+	if(lifeTime>100)
+		lifeTime = 100
+	return lifeTime;
   }
   
   getDetailActivityUrl(id: number): string{
@@ -214,6 +222,6 @@ export class MonitorDialogComponent{
  */
 export class MonitorDialogModel {
  
-  constructor(public locationId: number, public locationName: string, public isActivityMonitoring: boolean) {
+  constructor(public locationId: number, public locationName: string, public isActivityMonitoring: boolean, public semesterId:number=null) {
   }
 }

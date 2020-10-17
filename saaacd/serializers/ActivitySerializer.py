@@ -34,8 +34,8 @@ class ActivitySerializer(DynamicFieldsModelSerializer):
         if(attrs['fechaResolucion'] is not None):
             if(attrs['fechaAlta'] >= attrs['fechaResolucion']):
                 raise serializers.ValidationError("Resolution Date must occur after start Date.")
-        if(attrs['estado']== Actividad.ESTADO.r and attrs['fechaResolucion'] is None):
-            raise serializers.ValidationError("Thne state Done needs a resolution date to be registered.")
+        if((attrs['estado']== Actividad.REALIZADA or attrs['estado'] == Actividad.CANCELADA) and attrs['fechaResolucion'] is None):
+            raise serializers.ValidationError("The state Done and Interrumpted needs a resolution date to be registered.")
         
         """if(attrs['usuario'] is None):
             raise serializers.ValidationError("User is required.")

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { MessageService } from './Message.service';
 import { Observable, of } from 'rxjs';
 
 @Injectable({
@@ -8,8 +7,7 @@ import { Observable, of } from 'rxjs';
 })
 export class NotificationService {
   timespan : number = 5000;
-  constructor(private toastr: ToastrService,
-			  private messageService: MessageService	) { }
+  constructor(private toastr: ToastrService) { }
   
   showSuccessTimeout(message, title){
     this.toastr.success(message, title ,{
@@ -43,19 +41,10 @@ export class NotificationService {
       // TODO: send the error to remote logging infrastructure
       console.error(error); // log to console instead
 
-      // TODO: better job of transforming error for user consumption
-      this.log(`${operation} failed: ${error.message}`);
-
       // Let the app keep running by returning an empty result.
       return of(result as T);
     };
   }
-  
-  /** Log a ActivityService message with the MessageService */
-  private log(message: string) {
-    this.messageService.add(`NotificationService: ${message}`);
-  }
-
-  }
+}
   
 
