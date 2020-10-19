@@ -64,6 +64,7 @@ class DeviceView(generics.ListAPIView):
             locationId = request.GET['locationId']
             semesterId = request.GET['semesterId']
             semester = Semestre.objects.get(id=semesterId)
+
             if semester.esActivo == 1:
                 sql='''SELECT d.id, CONCAT(tp.nombre, " ", ma.nombre," ", mo.nombre ) AS nombre ,
 					(d.tiempoVida/ ft.prediccionVidaUtil)*100  AS data
@@ -96,7 +97,8 @@ class DeviceView(generics.ListAPIView):
 					AND ft.prediccionVidaUtil IS NOT NULL 
                     AND  d.ubicacion_id = %s
                     ORDER BY d.tiempoVida DESC'''
-                params = [semester.fin, "2021-01-29", locationId]				
+                activeSemester = Semestre.objects.get(esActivo=1)
+                params = [semester.fin, activeSemester.fin, locationId]				
             cursor = connection.cursor()
             cursor.execute(sql, params)
             data = UtilityView.dictFetchAll(cursor)
@@ -106,6 +108,7 @@ class DeviceView(generics.ListAPIView):
         if request.method == 'GET':
             semesterId = request.GET['semesterId']
             semester = Semestre.objects.get(id=semesterId)
+            activeSemester = Semestre.objects.get(esActivo=1)
             if semester.esActivo == 1:
                 sql = '''SELECT a.ubicacion_id AS id, a.prioridad AS data, u.nombre, rg.coordenada, rg.centroide 
 						FROM (
@@ -148,7 +151,7 @@ class DeviceView(generics.ListAPIView):
 						INNER JOIN saaacd_regiongeografica rg ON rg.id = u.regionGeografica_id
 						WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
 						GROUP BY a.ubicacion_id	'''
-                params = [semesterId, semester.fin, "2021-01-29"]
+                params = [semesterId, semester.fin, activeSemester.fin]
             cursor = connection.cursor()
             cursor.execute(sql, params)
             data = UtilityView.dictFetchAll(cursor)

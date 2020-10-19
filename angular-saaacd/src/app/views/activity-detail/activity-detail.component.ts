@@ -196,11 +196,11 @@ export class ActivityDetailComponent implements OnInit {
 	}
 	
 	if(this.isEdition){
-		this.currentDateControl.setValue(new Date(this.activity.fechaAlta));
+		this.currentDateControl.setValue(new Date(this.activity.fechaAlta + " 00:00:00"));
 		if(this.activity.fechaResolucion != null)
-			this.resolutionDateControl.setValue(new Date(this.activity.fechaResolucion));
+			this.resolutionDateControl.setValue(new Date(this.activity.fechaResolucion + " 00:00:00"));
 		if(this.activity.fechaRequerido != null)
-			this.requiredDateControl.setValue(new Date(this.activity.fechaRequerido));
+			this.requiredDateControl.setValue(new Date(this.activity.fechaRequerido + " 00:00:00"));
 		this.commentControl.setValue(this.activity.comentario);
 	}
 	else{
@@ -377,7 +377,11 @@ export class ActivityDetailComponent implements OnInit {
 					this.superiorCategoryControl.setValue(categoriaSuperior);
 					this.assignCategoryList(categoriaSuperior);
 					this.categoryControl.setValue(this.activity.categoria.id);
-         		}	
+         		}
+				if(this.activity.categoria!=null && this.activity.categoria.categoriaSuperior == null){
+					this.superiorCategoryControl.setValue(this.activity.categoria.id);
+					this.categoryControl.disable();
+				}
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Categoria>('getCategory'));
@@ -422,9 +426,13 @@ export class ActivityDetailComponent implements OnInit {
     
   assignCategoryList(selectedSuperiorCategory: number){
 	this.categoryGroups=[];
+	this.categoryControl.enable();
+	this.categoryControl.setValue(null);
 	Object.entries(this.categoryHashTable[selectedSuperiorCategory].children).forEach( element => { 
 		this.categoryGroups.push(element[1]);
 	});
+	if(this.categoryGroups.length <= 0)
+		this.categoryControl.setErrors(null);
   }
    
   getLocations(){
@@ -484,6 +492,7 @@ export class ActivityDetailComponent implements OnInit {
   
   assignDeviceList(selectedLocation: number){
 	this.devicesByLocation = [];
+	this.replicationControl.setValue(0);
     if(selectedLocation > 0){
 		const foundLocation= this.locations.find(location => location.id == selectedLocation);
 		if(foundLocation.ubicacionSuperior == null){
@@ -537,7 +546,7 @@ export class ActivityDetailComponent implements OnInit {
 			  'fechaRequerido': null,
 			  'esPeticion': this.validationGroup.get('petitionControl').value ? 1 : 0,
 			  'actividadSuperior': null,
-			  'categoria': this.validationGroup.get('categoryControl').value,
+			  'categoria': null,
 			  'semestre': this.validationGroup.get('semesterControl').value,
 			  'ubicacion': null,
 			  'usuario': this.validationGroup.get('userControl').value,
@@ -548,6 +557,13 @@ export class ActivityDetailComponent implements OnInit {
 			
 	if(this.isEdition)
 		newActivity['id'] = this.id;
+		
+	console.log(this.validationGroup.get('categoryControl').value);	
+	if(this.validationGroup.get('categoryControl').value==null && this.validationGroup.get('superiorCategoryControl').value != null){
+		newActivity['categoria'] = this.validationGroup.get('superiorCategoryControl').value;
+	} else{
+		newActivity['categoria'] = this.validationGroup.get('categoryControl').value;
+	}
 	
 	if( this.validationGroup.get('commentControl').value!='')
 		newActivity['comentario'] = this.validationGroup.get('commentControl').value;

@@ -42,7 +42,7 @@ export class MaterialStatisticsComponent implements OnInit {
   map: OlMap;
   selectedSemester: number;
   semesters: Semestre[];
-  superiorCategories: string[] = ['Extravío','Falla','Queja'];
+  superiorCategories: string[] = ['Extravío','Falla','Petición'];
   selectedChartType: string = "pie";
   charTypes = [{ key:   "Circular", value: "pie"},
 			  { key:   "Circular 3D", value: "pie3D"},
