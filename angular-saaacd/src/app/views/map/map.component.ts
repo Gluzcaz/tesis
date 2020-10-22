@@ -161,6 +161,7 @@ export class MapComponent implements OnInit {
   } 
   
   changeMapImageUrl(selectedMap){
+	this.isMainMap = false;
 	if(selectedMap){
 		const foundMap = this.maps.find(map => map.id == selectedMap);
 		this.mapImageUrl = '../' + (foundMap.imagen).split("saaacd/" , 2)[1];

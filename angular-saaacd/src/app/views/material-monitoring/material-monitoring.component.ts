@@ -67,7 +67,7 @@ export class MaterialMonitoringComponent implements OnInit {
 		{	stroke: new Stroke({ width:3, color:'red' }),
 			fill: new Fill({ color:'red' })
 		});
-  superiorCategories: string[] = ['Material expirado','Material por expirar en las próximas 4 semanas'];
+  superiorCategories: string[] = ['Material expirado','Material por expirar en el próximo mes'];
   chartColors = ["red","orange"]
   //Table Elements
   displayedColumns: string[] =['id','nombre','cantidad', 'precio']

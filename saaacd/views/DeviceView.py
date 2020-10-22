@@ -34,9 +34,8 @@ class DeviceView(generics.ListAPIView):
         if request.method == 'GET':
             semesterId = request.GET['semesterId']
             semester = Semestre.objects.get(id=semesterId)
-            activeSemester = Semestre.objects.get(esActivo=1)
-            cursor = connection.cursor()
-            cursor.execute('''SELECT d.id, 
+            if semester.esActivo == 1:
+                sql = '''SELECT d.id, 
 				CONCAT(tp.nombre, " ", ma.nombre," ", mo.nombre ) AS nombre, 
 				ft.precio,
 				COUNT(*) as cantidad
@@ -45,17 +44,37 @@ class DeviceView(generics.ListAPIView):
 				INNER JOIN saacd.saaacd_tipodispositivo tp ON tp.id = d.tipoDispositivo_id
 				INNER JOIN saacd.saaacd_modelo mo ON mo.id = ft.modelo_id
 				INNER JOIN saacd.saaacd_marca ma ON ma.id = mo.marca_id
-                INNER JOIN(SELECT ubicacion_id, 
-								SUM(duracionSemestral) AS predictionTime
-								FROM saacd.saaacd_horarioclase hc
-                                INNER JOIN saacd.saaacd_semestre s ON hc.semestre_id = s.id
-                                WHERE s.fin <= %s 
-									AND s.fin > %s
-								GROUP BY ubicacion_id) cs ON  d.ubicacion_id= cs.ubicacion_id
+				WHERE d.fechaBaja IS NULL 
+				AND ft.prediccionVidaUtil IS NOT NULL 
+                AND d.tiempoVida >= ft.prediccionVidaUtil
+                GROUP BY ft.id'''
+                params=[]
+            else:
+                sql='''SELECT d.id, 
+				CONCAT(tp.nombre, " ", ma.nombre," ", mo.nombre ) AS nombre, 
+				ft.precio,
+				COUNT(*) as cantidad
+				FROM saacd.saaacd_dispositivo d 
+				INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
+				INNER JOIN saacd.saaacd_tipodispositivo tp ON tp.id = d.tipoDispositivo_id
+				INNER JOIN saacd.saaacd_modelo mo ON mo.id = ft.modelo_id
+				INNER JOIN saacd.saaacd_marca ma ON ma.id = mo.marca_id
+                INNER JOIN(	SELECT SUM(h.horasClase) predictionTime, h.ubicacion_id
+										FROM ( SELECT semestre_id, diaHabil FROM saacd.saaacd_calendario
+											   WHERE diaHabil BETWEEN CURRENT_DATE AND %s ) c
+									   INNER JOIN (SELECT ie.semestre_id, hc.diaSemana, hc.horasClase, ie.ubicacion_id 
+													FROM saacd.saaacd_horarioclase hc
+													INNER JOIN saacd.saaacd_informacionescolar ie ON ie.id=hc.infoEscolar_id) h
+														ON DAYOFWEEK(c.diaHabil)=h.diaSemana AND h.semestre_id=c.semestre_id
+										GROUP BY h.ubicacion_id
+				) cs ON  d.ubicacion_id= cs.ubicacion_id
 				WHERE d.fechaBaja IS NULL 
 				AND ft.prediccionVidaUtil IS NOT NULL 
                 AND d.tiempoVida + cs.predictionTime >= ft.prediccionVidaUtil
-                GROUP BY ft.id''',[semester.fin, activeSemester.fin])
+                GROUP BY ft.id'''
+                params=[semester.fin]
+            cursor = connection.cursor()
+            cursor.execute(sql,params)
             data = UtilityView.dictFetchAll(cursor)
             return JsonResponse(data, safe=False)  	
 			
@@ -80,25 +99,26 @@ class DeviceView(generics.ListAPIView):
                 params=[locationId]
             else:
                 sql = '''SELECT d.id, CONCAT(tp.nombre, " ", ma.nombre," ", mo.nombre ) AS nombre ,
-					((d.tiempoVida + cs.predictionTime)/ ft.prediccionVidaUtil)*100  AS data
+					((d.tiempoVida + s.nextSemesters)/ ft.prediccionVidaUtil)*100  AS data
 					FROM saacd.saaacd_dispositivo d 
 					INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
                     INNER JOIN saacd.saaacd_tipodispositivo tp ON tp.id = d.tipoDispositivo_id
 					INNER JOIN saacd.saaacd_modelo mo ON mo.id = ft.modelo_id
                     INNER JOIN saacd.saaacd_marca ma ON ma.id = mo.marca_id
-                    INNER JOIN(SELECT ubicacion_id, 
-								SUM(duracionSemestral) AS predictionTime
-								FROM saacd.saaacd_horarioclase hc
-                                INNER JOIN saacd.saaacd_semestre s ON hc.semestre_id = s.id
-                                WHERE s.fin <= %s 
-									AND s.fin > %s
-								GROUP BY ubicacion_id) cs ON  d.ubicacion_id= cs.ubicacion_id
+                    INNER JOIN (SELECT SUM(h.horasClase) nextSemesters, h.ubicacion_id
+										FROM ( SELECT semestre_id, diaHabil FROM saacd.saaacd_calendario
+											   WHERE diaHabil BETWEEN CURRENT_DATE AND %s ) c
+									   INNER JOIN (SELECT ie.semestre_id, hc.diaSemana, hc.horasClase, ie.ubicacion_id 
+													FROM saacd.saaacd_horarioclase hc
+													INNER JOIN saacd.saaacd_informacionescolar ie ON ie.id=hc.infoEscolar_id
+													WHERE ie.ubicacion_id =%s) h
+														ON DAYOFWEEK(c.diaHabil)=h.diaSemana AND h.semestre_id=c.semestre_id
+										GROUP BY h.ubicacion_id) s ON  d.ubicacion_id= s.ubicacion_id
 					WHERE d.fechaBaja IS NULL 
 					AND ft.prediccionVidaUtil IS NOT NULL 
                     AND  d.ubicacion_id = %s
                     ORDER BY d.tiempoVida DESC'''
-                activeSemester = Semestre.objects.get(esActivo=1)
-                params = [semester.fin, activeSemester.fin, locationId]				
+                params = [semester.fin, locationId, locationId]				
             cursor = connection.cursor()
             cursor.execute(sql, params)
             data = UtilityView.dictFetchAll(cursor)
@@ -108,50 +128,67 @@ class DeviceView(generics.ListAPIView):
         if request.method == 'GET':
             semesterId = request.GET['semesterId']
             semester = Semestre.objects.get(id=semesterId)
-            activeSemester = Semestre.objects.get(esActivo=1)
             if semester.esActivo == 1:
                 sql = '''SELECT a.ubicacion_id AS id, a.prioridad AS data, u.nombre, rg.coordenada, rg.centroide 
 						FROM (
 							SELECT d.id, d.ubicacion_id,
-								IF(d.tiempoVida >=  ft.prediccionVidaUtil, 1, 
-								IF(d.tiempoVida + ns.duracionMensual >= ft.prediccionVidaUtil, 2, 0)) as prioridad 
-								FROM saacd.saaacd_dispositivo d 
-								INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
-								INNER JOIN (SELECT ubicacion_id, duracionMensual FROM saacd.saaacd_horarioclase  
-											WHERE semestre_id= %s) ns ON  d.ubicacion_id= ns.ubicacion_id
-								WHERE fechaBaja IS NULL AND 
-								ft.prediccionVidaUtil IS NOT NULL ORDER BY prioridad
+							IF(d.tiempoVida >=  ft.prediccionVidaUtil, 1, 
+							IF(d.tiempoVida + m.nextMonth >= ft.prediccionVidaUtil, 2, 0)) as prioridad 
+							FROM saacd.saaacd_dispositivo d 
+							INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
+							LEFT JOIN (SELECT SUM(h.horasClase) nextMonth, h.ubicacion_id
+										FROM ( SELECT semestre_id, diaHabil FROM saacd.saaacd_calendario
+											   WHERE diaHabil BETWEEN CURRENT_DATE AND DATE_ADD(%s, INTERVAL 1 MONTH) ) c
+									    INNER JOIN (SELECT ie.semestre_id, hc.diaSemana, hc.horasClase, ie.ubicacion_id 
+													FROM saacd.saaacd_horarioclase hc
+													INNER JOIN saacd.saaacd_informacionescolar ie ON ie.id=hc.infoEscolar_id) h
+														ON DAYOFWEEK(c.diaHabil)=h.diaSemana AND h.semestre_id=c.semestre_id
+										GROUP BY h.ubicacion_id) m ON  d.ubicacion_id= m.ubicacion_id
+							WHERE fechaBaja IS NULL 
+							AND ft.prediccionVidaUtil IS NOT NULL 
+							ORDER BY prioridad
 						) a
 						INNER JOIN saaacd_ubicacion u ON u.id = a.ubicacion_id
 						INNER JOIN saaacd_regiongeografica rg ON rg.id = u.regionGeografica_id
 						WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
+						AND a.prioridad > 0
 						GROUP BY a.ubicacion_id'''
-                params = [semester.id]
-            else:
+                params = [semester.fin]
+            else:#PENDIENTE: Cambiar LEFT JOIN (SELECT SUM(h.horasClase) nextMonth,... por INNER JOIN cuando esté poblada la bd
                 sql = '''SELECT a.ubicacion_id AS id, a.prioridad AS data, u.nombre, rg.coordenada, rg.centroide
 						FROM (
-							SELECT d.id, d.ubicacion_id, 
-								IF(d.tiempoVida + cs.predictionTime >=  ft.prediccionVidaUtil, 1, 
-								IF(d.tiempoVida + cs.predictionTime + ns.duracionMensual >= ft.prediccionVidaUtil, 2, 0)) as prioridad 
-								FROM saacd.saaacd_dispositivo d 
-								INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
-								INNER JOIN (SELECT ubicacion_id, duracionMensual FROM saacd.saaacd_horarioclase  
-											WHERE semestre_id= %s) ns ON  d.ubicacion_id= ns.ubicacion_id
-								INNER JOIN(SELECT ubicacion_id, 
-											SUM(duracionSemestral) AS predictionTime
-											FROM saacd.saaacd_horarioclase hc
-											INNER JOIN saacd.saaacd_semestre s ON hc.semestre_id = s.id
-											WHERE s.fin <= %s 
-												AND s.fin > %s
-											GROUP BY ubicacion_id) cs ON  d.ubicacion_id= cs.ubicacion_id
-								WHERE fechaBaja IS NULL AND 
-								ft.prediccionVidaUtil IS NOT NULL ORDER BY prioridad
+							SELECT d.id, d.ubicacion_id,
+							IF(d.tiempoVida + s.nextSemesters >=  ft.prediccionVidaUtil, 1, 
+							IF(d.tiempoVida + s.nextSemesters + m.nextMonth >= ft.prediccionVidaUtil, 2, 0)) as prioridad 
+							FROM saacd.saaacd_dispositivo d 
+							INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
+							INNER JOIN (SELECT SUM(h.horasClase) nextSemesters, h.ubicacion_id
+										FROM ( SELECT semestre_id, diaHabil FROM saacd.saaacd_calendario
+											   WHERE diaHabil BETWEEN CURRENT_DATE AND %s ) c
+									   INNER JOIN (SELECT ie.semestre_id, hc.diaSemana, hc.horasClase, ie.ubicacion_id 
+													FROM saacd.saaacd_horarioclase hc
+													INNER JOIN saacd.saaacd_informacionescolar ie ON ie.id=hc.infoEscolar_id) h
+														ON DAYOFWEEK(c.diaHabil)=h.diaSemana AND h.semestre_id=c.semestre_id
+										GROUP BY h.ubicacion_id) s ON  d.ubicacion_id= s.ubicacion_id
+							LEFT JOIN (SELECT SUM(h.horasClase) nextMonth, h.ubicacion_id
+										FROM ( SELECT semestre_id, diaHabil FROM saacd.saaacd_calendario
+											   WHERE diaHabil BETWEEN DATE_ADD(%s, INTERVAL 1 DAY)
+											   AND DATE_ADD(%s, INTERVAL 1 MONTH) ) c
+									   INNER JOIN (SELECT ie.semestre_id, hc.diaSemana, hc.horasClase, ie.ubicacion_id 
+													FROM saacd.saaacd_horarioclase hc
+													INNER JOIN saacd.saaacd_informacionescolar ie ON ie.id=hc.infoEscolar_id) h
+														ON DAYOFWEEK(c.diaHabil)=h.diaSemana AND h.semestre_id=c.semestre_id
+										GROUP BY h.ubicacion_id) m ON  d.ubicacion_id= m.ubicacion_id
+							WHERE fechaBaja IS NULL 
+							AND ft.prediccionVidaUtil IS NOT NULL 
+							ORDER BY prioridad
 						) a
 						INNER JOIN saaacd_ubicacion u ON u.id = a.ubicacion_id
 						INNER JOIN saaacd_regiongeografica rg ON rg.id = u.regionGeografica_id
 						WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
+						AND a.prioridad > 0
 						GROUP BY a.ubicacion_id	'''
-                params = [semesterId, semester.fin, activeSemester.fin]
+                params = [semester.fin, semester.fin, semester.fin]
             cursor = connection.cursor()
             cursor.execute(sql, params)
             data = UtilityView.dictFetchAll(cursor)

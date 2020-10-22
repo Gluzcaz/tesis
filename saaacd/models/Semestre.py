@@ -6,7 +6,6 @@ class Semestre(Model):
 	esActivo = models.BooleanField(default=0)
 	inicio = models.DateField(null=False)
 	fin = models.DateField(null=False)
-	diasAsueto = models.IntegerField(null=False)
 	
 	def __str__(self):
 		return self.nombre

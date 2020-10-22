@@ -12,6 +12,8 @@ from .models.RegionGeografica import RegionGeografica
 from .models.TipoDispositivo import TipoDispositivo
 from .models.TipoUbicacion import TipoUbicacion
 from .models.HorarioClase import HorarioClase
+from .models.Calendario import Calendario
+from .models.InformacionEscolar import InformacionEscolar
 
 # Header Admin Site
 admin.site.site_header = 'SAAACD' # default: "Django Administration"
@@ -67,7 +69,7 @@ class RegionGeografica(admin.ModelAdmin):
 
 @admin.register(Semestre)
 class Semestre(admin.ModelAdmin):
- list_display = ('id', 'nombre', 'esActivo', 'inicio', 'fin', 'diasAsueto')
+ list_display = ('id', 'nombre', 'esActivo', 'inicio', 'fin')
  
 @admin.register(TipoDispositivo)
 class TipoDispositivo(admin.ModelAdmin):
@@ -82,10 +84,23 @@ class Ubicacion(admin.ModelAdmin):
  list_display = ('id', 'nombre', 'tipoUbicacion', 'ubicacionSuperior', 'regionGeografica')
  fields = ['nombre', 'tipoUbicacion', 'ubicacionSuperior', 'regionGeografica']
  
+@admin.register(Calendario)
+class Calendario(admin.ModelAdmin):
+ list_display = ('id', 'diaHabil')
+ fields = ['diaHabil']
+ 
+@admin.register(InformacionEscolar)
+class InformacionEscolar(admin.ModelAdmin):
+ list_display = ('id', 'ubicacion', 'semestre', 'duracionSemestral', 'duracionMensual','numClasesSemanal')
+ fields = ['ubicacion', 'semestre', 'duracionSemestral', 'duracionMensual','numClasesSemanal']
+ 
 @admin.register(HorarioClase)
 class HorarioClase(admin.ModelAdmin):
- list_display = ('id', 'ubicacion', 'semestre', 'duracionSemestral', 'duracionMensual', 'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo')
- fields = ['ubicacion', 'semestre',  'duracionSemestral', 'duracionMensual', 'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo']
+ list_display = ('id', 'diaSemana', 'horasClase', 'infoEscolar')
+ fields = ['diaSemana', 'horasClase', 'infoEscolar']
+
+
+ 
 
 
 

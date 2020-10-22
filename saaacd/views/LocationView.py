@@ -64,6 +64,7 @@ class LocationView(TemplateView):
         
         try:
     	    with transaction.atomic():
+                print(isActiveMap)
                 if(map.esActivo != isActiveMap):
                     map.esActivo = isActiveMap
                     map.save()
@@ -72,6 +73,7 @@ class LocationView(TemplateView):
                         for mapObject in maps:
                             if(mapObject.id != mapId):
                                 mapObject.esActivo = 0
+                                print("desactive map", mapObject.id)
                                 mapObject.save()
                             						
                 for locationData in data:
