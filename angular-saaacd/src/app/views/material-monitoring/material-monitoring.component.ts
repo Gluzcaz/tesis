@@ -216,7 +216,8 @@ export class MaterialMonitoringComponent implements OnInit {
   getActiveMap(){
     this.mapService.getActiveMap()
     .subscribe(map =>{ 
-				this.mapImageUrl = '../' + (map.imagen).split("saaacd/" , 2)[1];
+				if(map)
+					this.mapImageUrl = '../' + (map.imagen).split("saaacd/" , 2)[1];
 	           },
 			   error => {
 				  catchError(this.notifyService.handleError<Mapa>('getActiveMap'));

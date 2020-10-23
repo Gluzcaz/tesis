@@ -3,7 +3,7 @@ from django.db.models import Model
 from saaacd.models.Mapa import Mapa
 
 class RegionGeografica(Model):
-	coordenada = models.CharField(max_length=2000)
+	coordenada = models.CharField(max_length=5000)
 	centroide = models.CharField(max_length=100)
 	#Foreign Keys
 	mapa=models.ForeignKey(Mapa, on_delete=models.CASCADE)

@@ -10,7 +10,14 @@ from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import viewsets
 
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.conf import settings 
+
+@method_decorator(login_required(login_url='/login/'),name="dispatch")
 class RegionView(TemplateView):
+
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)
     def getRegionsOnMap(request):
         if request.method == 'GET':
             try:

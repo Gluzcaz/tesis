@@ -38,14 +38,14 @@ class Categoria(admin.ModelAdmin):
  
 @admin.register(Dispositivo)
 class Dispositivo(admin.ModelAdmin):
- list_display = ('id', 'inventarioUNAM', 'tipoDispositivo', 'fichaTecnica', 'tiempoVida', 'ubicacion' , 'fechaAlta', 'fechaBaja', 'motivoBaja')
+ list_display = ('id', 'inventarioUNAM','serie', 'resguardo', 'tipoDispositivo', 'fichaTecnica', 'tiempoVida', 'prediccionVidaUtil', 'ubicacion' , 'fechaAlta', 'fechaBaja', 'motivoBaja')
  list_filter = ['ubicacion__nombre']
- fields = ['inventarioUNAM', 'tipoDispositivo','fichaTecnica', 'ubicacion' , 'fechaAlta','fechaBaja', 'motivoBaja']
+ fields = [ 'inventarioUNAM', 'serie', 'resguardo', 'tipoDispositivo', 'fichaTecnica', 'tiempoVida', 'prediccionVidaUtil', 'ubicacion' , 'fechaAlta', 'fechaBaja', 'motivoBaja']
  ordering = ['fechaAlta']
  
 @admin.register(FichaTecnica)
 class FichaTecnica(admin.ModelAdmin):
- list_display = ('id', 'garantiaFabricante', 'detalles', 'precio', 'modelo', 'prediccionVidaUtil')
+ list_display = ('id', 'garantiaFabricante', 'detalles', 'precio', 'modelo')
 
 @admin.register(Mapa)
 class Mapa(admin.ModelAdmin):
@@ -91,7 +91,7 @@ class Calendario(admin.ModelAdmin):
  
 @admin.register(InformacionEscolar)
 class InformacionEscolar(admin.ModelAdmin):
- list_display = ('id', 'ubicacion', 'semestre', 'duracionSemestral', 'duracionMensual','numClasesSemanal')
+ list_display = ('id', 'ubicacion', 'semestre','numClasesSemanal')
  fields = ['ubicacion', 'semestre', 'duracionSemestral', 'duracionMensual','numClasesSemanal']
  
 @admin.register(HorarioClase)

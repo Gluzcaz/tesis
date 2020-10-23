@@ -4,8 +4,6 @@ from saaacd.models.Semestre import Semestre
 from saaacd.models.Ubicacion import Ubicacion
 
 class InformacionEscolar(Model):
-	duracionSemestral = models.IntegerField(null=False, default=0)
-	duracionMensual = models.IntegerField(null=False, default=0) #4Semanas
 	numClasesSemanal = models.IntegerField(null=False, default=0)
 
 #Foreign Keys

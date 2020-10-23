@@ -3,7 +3,6 @@ from django.db.models import Model
 from saaacd.models.Modelo import Modelo
 
 class FichaTecnica(Model):
-	prediccionVidaUtil = models.IntegerField(blank=False, null=True, help_text='Predicción en horas.')	#Horas
 	garantiaFabricante = models.IntegerField(blank=False, null=True, help_text='Guardada en años.')
 	detalles = models.TextField(help_text='Redacta algún Comentario', null=True)
 	precio = models.DecimalField( 

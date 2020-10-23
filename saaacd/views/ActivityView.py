@@ -48,7 +48,8 @@ class ActivityView( TemplateView):
             data = Actividad.objects.all()
             serializer =  ActivitySerializer(data, many=True, fields=('id', 'estado','prioridad', 'comentario', 'fechaResolucion', 'fechaAlta', 'fechaRequerido', 'esPeticion', 'actividadSuperior', 'categoria', 'semestre', 'ubicacion', 'usuario', 'dispositivo'))
             return JsonResponse(serializer.data, safe=False)
-			
+    
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)			
     @api_view(['GET'])
     def getActivitiesByLocation(request):
         try:
@@ -60,7 +61,7 @@ class ActivityView( TemplateView):
         except Exception as e:
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
 	
-    @csrf_exempt	
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)
     @api_view(['GET'])
     def getPetitionActivities(request):
         try:
@@ -168,7 +169,8 @@ class ActivityView( TemplateView):
                 values.append(statistics[key])
             object['data'] = json.dumps(values)
         return data
-		
+
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)
     def getActivityStadisticByInfLocation(request):
         if request.method == 'GET':
             semesterId = request.GET['semesterId']
@@ -190,6 +192,7 @@ class ActivityView( TemplateView):
             data = ActivityView.__addEmptyActivityCategories(data)
             return JsonResponse(data, safe=False)
 
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)
     def getActivityStadisticBySupLocation(request):
         if request.method == 'GET':
             semesterId = request.GET['semesterId']
@@ -212,7 +215,8 @@ class ActivityView( TemplateView):
             data = UtilityView.dictFetchAll(cursor)
             data = ActivityView.__addEmptyActivityCategories(data)
             return JsonResponse(data, safe=False)
-	
+
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)
     def getActivityMonitoringByLocation(request):
         if request.method == 'GET':
             cursor = connection.cursor()

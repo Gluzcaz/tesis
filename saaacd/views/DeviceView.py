@@ -12,8 +12,14 @@ from django.db import connection
 from saaacd.utilities.UtilityView import UtilityView
 import json
 
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+
+@method_decorator(login_required(login_url='/login/'),name="dispatch")
 class DeviceView(generics.ListAPIView):
-    @csrf_exempt		
+
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)		
     @api_view(['GET'])
     def getDevicesByLocation(request):
         try:
@@ -29,7 +35,7 @@ class DeviceView(generics.ListAPIView):
                 return JsonResponse(serializer.data, safe=False)
         except Exception as e:
             return JsonResponse({'error': e}, safe=False, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
-     
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)    
     def getExpiredDevices(request):
         if request.method == 'GET':
             semesterId = request.GET['semesterId']
@@ -45,8 +51,8 @@ class DeviceView(generics.ListAPIView):
 				INNER JOIN saacd.saaacd_modelo mo ON mo.id = ft.modelo_id
 				INNER JOIN saacd.saaacd_marca ma ON ma.id = mo.marca_id
 				WHERE d.fechaBaja IS NULL 
-				AND ft.prediccionVidaUtil IS NOT NULL 
-                AND d.tiempoVida >= ft.prediccionVidaUtil
+				AND d.prediccionVidaUtil IS NOT NULL 
+                AND d.tiempoVida >= d.prediccionVidaUtil
                 GROUP BY ft.id'''
                 params=[]
             else:
@@ -69,15 +75,16 @@ class DeviceView(generics.ListAPIView):
 										GROUP BY h.ubicacion_id
 				) cs ON  d.ubicacion_id= cs.ubicacion_id
 				WHERE d.fechaBaja IS NULL 
-				AND ft.prediccionVidaUtil IS NOT NULL 
-                AND d.tiempoVida + cs.predictionTime >= ft.prediccionVidaUtil
+				AND d.prediccionVidaUtil IS NOT NULL 
+                AND d.tiempoVida + cs.predictionTime >= d.prediccionVidaUtil
                 GROUP BY ft.id'''
                 params=[semester.fin]
             cursor = connection.cursor()
             cursor.execute(sql,params)
             data = UtilityView.dictFetchAll(cursor)
             return JsonResponse(data, safe=False)  	
-			
+
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)			
     def getDeviceLifeTimeByLocation(request):
         if request.method == 'GET':
             locationId = request.GET['locationId']
@@ -86,20 +93,20 @@ class DeviceView(generics.ListAPIView):
 
             if semester.esActivo == 1:
                 sql='''SELECT d.id, CONCAT(tp.nombre, " ", ma.nombre," ", mo.nombre ) AS nombre ,
-					(d.tiempoVida/ ft.prediccionVidaUtil)*100  AS data
+					(d.tiempoVida/ d.prediccionVidaUtil)*100  AS data
 					FROM saacd.saaacd_dispositivo d 
 					INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
                     INNER JOIN saacd.saaacd_tipodispositivo tp ON tp.id = d.tipoDispositivo_id
 					INNER JOIN saacd.saaacd_modelo mo ON mo.id = ft.modelo_id
                     INNER JOIN saacd.saaacd_marca ma ON ma.id = mo.marca_id
                     WHERE d.fechaBaja IS NULL 
-					AND ft.prediccionVidaUtil IS NOT NULL 
+					AND d.prediccionVidaUtil IS NOT NULL 
                     AND  d.ubicacion_id = %s
                     ORDER BY d.tiempoVida DESC'''
                 params=[locationId]
             else:
                 sql = '''SELECT d.id, CONCAT(tp.nombre, " ", ma.nombre," ", mo.nombre ) AS nombre ,
-					((d.tiempoVida + s.nextSemesters)/ ft.prediccionVidaUtil)*100  AS data
+					((d.tiempoVida + s.nextSemesters)/ d.prediccionVidaUtil)*100  AS data
 					FROM saacd.saaacd_dispositivo d 
 					INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
                     INNER JOIN saacd.saaacd_tipodispositivo tp ON tp.id = d.tipoDispositivo_id
@@ -115,7 +122,7 @@ class DeviceView(generics.ListAPIView):
 														ON DAYOFWEEK(c.diaHabil)=h.diaSemana AND h.semestre_id=c.semestre_id
 										GROUP BY h.ubicacion_id) s ON  d.ubicacion_id= s.ubicacion_id
 					WHERE d.fechaBaja IS NULL 
-					AND ft.prediccionVidaUtil IS NOT NULL 
+					AND d.prediccionVidaUtil IS NOT NULL 
                     AND  d.ubicacion_id = %s
                     ORDER BY d.tiempoVida DESC'''
                 params = [semester.fin, locationId, locationId]				
@@ -123,7 +130,8 @@ class DeviceView(generics.ListAPIView):
             cursor.execute(sql, params)
             data = UtilityView.dictFetchAll(cursor)
             return JsonResponse(data, safe=False) 
-	
+
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)			
     def getDeviceMonitoringByLocation(request):
         if request.method == 'GET':
             semesterId = request.GET['semesterId']
@@ -132,10 +140,9 @@ class DeviceView(generics.ListAPIView):
                 sql = '''SELECT a.ubicacion_id AS id, a.prioridad AS data, u.nombre, rg.coordenada, rg.centroide 
 						FROM (
 							SELECT d.id, d.ubicacion_id,
-							IF(d.tiempoVida >=  ft.prediccionVidaUtil, 1, 
-							IF(d.tiempoVida + m.nextMonth >= ft.prediccionVidaUtil, 2, 0)) as prioridad 
+							IF(d.tiempoVida >=  d.prediccionVidaUtil, 1, 
+							IF(d.tiempoVida + m.nextMonth >= d.prediccionVidaUtil, 2, 0)) as prioridad 
 							FROM saacd.saaacd_dispositivo d 
-							INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
 							LEFT JOIN (SELECT SUM(h.horasClase) nextMonth, h.ubicacion_id
 										FROM ( SELECT semestre_id, diaHabil FROM saacd.saaacd_calendario
 											   WHERE diaHabil BETWEEN CURRENT_DATE AND DATE_ADD(%s, INTERVAL 1 MONTH) ) c
@@ -145,7 +152,7 @@ class DeviceView(generics.ListAPIView):
 														ON DAYOFWEEK(c.diaHabil)=h.diaSemana AND h.semestre_id=c.semestre_id
 										GROUP BY h.ubicacion_id) m ON  d.ubicacion_id= m.ubicacion_id
 							WHERE fechaBaja IS NULL 
-							AND ft.prediccionVidaUtil IS NOT NULL 
+							AND d.prediccionVidaUtil IS NOT NULL 
 							ORDER BY prioridad
 						) a
 						INNER JOIN saaacd_ubicacion u ON u.id = a.ubicacion_id
@@ -158,10 +165,9 @@ class DeviceView(generics.ListAPIView):
                 sql = '''SELECT a.ubicacion_id AS id, a.prioridad AS data, u.nombre, rg.coordenada, rg.centroide
 						FROM (
 							SELECT d.id, d.ubicacion_id,
-							IF(d.tiempoVida + s.nextSemesters >=  ft.prediccionVidaUtil, 1, 
-							IF(d.tiempoVida + s.nextSemesters + m.nextMonth >= ft.prediccionVidaUtil, 2, 0)) as prioridad 
+							IF(d.tiempoVida + s.nextSemesters >=  d.prediccionVidaUtil, 1, 
+							IF(d.tiempoVida + s.nextSemesters + m.nextMonth >= d.prediccionVidaUtil, 2, 0)) as prioridad 
 							FROM saacd.saaacd_dispositivo d 
-							INNER JOIN saacd.saaacd_fichatecnica ft ON d.fichaTecnica_id = ft.id
 							INNER JOIN (SELECT SUM(h.horasClase) nextSemesters, h.ubicacion_id
 										FROM ( SELECT semestre_id, diaHabil FROM saacd.saaacd_calendario
 											   WHERE diaHabil BETWEEN CURRENT_DATE AND %s ) c
@@ -180,7 +186,7 @@ class DeviceView(generics.ListAPIView):
 														ON DAYOFWEEK(c.diaHabil)=h.diaSemana AND h.semestre_id=c.semestre_id
 										GROUP BY h.ubicacion_id) m ON  d.ubicacion_id= m.ubicacion_id
 							WHERE fechaBaja IS NULL 
-							AND ft.prediccionVidaUtil IS NOT NULL 
+							AND d.prediccionVidaUtil IS NOT NULL 
 							ORDER BY prioridad
 						) a
 						INNER JOIN saaacd_ubicacion u ON u.id = a.ubicacion_id
@@ -204,7 +210,8 @@ class DeviceView(generics.ListAPIView):
                 stadistics[int(frequencies[0])]=int(frequencies[1])
             object['data'] = json.dumps(stadistics)
         return data			
-			
+
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)		
     def getDeviceStadisticBySupLocation(request):
         if request.method == 'GET':
             semesterId = request.GET['semesterId']
@@ -245,11 +252,13 @@ class DeviceView(generics.ListAPIView):
 			 ) b
 			 INNER JOIN saacd.saaacd_regiongeografica rg ON rg.id = b.regionId
 			 WHERE rg.mapa_id = (SELECT id FROM saacd.saaacd_mapa WHERE esActivo=1)
-			GROUP BY id''', [semesterId, semesterId, semesterId])
+			GROUP BY ubicacion_id''', [semesterId, semesterId, semesterId])
             data = UtilityView.dictFetchAll(cursor)
             data = DeviceView.__addEmptyMaterialCategories(data)
+            print(data)
             return JsonResponse(data, safe=False)
-			
+
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)			
     def getDeviceStadisticByInfLocation(request):
         if request.method == 'GET':
             semesterId = request.GET['semesterId']

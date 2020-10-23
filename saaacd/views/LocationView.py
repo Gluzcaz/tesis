@@ -21,20 +21,29 @@ from rest_framework import status
 from django.db import transaction
 from django.db import IntegrityError
 
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.conf import settings 
+
+@method_decorator(login_required(login_url='/login/'),name="dispatch")
 class LocationView(TemplateView):
+
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)
     def getLocations(request):
         if request.method == 'GET':
             data = Ubicacion.objects.all()
             serializer = LocationSerializer(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'ubicacionSuperior'))
             return JsonResponse(serializer.data, safe=False)
-	
+
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)			
     def getSuperiorLocations(request):
         if request.method == 'GET':
             data = Ubicacion.objects.all()
             data = data.filter(ubicacionSuperior= None)
             serializer = LocationSerializer(data, many=True, fields=('id', 'nombre', 'tipoUbicacion', 'regionGeografica'))
             return JsonResponse(serializer.data, safe=False)
-			
+
+    @login_required(login_url=settings.LOGIN_REDIRECT_URL)			
     def getInferiorLocations(request):
         try:
             location=request.GET['location']

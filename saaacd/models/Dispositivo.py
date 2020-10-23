@@ -6,7 +6,10 @@ from saaacd.models.TipoDispositivo import TipoDispositivo
 
 class Dispositivo(models.Model):
 	tiempoVida = models.IntegerField(blank=False, null=False, default=0, help_text='Tiempo de vida en horas.')	#Horas
-	inventarioUNAM = models.CharField(max_length=50)
+	prediccionVidaUtil = models.IntegerField(blank=False, null=True, help_text='Predicción en horas.')	#Horas
+	inventarioUNAM = models.CharField(max_length=80)
+	serie = models.CharField(max_length=80)
+	resguardo = models.CharField(max_length=80)
 	fechaBaja = models.DateField(null=True)
 	fechaAlta = models.DateField(null=False)
 	motivoBaja = models.TextField(help_text='Redacta algún Comentario', null=True)
